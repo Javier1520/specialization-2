@@ -1,0 +1,27 @@
+type,col2,col3,col4,col5,col6,col7
+Trainee,John,Doe,1990-01-01,123 Main St,,
+Trainee,Jane,Smith,1992-02-02,456 Oak Ave,,
+Trainee,Mike,Johnson,1988-03-15,789 Pine Rd,,
+Trainee,Sarah,Wilson,1995-07-20,321 Elm St,,
+Trainee,David,Brown,1993-11-10,654 Maple Dr,,
+Trainee,Emily,Davis,1991-09-05,987 Cedar Ln,,
+Trainee,James,Miller,1994-04-25,147 Birch Ave,,
+Trainee,Lisa,Anderson,1989-12-30,258 Spruce St,,
+Trainee,Maria,Lopez,1987-06-15,741 Pine St,,
+Trainee,Robert,Lee,1986-08-22,852 Oak Rd,,
+Trainer,Alice,Cooper,CARDIO,,,
+Trainer,Bob,Taylor,STRENGTH,,,
+Trainer,Carol,White,YOGA,,,
+Trainer,Dan,Martinez,HIIT,,,
+Trainer,Eva,Garcia,PILATES,,,
+Training,1,1,Morning Cardio,,2025-10-18,60
+Training,2,2,Strength Training 101,,2025-10-19,45
+Training,3,3,Yoga Flow Session,,2025-10-20,60
+Training,4,4,HIIT Workout,,2025-10-21,45
+Training,5,5,Pilates Core,,2025-10-22,60
+Training,6,1,Advanced Cardio,,2025-10-23,75
+Training,7,2,Power Lifting,,2025-10-24,60
+Training,8,3,Deep Stretch Yoga,,2025-10-25,60
+Training,9,4,Tabata Training,,2025-10-26,45
+Training,10,5,Core Challenge,,2025-10-27,45
+

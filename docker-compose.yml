@@ -1,0 +1,14 @@
+services:
+  mysql:
+    image: mysql:8.1
+    environment:
+      MYSQL_DATABASE: gym_db
+      MYSQL_USER: gym_user
+      MYSQL_PASSWORD: gym_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
