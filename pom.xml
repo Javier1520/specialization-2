@@ -9,7 +9,7 @@
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.10.2</junit.version>
-    <spring.version>6.1.5</spring.version>
+    <spring.version>6.2.10</spring.version>
     <spring-data.version>3.2.4</spring-data.version>
     <hibernate.version>6.4.4.Final</hibernate.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
@@ -149,6 +149,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
+          <parameters>true</parameters>
           <release>${maven.compiler.release}</release>
           <annotationProcessorPaths>
             <path>
