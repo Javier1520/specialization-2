@@ -211,16 +211,13 @@
           <webApp>
             <contextPath>/</contextPath>
             <war>${project.basedir}/src/main/webapp</war>
-            <!-- IMPORTANTE: Configurar para extraer y servir recursos de JARs (WebJars) -->
             <containerIncludeJarPattern>.*/.*\.jar$</containerIncludeJarPattern>
             <webInfIncludeJarPattern>.*/.*\.jar$</webInfIncludeJarPattern>
-            <!-- Habilitar extracción de recursos -->
             <extractWAR>true</extractWAR>
           </webApp>
           <httpConnector>
             <port>8080</port>
           </httpConnector>
-          <!-- Escanear cambios automáticamente -->
           <scan>10</scan>
         </configuration>
       </plugin>

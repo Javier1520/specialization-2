@@ -17,6 +17,12 @@ import java.util.List;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface TraineeMapper {
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
+    @Mapping(target = "trainers", ignore = true)
+    @Mapping(target = "trainings", ignore = true)
     Trainee toEntity(TraineeRegistrationRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -29,6 +35,9 @@ public interface TraineeMapper {
     @Mapping(target = "trainers", expression = "java(trainee.getTrainers() != null ? trainersToInfoResponseList(trainee.getTrainers()) : null)")
     TraineeProfileResponse toProfileResponse(Trainee trainee);
 
+    @Mapping(target = "traineeUsername", source = "username")
+    @Mapping(target = "traineeFirstName", source = "firstName")
+    @Mapping(target = "traineeLastName", source = "lastName")
     TraineeInfoResponse toInfoResponse(Trainee trainee);
 
     default List<TrainerInfoResponse> trainersToInfoResponseList(List<Trainer> trainers) {
