@@ -1,6 +1,9 @@
 package com.epam.gym.config;
 
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+import jakarta.servlet.Filter;
 
 public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -17,6 +20,14 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
     @Override
     protected String[] getServletMappings() {
         return new String[]{"/"};
+    }
+
+    @Override
+    protected Filter[] getServletFilters() {
+        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
+        encodingFilter.setEncoding("UTF-8");
+        encodingFilter.setForceEncoding(true);
+        return new Filter[]{encodingFilter};
     }
 }
 
