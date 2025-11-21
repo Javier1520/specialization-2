@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class AuthenticationService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
@@ -56,7 +57,6 @@ public class AuthenticationService {
         throw new NotFoundException("User not found: " + username);
     }
 
-    @Transactional(readOnly = true)
     public void changePassword(String username, String oldPassword, String newPassword) {
         if (newPassword == null || newPassword.length() < 10) {
             throw new ValidationException("New password must be at least 10 characters");
