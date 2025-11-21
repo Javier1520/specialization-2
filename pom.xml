@@ -3,6 +3,7 @@
   <groupId>com.epam.gym</groupId>
   <artifactId>gym-crm</artifactId>
   <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
   <name>gym-crm</name>
   <properties>
     <maven.compiler.release>21</maven.compiler.release>
@@ -12,7 +13,7 @@
     <spring-data.version>3.2.4</spring-data.version>
     <hibernate.version>6.4.4.Final</hibernate.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
-    <jetty-maven-plugin.version>11.0.24</jetty-maven-plugin.version>
+    <jetty-maven-plugin.version>12.0.23</jetty-maven-plugin.version>
     <jackson.version>2.16.1</jackson.version>
   </properties>
   <dependencies>
@@ -203,24 +204,25 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>${jetty-maven-plugin.version}</version>
-        <configuration>
-          <webApp>
-            <contextPath>/</contextPath>
-            <war>${project.basedir}/src/main/webapp</war>
-            <containerIncludeJarPattern>.*/.*\.jar$</containerIncludeJarPattern>
-            <webInfIncludeJarPattern>.*/.*\.jar$</webInfIncludeJarPattern>
-            <extractWAR>true</extractWAR>
-          </webApp>
-          <httpConnector>
-            <port>8080</port>
-          </httpConnector>
-          <scan>10</scan>
-        </configuration>
-      </plugin>
+        <plugin>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>11.0.24</version> <!-- versión compatible con Jakarta y JDK 21 -->
+            <configuration>
+                <webApp>
+                    <contextPath>/</contextPath>
+
+                    <containerIncludeJarPattern>.*/.*\.jar$</containerIncludeJarPattern>
+                    <webInfIncludeJarPattern>.*/.*\.jar$</webInfIncludeJarPattern>
+                    <extractWAR>true</extractWAR>
+                </webApp>
+                <httpConnector>
+                    <port>8080</port>
+                </httpConnector>
+                <scan>10</scan>
+            </configuration>
+        </plugin>
+
     </plugins>
   </build>
 </project>
