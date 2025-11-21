@@ -1,19 +1,21 @@
 package com.epam.gym.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.epam.gym.dto.request.AddTrainingRequest;
-import com.epam.gym.dto.response.TrainingResponse;
-import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Training;
-import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.TrainingService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/trainings")
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class TrainingController {
     private final TrainingService trainingService;
-    private final TrainingMapper trainingMapper;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
 

@@ -1,6 +1,27 @@
 package com.epam.gym.controller;
 
-import com.epam.gym.dto.request.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.epam.gym.dto.request.ActivateDeactivateRequest;
+import com.epam.gym.dto.request.TraineeRegistrationRequest;
+import com.epam.gym.dto.request.UpdateTraineeRequest;
+import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
 import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TraineeProfileResponse;
 import com.epam.gym.dto.response.TrainerInfoResponse;
@@ -14,18 +35,10 @@ import com.epam.gym.model.Training;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.TraineeService;
-import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/trainees")
