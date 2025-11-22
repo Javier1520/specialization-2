@@ -99,7 +99,7 @@ class TrainerServiceTest {
 
     @Test
     void updateTrainer_notFound_throws() {
-        when(trainerRepository.findByUsername("no")).thenReturn(Optional.empty());
+        when(trainerRepository.findByUsernameWithTrainees("no")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> trainerService.updateTrainer("no", new Trainer()));
     }
 
@@ -120,7 +120,7 @@ class TrainerServiceTest {
                 .specialization(TrainingType.Type.STRENGTH)
                 .build();
 
-        when(trainerRepository.findByUsername("trainer.user")).thenReturn(Optional.of(existing));
+        when(trainerRepository.findByUsernameWithTrainees("trainer.user")).thenReturn(Optional.of(existing));
         when(trainerRepository.save(existing)).thenReturn(existing);
 
         // Act

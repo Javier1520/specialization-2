@@ -157,7 +157,7 @@ class TraineeServiceTest {
     void updateTrainee_happyPath_updatesFields() {
         Trainee existing = Trainee.builder()
                 .username("u").firstName("A").lastName("B").address("old").dateOfBirth(new Date(0)).build();
-        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(existing));
+        when(traineeRepository.findByUsernameWithTrainers("u")).thenReturn(Optional.of(existing));
         when(traineeRepository.save(any())).thenReturn(existing);
 
         Trainee update = Trainee.builder().firstName("X").lastName("Y").address("new").dateOfBirth(new Date(1)).build();
@@ -171,7 +171,7 @@ class TraineeServiceTest {
 
     @Test
     void updateTrainee_notFound_throwsNotFound() {
-        when(traineeRepository.findByUsername("missing")).thenReturn(Optional.empty());
+        when(traineeRepository.findByUsernameWithTrainers("missing")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> traineeService.updateTrainee("missing", new Trainee()));
     }
 
