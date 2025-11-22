@@ -98,6 +98,11 @@ public class TraineeServiceImpl implements TraineeService {
         return traineeRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
     }
 
+    @Transactional(readOnly = true)
+    public Trainee getByUsernameWithTrainers(String username) {
+        return traineeRepository.findByUsernameWithTrainers(username).orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+    }
+
     public void changePassword(String username, String newPassword) {
         Optional.ofNullable(newPassword)
             .filter(password -> password.length() == PASSWORD_LENGTH)

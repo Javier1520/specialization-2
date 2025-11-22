@@ -11,6 +11,7 @@ import java.util.List;
 public interface TraineeService {
     Trainee createTrainee(Trainee payload);
     Trainee getByUsername(String username);
+    Trainee getByUsernameWithTrainers(String username);
     void changePassword(String username, String newPassword);
     Trainee updateTrainee(String username, Trainee update);
     void setActive(String username, boolean active);
