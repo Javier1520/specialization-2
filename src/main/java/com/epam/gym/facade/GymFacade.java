@@ -11,6 +11,7 @@ import com.epam.gym.service.TrainingTypeService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -58,7 +59,7 @@ public class GymFacade {
 	public void setTrainerActive(String username, boolean active) { trainerService.setActive(username, active); }
 
 	// trainer trainings
-	public List<Training> getTrainerTrainings(String username, LocalDate from, LocalDate to, String traineeName) {
+	public List<Training> getTrainerTrainings(String username, Date from, Date to, String traineeName) {
 	    return trainerService.getTrainerTrainings(username, from, to, traineeName);
 	}
 

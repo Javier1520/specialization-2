@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -157,7 +156,7 @@ class TrainerServiceTest {
         when(trainingRepository.findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class), isNull()))
                 .thenReturn(List.of(tr));
 
-        List<Training> out = trainerService.getTrainerTrainings("t1", LocalDate.ofEpochDay(0), LocalDate.now(), null);
+                List<Training> out = trainerService.getTrainerTrainings("t1", new Date(0), new Date(), null);
         assertEquals(1, out.size());
         verify(trainingRepository).findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class), isNull());
     }

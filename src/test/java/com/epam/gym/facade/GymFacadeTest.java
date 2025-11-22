@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -210,8 +211,9 @@ class GymFacadeTest {
 
     @Test
     void getTrainerTrainings_delegatesAndReturns() {
-        LocalDate from = LocalDate.now().minusDays(2);
-        LocalDate to = LocalDate.now();
+        Date from = new Date(System.currentTimeMillis() - (2L * 24 * 60 * 60 * 1000)); // 2 days ago
+        Date to = new Date(); // current date and time
+
         when(trainerService.getTrainerTrainings("r.two", from, to, "t"))
                 .thenReturn(List.of(sampleTraining));
 

@@ -15,8 +15,8 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
     // List trainings by trainee username with optional filters
     @Query("""
         SELECT tr FROM Training tr
-        JOIN tr.trainee te
-        LEFT JOIN tr.trainer trn
+        JOIN FETCH tr.trainee te
+        LEFT JOIN FETCH tr.trainer trn
         WHERE te.username = :username
           AND (:fromDate IS NULL OR tr.date >= :fromDate)
           AND (:toDate IS NULL OR tr.date <= :toDate)
@@ -34,8 +34,8 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
     // List trainings by trainer username with optional filters
     @Query("""
         SELECT tr FROM Training tr
-        JOIN tr.trainer t
-        LEFT JOIN tr.trainee te
+        JOIN FETCH tr.trainer t
+        LEFT JOIN FETCH tr.trainee te
         WHERE t.username = :username
           AND (:fromDate IS NULL OR tr.date >= :fromDate)
           AND (:toDate IS NULL OR tr.date <= :toDate)

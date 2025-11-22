@@ -1,6 +1,6 @@
 package com.epam.gym.controller;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,6 +22,7 @@ import com.epam.gym.dto.request.UpdateTrainerRequest;
 import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.dto.response.TrainingResponse;
+import com.epam.gym.exception.ValidationException;
 import com.epam.gym.mapper.TrainerMapper;
 import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainer;
@@ -76,16 +77,18 @@ public class TrainerController {
     @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingResponse>> getTrainings(
             @PathVariable String username,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
             @RequestParam(required = false) String traineeName) {
+
         log.info("Get trainer trainings request: username={}, periodFrom={}, periodTo={}, traineeName={}",
                 username, periodFrom, periodTo, traineeName);
 
-        LocalDate from = periodFrom != null ? periodFrom : LocalDate.now().minusYears(1);
-        LocalDate to = periodTo != null ? periodTo : LocalDate.now().plusYears(1);
+        if (periodFrom != null && periodTo != null && periodFrom.after(periodTo)) {
+            throw new ValidationException("periodFrom cannot be after periodTo");
+        }
 
-        List<Training> trainings = trainerService.getTrainerTrainings(username, from, to, traineeName);
+        List<Training> trainings = trainerService.getTrainerTrainings(username, periodFrom, periodTo, traineeName);
         List<TrainingResponse> response = trainingMapper.toResponseList(trainings);
         return ResponseEntity.ok(response);
     }

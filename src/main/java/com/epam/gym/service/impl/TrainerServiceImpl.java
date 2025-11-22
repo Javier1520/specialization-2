@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -140,11 +138,8 @@ public class TrainerServiceImpl implements TrainerService {
 
     //Get Trainer Trainings List by trainer username and criteria (from date, to date, trainee name).
     @Transactional(readOnly = true)
-    public List<Training> getTrainerTrainings(String username, LocalDate from, LocalDate to, String traineeName) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        Date dateFrom = Date.from(from.atStartOfDay(zoneId).toInstant());
-        Date dateTo = Date.from(to.atStartOfDay(zoneId).toInstant());
+    public List<Training> getTrainerTrainings(String username, Date from, Date to, String traineeName) {
 
-        return trainingRepository.findByTrainerUsernameAndCriteria(username, dateFrom, dateTo, traineeName);
+        return trainingRepository.findByTrainerUsernameAndCriteria(username, from, to, traineeName);
     }
 }
