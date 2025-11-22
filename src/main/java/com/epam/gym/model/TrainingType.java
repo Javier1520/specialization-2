@@ -51,19 +51,11 @@ public class TrainingType {
      * Use this in business logic for type-safe comparisons.
      */
     public enum Type {
-        CARDIO("Cardio"),
-        STRENGTH("Strength"),
-        YOGA("Yoga"),
-        HIIT("HIIT"),
-        PILATES("Pilates");
+        CARDIO,
+        STRENGTH,
+        YOGA,
+        HIIT,
+        PILATES;
 
-        private final String displayName;
-
-        Type(String displayName) {
-            this.displayName = displayName;
-        }
-        public String getDisplayName() {
-            return displayName;
-        }
     }
 }

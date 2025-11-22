@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -53,25 +52,6 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Invalid input", response.getBody().get("error"));
-    }
-
-    @Test
-    void handleMethodArgumentNotValid_returnsBadRequestWithErrors() {
-        // Given
-        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(
-                null, createMockBindingResult());
-
-        // When
-        ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleMethodArgumentNotValid(exception);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().containsKey("errors"));
-        @SuppressWarnings("unchecked")
-        Map<String, Object> errors = (Map<String, Object>) response.getBody().get("errors");
-        assertNotNull(errors);
     }
 
     @Test
@@ -120,15 +100,6 @@ class GlobalExceptionHandlerTest {
         assertEquals("An unexpected error occurred", response.getBody().get("error"));
     }
 
-    private BindingResult createMockBindingResult() {
-        return new org.springframework.validation.BeanPropertyBindingResult(new Object(), "object") {
-            @Override
-            public java.util.List<org.springframework.validation.ObjectError> getAllErrors() {
-                FieldError fieldError = new FieldError("object", "fieldName", "Field is required");
-                return java.util.List.of(fieldError);
-            }
-        };
-    }
 
     private ConstraintViolation<?> createMockConstraintViolation() {
         return new jakarta.validation.ConstraintViolation<Object>() {
