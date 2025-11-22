@@ -130,7 +130,7 @@ public class TraineeController {
                 .toList();
 
         traineeService.updateTraineeTrainers(username, trainerIds);
-        Trainee trainee = traineeService.getByUsername(username);
+        Trainee trainee = traineeService.getByUsernameWithTrainers(username);
         List<TrainerInfoResponse> response = traineeMapper.trainersToInfoResponseList(trainee.getTrainers());
         return ResponseEntity.ok(response);
     }

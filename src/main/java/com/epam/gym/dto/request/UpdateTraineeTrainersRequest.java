@@ -1,7 +1,6 @@
 package com.epam.gym.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class UpdateTraineeTrainersRequest {
     @NotNull(message = "Trainers list is required")
-    @NotEmpty(message = "Trainers list cannot be empty")
     private List<@NotNull TrainerUsernameRequest> trainers;
 
     @Data
