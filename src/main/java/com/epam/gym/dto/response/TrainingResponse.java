@@ -1,6 +1,8 @@
 package com.epam.gym.dto.response;
 
 import com.epam.gym.model.TrainingType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +16,8 @@ import java.util.Date;
 @AllArgsConstructor
 public class TrainingResponse {
     private String trainingName;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date trainingDate;
     private TrainingType.Type trainingType;
     private Integer trainingDuration;
