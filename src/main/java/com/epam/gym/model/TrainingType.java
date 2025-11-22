@@ -62,5 +62,8 @@ public class TrainingType {
         Type(String displayName) {
             this.displayName = displayName;
         }
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 }

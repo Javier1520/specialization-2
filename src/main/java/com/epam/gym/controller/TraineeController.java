@@ -1,6 +1,5 @@
 package com.epam.gym.controller;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
