@@ -16,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -226,12 +225,15 @@ class TraineeServiceTest {
 
     @Test
     void getTraineeTrainings_convertsDatesAndCallsRepository() {
-
         Training t = Training.builder().id(99L).build();
         when(trainingRepository.findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class), isNull(), isNull()))
                 .thenReturn(List.of(t));
 
-        List<Training> result = traineeService.getTraineeTrainings("u", LocalDate.ofEpochDay(0), LocalDate.now(), null, null);
+        // Convert LocalDate to Date
+        Date fromDate = new Date(0); // epoch start (Jan 1, 1970)
+        Date toDate = new Date(); // current date
+
+        List<Training> result = traineeService.getTraineeTrainings("u", fromDate, toDate, null, null);
         assertEquals(1, result.size());
         verify(trainingRepository).findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class), isNull(), isNull());
     }

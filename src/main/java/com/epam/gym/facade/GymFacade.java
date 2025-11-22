@@ -10,7 +10,6 @@ import com.epam.gym.service.TrainingService;
 import com.epam.gym.service.TrainingTypeService;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class GymFacade {
 	public void deleteTraineeByUsername(String username) { traineeService.deleteByUsername(username); }
 
 	// trainees trainings & trainers
-	public List<Training> getTraineeTrainings(String username, LocalDate from, LocalDate to, String trainerName, TrainingType.Type trainingType) {
+	public List<Training> getTraineeTrainings(String username, Date from, Date to, String trainerName, TrainingType.Type trainingType) {
 	    return traineeService.getTraineeTrainings(username, from, to, trainerName, trainingType);
 	}
 	public List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername) {

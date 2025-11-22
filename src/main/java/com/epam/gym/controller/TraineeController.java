@@ -1,6 +1,7 @@
 package com.epam.gym.controller;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -91,17 +92,15 @@ public class TraineeController {
     @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingResponse>> getTrainings(
             @PathVariable String username,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
             @RequestParam(required = false) String trainerName,
             @RequestParam(required = false) TrainingType.Type trainingType) {
         log.info("Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, trainingType={}",
                 username, periodFrom, periodTo, trainerName, trainingType);
 
-        LocalDate from = periodFrom != null ? periodFrom : LocalDate.now().minusYears(1);
-        LocalDate to = periodTo != null ? periodTo : LocalDate.now().plusYears(1);
 
-        List<Training> trainings = traineeService.getTraineeTrainings(username, from, to, trainerName, trainingType);
+        List<Training> trainings = traineeService.getTraineeTrainings(username, periodFrom, periodTo, trainerName, trainingType);
         List<TrainingResponse> response = trainingMapper.toResponseList(trainings);
         return ResponseEntity.ok(response);
     }

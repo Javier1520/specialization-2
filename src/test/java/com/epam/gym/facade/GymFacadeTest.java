@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -128,8 +127,10 @@ class GymFacadeTest {
 
     @Test
     void getTraineeTrainings_delegatesAndReturnsList() {
-        LocalDate from = LocalDate.now().minusDays(1);
-        LocalDate to = LocalDate.now();
+        // Convert LocalDate to Date
+        Date from = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000)); // 1 day ago
+        Date to = new Date(); // current date
+
         when(traineeService.getTraineeTrainings("t.one", from, to, "r", TrainingType.Type.CARDIO))
                 .thenReturn(List.of(sampleTraining));
 
