@@ -77,7 +77,6 @@ public class TraineeController {
         log.info("Update trainee profile request: username={}", username);
         Trainee existing = traineeService.getByUsername(username);
         traineeMapper.updateEntityFromRequest(request, existing);
-        existing.setIsActive(request.getIsActive());
         Trainee updated = traineeService.updateTrainee(username, existing);
         TraineeProfileResponse response = traineeMapper.toProfileResponse(updated);
         return ResponseEntity.ok(response);

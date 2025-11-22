@@ -117,7 +117,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     public Trainee updateTrainee(String username, Trainee update) {
-        Trainee existing = traineeRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+        Trainee existing = traineeRepository.findByUsernameWithTrainers(username).orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
 
         validateTraineePayload(update);
 
@@ -125,6 +125,7 @@ public class TraineeServiceImpl implements TraineeService {
         existing.setLastName(update.getLastName());
         existing.setAddress(update.getAddress());
         existing.setDateOfBirth(update.getDateOfBirth());
+        existing.setIsActive(update.getIsActive());
         traineeRepository.save(existing);
         log.info("Updated trainee {}", username);
         return existing;
