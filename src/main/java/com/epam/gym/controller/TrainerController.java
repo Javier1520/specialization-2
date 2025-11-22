@@ -68,7 +68,6 @@ public class TrainerController {
         log.info("Update trainer profile request: username={}", username);
         Trainer existing = trainerService.getByUsername(username);
         trainerMapper.updateEntityFromRequest(request, existing);
-        existing.setIsActive(request.getIsActive());
         Trainer updated = trainerService.updateTrainer(username, existing);
         TrainerProfileResponse response = trainerMapper.toProfileResponse(updated);
         return ResponseEntity.ok(response);

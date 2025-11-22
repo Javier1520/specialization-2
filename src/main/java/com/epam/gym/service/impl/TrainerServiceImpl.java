@@ -111,13 +111,14 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     public Trainer updateTrainer(String username, Trainer update) {
-        Trainer existing = trainerRepository.findByUsername(username)
+        Trainer existing = trainerRepository.findByUsernameWithTrainees(username)
             .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
 
         validateTrainerPayload(update);
 
         existing.setFirstName(update.getFirstName());
         existing.setLastName(update.getLastName());
+        existing.setIsActive(update.getIsActive());
 
         trainerRepository.save(existing);
         log.info("Updated trainer {}", username);
