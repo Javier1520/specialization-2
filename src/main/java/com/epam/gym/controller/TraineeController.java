@@ -2,7 +2,6 @@ package com.epam.gym.controller;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -113,7 +112,7 @@ public class TraineeController {
         List<com.epam.gym.model.Trainer> trainers = traineeService.getTrainersNotAssignedToTrainee(username);
         List<TrainerInfoResponse> response = trainers.stream()
                 .map(traineeMapper::trainerToInfoResponse)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(response);
     }
 
@@ -128,7 +127,7 @@ public class TraineeController {
                             .orElseThrow(() -> new NotFoundException("Trainer not found: " + t.getTrainerUsername()));
                     return trainer.getId();
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         traineeService.updateTraineeTrainers(username, trainerIds);
         Trainee trainee = traineeService.getByUsername(username);
