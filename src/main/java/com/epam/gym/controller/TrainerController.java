@@ -56,7 +56,7 @@ public class TrainerController {
     @GetMapping("/{username}")
     public ResponseEntity<TrainerProfileResponse> getProfile(@PathVariable String username) {
         log.info("Get trainer profile request: username={}", username);
-        Trainer trainer = trainerService.getByUsername(username);
+        Trainer trainer = trainerService.getByUsernameWithTrainees(username);
         TrainerProfileResponse response = trainerMapper.toProfileResponse(trainer);
         return ResponseEntity.ok(response);
     }

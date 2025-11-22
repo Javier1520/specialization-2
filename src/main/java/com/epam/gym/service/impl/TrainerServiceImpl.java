@@ -92,6 +92,11 @@ public class TrainerServiceImpl implements TrainerService {
             .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
     }
 
+    @Transactional(readOnly = true)
+    public Trainer getByUsernameWithTrainees(String username) {
+        return trainerRepository.findByUsernameWithTrainees(username).orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
+    }
+
     public void changePassword(String username, String newPassword) {
         Optional.ofNullable(newPassword)
             .filter(pwd -> pwd.length() >= 10)
