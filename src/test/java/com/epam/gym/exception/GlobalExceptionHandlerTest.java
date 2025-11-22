@@ -1,0 +1,202 @@
+package com.epam.gym.exception;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+
+@ExtendWith(MockitoExtension.class)
+class GlobalExceptionHandlerTest {
+
+    @InjectMocks
+    private GlobalExceptionHandler globalExceptionHandler;
+
+    @Test
+    void handleNotFoundException_returnsNotFoundStatus() {
+        // Given
+        NotFoundException exception = new NotFoundException("Resource not found");
+
+        // When
+        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleNotFoundException(exception);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Resource not found", response.getBody().get("error"));
+    }
+
+    @Test
+    void handleValidationException_returnsBadRequestStatus() {
+        // Given
+        ValidationException exception = new ValidationException("Invalid input");
+
+        // When
+        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleValidationException(exception);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Invalid input", response.getBody().get("error"));
+    }
+
+    @Test
+    void handleMethodArgumentNotValid_returnsBadRequestWithErrors() {
+        // Given
+        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(
+                null, createMockBindingResult());
+
+        // When
+        ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleMethodArgumentNotValid(exception);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().containsKey("errors"));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> errors = (Map<String, Object>) response.getBody().get("errors");
+        assertNotNull(errors);
+    }
+
+    @Test
+    void handleConstraintViolation_returnsBadRequestWithErrors() {
+        // Given
+        ConstraintViolationException exception = new ConstraintViolationException(
+                java.util.Set.of(createMockConstraintViolation()));
+
+        // When
+        ResponseEntity<Map<String, Object>> response = globalExceptionHandler.handleConstraintViolation(exception);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().containsKey("errors"));
+    }
+
+    @Test
+    void handleGenericException_returnsInternalServerError() {
+        // Given
+        Exception exception = new RuntimeException("Unexpected error");
+
+        // When
+        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleGenericException(exception);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("An unexpected error occurred", response.getBody().get("error"));
+    }
+
+    @Test
+    void handleGenericException_nullPointerException_returnsInternalServerError() {
+        // Given
+        Exception exception = new NullPointerException("Null pointer");
+
+        // When
+        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleGenericException(exception);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("An unexpected error occurred", response.getBody().get("error"));
+    }
+
+    private BindingResult createMockBindingResult() {
+        return new org.springframework.validation.BeanPropertyBindingResult(new Object(), "object") {
+            @Override
+            public java.util.List<org.springframework.validation.ObjectError> getAllErrors() {
+                FieldError fieldError = new FieldError("object", "fieldName", "Field is required");
+                return java.util.List.of(fieldError);
+            }
+        };
+    }
+
+    private ConstraintViolation<?> createMockConstraintViolation() {
+        return new jakarta.validation.ConstraintViolation<Object>() {
+            @Override
+            public String getMessage() {
+                return "Constraint violation message";
+            }
+
+            @Override
+            public String getMessageTemplate() {
+                return "template";
+            }
+
+            @Override
+            public Object getRootBean() {
+                return null;
+            }
+
+            @Override
+            public Class<Object> getRootBeanClass() {
+                return Object.class;
+            }
+
+            @Override
+            public Object getLeafBean() {
+                return null;
+            }
+
+            @Override
+            public Object[] getExecutableParameters() {
+                return new Object[0];
+            }
+
+            @Override
+            public Object getExecutableReturnValue() {
+                return null;
+            }
+
+            @Override
+            public jakarta.validation.Path getPropertyPath() {
+                return new jakarta.validation.Path() {
+                    @Override
+                    public String toString() {
+                        return "fieldName";
+                    }
+
+                    @Override
+                    public java.util.Iterator<Node> iterator() {
+                        return java.util.List.<Node>of().iterator();
+                    }
+                };
+            }
+
+            @Override
+            public Object getInvalidValue() {
+                return null;
+            }
+
+            @Override
+            public jakarta.validation.metadata.ConstraintDescriptor<?> getConstraintDescriptor() {
+                return null;
+            }
+
+            @Override
+            public <U> U unwrap(Class<U> type) {
+                return null;
+            }
+        };
+    }
+}
+
