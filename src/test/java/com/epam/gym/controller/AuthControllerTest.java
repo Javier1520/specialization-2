@@ -35,10 +35,7 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        changePasswordRequest = new ChangePasswordRequest();
-        changePasswordRequest.setUsername("testuser");
-        changePasswordRequest.setOldPassword("oldPass123");
-        changePasswordRequest.setNewPassword("newPass123");
+        changePasswordRequest = new ChangePasswordRequest("testuser", "oldPass123", "newPass123");
     }
 
     @Test
@@ -79,9 +76,9 @@ class AuthControllerTest {
     void changePassword_success_returnsOk() {
         // Given
         doNothing().when(authenticationService).changePassword(
-                changePasswordRequest.getUsername(),
-                changePasswordRequest.getOldPassword(),
-                changePasswordRequest.getNewPassword()
+                changePasswordRequest.username(),
+                changePasswordRequest.oldPassword(),
+                changePasswordRequest.newPassword()
         );
 
         // When
@@ -91,9 +88,9 @@ class AuthControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(authenticationService).changePassword(
-                eq(changePasswordRequest.getUsername()),
-                eq(changePasswordRequest.getOldPassword()),
-                eq(changePasswordRequest.getNewPassword())
+                eq(changePasswordRequest.username()),
+                eq(changePasswordRequest.oldPassword()),
+                eq(changePasswordRequest.newPassword())
         );
         verifyNoMoreInteractions(authenticationService);
     }
@@ -103,9 +100,9 @@ class AuthControllerTest {
         // Given
         doThrow(new NotFoundException("User not found"))
                 .when(authenticationService).changePassword(
-                        changePasswordRequest.getUsername(),
-                        changePasswordRequest.getOldPassword(),
-                        changePasswordRequest.getNewPassword()
+                        changePasswordRequest.username(),
+                        changePasswordRequest.oldPassword(),
+                        changePasswordRequest.newPassword()
                 );
 
         // When & Then
@@ -115,9 +112,9 @@ class AuthControllerTest {
             assertEquals("User not found", e.getMessage());
         }
         verify(authenticationService).changePassword(
-                eq(changePasswordRequest.getUsername()),
-                eq(changePasswordRequest.getOldPassword()),
-                eq(changePasswordRequest.getNewPassword())
+                eq(changePasswordRequest.username()),
+                eq(changePasswordRequest.oldPassword()),
+                eq(changePasswordRequest.newPassword())
         );
     }
 
@@ -126,9 +123,9 @@ class AuthControllerTest {
         // Given
         doThrow(new ValidationException("Old password is incorrect"))
                 .when(authenticationService).changePassword(
-                        changePasswordRequest.getUsername(),
-                        changePasswordRequest.getOldPassword(),
-                        changePasswordRequest.getNewPassword()
+                        changePasswordRequest.username(),
+                        changePasswordRequest.oldPassword(),
+                        changePasswordRequest.newPassword()
                 );
 
         // When & Then
@@ -138,9 +135,9 @@ class AuthControllerTest {
             assertEquals("Old password is incorrect", e.getMessage());
         }
         verify(authenticationService).changePassword(
-                eq(changePasswordRequest.getUsername()),
-                eq(changePasswordRequest.getOldPassword()),
-                eq(changePasswordRequest.getNewPassword())
+                eq(changePasswordRequest.username()),
+                eq(changePasswordRequest.oldPassword()),
+                eq(changePasswordRequest.newPassword())
         );
     }
 }

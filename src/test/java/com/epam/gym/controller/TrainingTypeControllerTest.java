@@ -50,13 +50,8 @@ class TrainingTypeControllerTest {
 
         trainingTypes = List.of(cardio, strength);
 
-        TrainingTypeResponse cardioResponse = new TrainingTypeResponse();
-        cardioResponse.setTrainingTypeId(1L);
-        cardioResponse.setTrainingType("Cardio");
-
-        TrainingTypeResponse strengthResponse = new TrainingTypeResponse();
-        strengthResponse.setTrainingTypeId(2L);
-        strengthResponse.setTrainingType("Strength");
+        TrainingTypeResponse cardioResponse = new TrainingTypeResponse(1L, "Cardio");
+        TrainingTypeResponse strengthResponse = new TrainingTypeResponse(2L, "Strength");
 
         trainingTypeResponses = List.of(cardioResponse, strengthResponse);
     }

@@ -33,8 +33,8 @@ class TrainingTypeMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(1L, result.getTrainingTypeId());
-        assertEquals("Cardio", result.getTrainingType());
+        assertEquals(1L, result.trainingTypeId());
+        assertEquals("Cardio", result.trainingType());
     }
 
     @Test
@@ -58,10 +58,10 @@ class TrainingTypeMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals(1L, result.get(0).getTrainingTypeId());
-        assertEquals("Cardio", result.get(0).getTrainingType());
-        assertEquals(2L, result.get(1).getTrainingTypeId());
-        assertEquals("Strength", result.get(1).getTrainingType());
+        assertEquals(1L, result.get(0).trainingTypeId());
+        assertEquals("Cardio", result.get(0).trainingType());
+        assertEquals(2L, result.get(1).trainingTypeId());
+        assertEquals("Strength", result.get(1).trainingType());
     }
 
     @Test

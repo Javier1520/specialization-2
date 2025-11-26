@@ -31,16 +31,9 @@ class TrainerMapperTest {
 
     @BeforeEach
     void setUp() {
-        registrationRequest = TrainerRegistrationRequest.builder()
-                .firstName("Trainer")
-                .lastName("One")
-                .specialization(TrainingType.Type.CARDIO)
-                .build();
+        registrationRequest = new TrainerRegistrationRequest("Trainer", "One", TrainingType.Type.CARDIO);
 
-        updateRequest = UpdateTrainerRequest.builder()
-                .firstName("Updated")
-                .lastName("Trainer")
-                .build();
+        updateRequest = new UpdateTrainerRequest("trainer1", "Updated", "Trainer", TrainingType.Type.CARDIO, true);
 
         trainee = Trainee.builder()
                 .id(1L)
@@ -114,13 +107,13 @@ class TrainerMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("trainer1", result.getUsername());
-        assertEquals("Trainer", result.getFirstName());
-        assertEquals("One", result.getLastName());
-        assertEquals(TrainingType.Type.CARDIO, result.getSpecialization());
-        assertEquals(true, result.getIsActive());
-        assertNotNull(result.getTrainees());
-        assertEquals(1, result.getTrainees().size());
+        assertEquals("trainer1", result.username());
+        assertEquals("Trainer", result.firstName());
+        assertEquals("One", result.lastName());
+        assertEquals(TrainingType.Type.CARDIO, result.specialization());
+        assertEquals(true, result.isActive());
+        assertNotNull(result.trainees());
+        assertEquals(1, result.trainees().size());
     }
 
     @Test
@@ -133,7 +126,7 @@ class TrainerMapperTest {
 
         // Then
         assertNotNull(result);
-        assertNull(result.getTrainees());
+        assertNull(result.trainees());
     }
 
     @Test
@@ -143,10 +136,10 @@ class TrainerMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("trainer1", result.getTrainerUsername());
-        assertEquals("Trainer", result.getTrainerFirstName());
-        assertEquals("One", result.getTrainerLastName());
-        assertEquals(TrainingType.Type.CARDIO, result.getTrainerSpecialization());
+        assertEquals("trainer1", result.trainerUsername());
+        assertEquals("Trainer", result.trainerFirstName());
+        assertEquals("One", result.trainerLastName());
+        assertEquals(TrainingType.Type.CARDIO, result.trainerSpecialization());
     }
 
     @Test
@@ -160,9 +153,9 @@ class TrainerMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("trainee1", result.get(0).getTraineeUsername());
-        assertEquals("John", result.get(0).getTraineeFirstName());
-        assertEquals("Doe", result.get(0).getTraineeLastName());
+        assertEquals("trainee1", result.get(0).traineeUsername());
+        assertEquals("John", result.get(0).traineeFirstName());
+        assertEquals("Doe", result.get(0).traineeLastName());
     }
 
     @Test
@@ -181,9 +174,9 @@ class TrainerMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("trainee1", result.getTraineeUsername());
-        assertEquals("John", result.getTraineeFirstName());
-        assertEquals("Doe", result.getTraineeLastName());
+        assertEquals("trainee1", result.traineeUsername());
+        assertEquals("John", result.traineeFirstName());
+        assertEquals("Doe", result.traineeLastName());
     }
 }
 

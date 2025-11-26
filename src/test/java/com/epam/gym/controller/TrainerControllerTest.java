@@ -79,10 +79,8 @@ class TrainerControllerTest {
     @Test
     void register_success_returnsCreated() {
         // Given
-        TrainerRegistrationRequest request = new TrainerRegistrationRequest();
-        request.setFirstName("Trainer");
-        request.setLastName("One");
-        request.setSpecialization(TrainingType.Type.CARDIO);
+        TrainerRegistrationRequest request = new TrainerRegistrationRequest(
+                "Trainer", "One", TrainingType.Type.CARDIO);
 
         Trainer createdTrainer = Trainer.builder()
                 .username("trainer1")
@@ -99,8 +97,8 @@ class TrainerControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("trainer1", response.getBody().getUsername());
-        assertEquals("password123", response.getBody().getPassword());
+        assertEquals("trainer1", response.getBody().username());
+        assertEquals("password123", response.getBody().password());
         verify(trainerMapper).toEntity(request);
         verify(trainerService).createTrainer(any(Trainer.class));
     }
@@ -109,9 +107,8 @@ class TrainerControllerTest {
     void getProfile_success_returnsOk() {
         // Given
         String username = "trainer1";
-        TrainerProfileResponse profileResponse = new TrainerProfileResponse();
-        profileResponse.setFirstName("Trainer");
-        profileResponse.setLastName("One");
+        TrainerProfileResponse profileResponse = new TrainerProfileResponse(
+                username, "Trainer", "One", TrainingType.Type.CARDIO, true, List.of());
 
         when(trainerService.getByUsernameWithTrainees(username)).thenReturn(trainer);
         when(trainerMapper.toProfileResponse(trainer)).thenReturn(profileResponse);
@@ -131,13 +128,11 @@ class TrainerControllerTest {
     void updateProfile_success_returnsOk() {
         // Given
         String username = "trainer1";
-        UpdateTrainerRequest request = new UpdateTrainerRequest();
-        request.setFirstName("Updated");
-        request.setLastName("Trainer");
+        UpdateTrainerRequest request = new UpdateTrainerRequest(
+                username, "Updated", "Trainer", TrainingType.Type.CARDIO, true);
 
-        TrainerProfileResponse profileResponse = new TrainerProfileResponse();
-        profileResponse.setFirstName("Updated");
-        profileResponse.setLastName("Trainer");
+        TrainerProfileResponse profileResponse = new TrainerProfileResponse(
+                username, "Updated", "Trainer", TrainingType.Type.CARDIO, true, List.of());
 
         when(trainerService.getByUsername(username)).thenReturn(trainer);
         doNothing().when(trainerMapper).updateEntityFromRequest(request, trainer);
@@ -165,7 +160,8 @@ class TrainerControllerTest {
         String traineeName = "John Doe";
 
         List<Training> trainings = List.of(training);
-        List<TrainingResponse> trainingResponses = List.of(new TrainingResponse());
+        List<TrainingResponse> trainingResponses = List.of(
+                new TrainingResponse("Morning Run", new Date(), TrainingType.Type.CARDIO, 60, "Trainer One", "John Doe"));
 
         when(trainerService.getTrainerTrainings(username, periodFrom, periodTo, traineeName))
                 .thenReturn(trainings);
@@ -203,8 +199,7 @@ class TrainerControllerTest {
     void activateDeactivate_success_returnsOk() {
         // Given
         String username = "trainer1";
-        ActivateDeactivateRequest request = new ActivateDeactivateRequest();
-        request.setIsActive(false);
+        ActivateDeactivateRequest request = new ActivateDeactivateRequest(false);
 
         doNothing().when(trainerService).setActive(username, false);
 

@@ -65,12 +65,8 @@ class TrainingControllerTest {
                 .specialization(TrainingType.Type.CARDIO)
                 .build();
 
-        request = new AddTrainingRequest();
-        request.setTraineeUsername("trainee1");
-        request.setTrainerUsername("trainer1");
-        request.setTrainingName("Morning Run");
-        request.setTrainingDate(new Date());
-        request.setTrainingDuration(60);
+        Date trainingDate = new Date();
+        request = new AddTrainingRequest("trainee1", "trainer1", "Morning Run", trainingDate, 60);
     }
 
     @Test

@@ -60,12 +60,12 @@ class TrainingMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("Morning Run", result.getTrainingName());
-        assertEquals(training.getDate(), result.getTrainingDate());
-        assertEquals(TrainingType.Type.CARDIO, result.getTrainingType());
-        assertEquals(60, result.getTrainingDuration());
-        assertEquals("Trainer One", result.getTrainerName());
-        assertEquals("John Doe", result.getTraineeName());
+        assertEquals("Morning Run", result.trainingName());
+        assertEquals(training.getDate(), result.trainingDate());
+        assertEquals(TrainingType.Type.CARDIO, result.trainingType());
+        assertEquals(60, result.trainingDuration());
+        assertEquals("Trainer One", result.trainerName());
+        assertEquals("John Doe", result.traineeName());
     }
 
     @Test
@@ -78,8 +78,8 @@ class TrainingMapperTest {
 
         // Then
         assertNotNull(result);
-        assertNull(result.getTrainerName());
-        assertEquals("John Doe", result.getTraineeName());
+        assertNull(result.trainerName());
+        assertEquals("John Doe", result.traineeName());
     }
 
     @Test
@@ -92,8 +92,8 @@ class TrainingMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("Trainer One", result.getTrainerName());
-        assertNull(result.getTraineeName());
+        assertEquals("Trainer One", result.trainerName());
+        assertNull(result.traineeName());
     }
 
     @Test
@@ -117,8 +117,8 @@ class TrainingMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("Morning Run", result.get(0).getTrainingName());
-        assertEquals("Evening Workout", result.get(1).getTrainingName());
+        assertEquals("Morning Run", result.get(0).trainingName());
+        assertEquals("Evening Workout", result.get(1).trainingName());
     }
 
     @Test
