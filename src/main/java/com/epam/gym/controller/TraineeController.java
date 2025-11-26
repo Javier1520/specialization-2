@@ -67,8 +67,7 @@ public class TraineeController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<TraineeProfileResponse> updateProfile(
-            @PathVariable String username,
+    public ResponseEntity<TraineeProfileResponse> updateProfile(@PathVariable String username,
             @Valid @RequestBody UpdateTraineeRequest request) {
         log.info("Update trainee profile request: username={}", username);
         Trainee existing = traineeService.getByUsername(username);
@@ -114,8 +113,7 @@ public class TraineeController {
     }
 
     @PutMapping("/{username}/trainers")
-    public ResponseEntity<List<TrainerInfoResponse>> updateTrainers(
-            @PathVariable String username,
+    public ResponseEntity<List<TrainerInfoResponse>> updateTrainers(@PathVariable String username,
             @Valid @RequestBody UpdateTraineeTrainersRequest request) {
         log.info("Update trainee trainers request: traineeUsername={}", username);
         List<Long> trainerIds = request.trainers().stream()
@@ -133,8 +131,7 @@ public class TraineeController {
     }
 
     @PatchMapping("/{username}/activate")
-    public ResponseEntity<Void> activateDeactivate(
-            @PathVariable String username,
+    public ResponseEntity<Void> activateDeactivate(@PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {
         log.info("Activate/Deactivate trainee request: username={}, isActive={}", username, request.isActive());
         traineeService.setActive(username, request.isActive());

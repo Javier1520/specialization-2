@@ -60,8 +60,7 @@ public class TrainerController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<TrainerProfileResponse> updateProfile(
-            @PathVariable String username,
+    public ResponseEntity<TrainerProfileResponse> updateProfile(@PathVariable String username,
             @Valid @RequestBody UpdateTrainerRequest request) {
         log.info("Update trainer profile request: username={}", username);
         Trainer existing = trainerService.getByUsername(username);
@@ -91,8 +90,7 @@ public class TrainerController {
     }
 
     @PatchMapping("/{username}/activate")
-    public ResponseEntity<Void> activateDeactivate(
-            @PathVariable String username,
+    public ResponseEntity<Void> activateDeactivate(@PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {
         log.info("Activate/Deactivate trainer request: username={}, isActive={}", username, request.isActive());
         trainerService.setActive(username, request.isActive());
