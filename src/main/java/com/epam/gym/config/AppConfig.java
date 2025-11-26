@@ -25,6 +25,8 @@ import java.util.Properties;
 @PropertySource("classpath:application.properties")
 public class AppConfig {
 
+    public static final String COM_EPAM_GYM_MODEL = "com.epam.gym.model";
+    
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
 
@@ -65,7 +67,7 @@ public class AppConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        em.setPackagesToScan("com.epam.gym.model");
+        em.setPackagesToScan(COM_EPAM_GYM_MODEL);
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
