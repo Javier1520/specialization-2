@@ -33,10 +33,12 @@ class TraineeMapperTest {
     @BeforeEach
     void setUp() {
         Date dateOfBirth1 = new Date();
-        registrationRequest = new TraineeRegistrationRequest("John", "Doe", dateOfBirth1, "123 Main St");
+        registrationRequest = new TraineeRegistrationRequest("John", "Doe", dateOfBirth1,
+                "123 Main St");
 
         Date dateOfBirth2 = new Date();
-        updateRequest = new UpdateTraineeRequest("john.doe", "Jane", "Smith", dateOfBirth2, "456 Oak Ave", true);
+        updateRequest = new UpdateTraineeRequest("john.doe", "Jane", "Smith", dateOfBirth2,
+                "456 Oak Ave", true);
 
         trainer = Trainer.builder()
                 .id(1L)

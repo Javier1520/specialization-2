@@ -31,9 +31,11 @@ class TrainerMapperTest {
 
     @BeforeEach
     void setUp() {
-        registrationRequest = new TrainerRegistrationRequest("Trainer", "One", TrainingType.Type.CARDIO);
+        registrationRequest = new TrainerRegistrationRequest("Trainer", "One",
+                TrainingType.Type.CARDIO);
 
-        updateRequest = new UpdateTrainerRequest("trainer1", "Updated", "Trainer", TrainingType.Type.CARDIO, true);
+        updateRequest = new UpdateTrainerRequest("trainer1", "Updated", "Trainer",
+                TrainingType.Type.CARDIO, true);
 
         trainee = Trainee.builder()
                 .id(1L)

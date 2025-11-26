@@ -35,7 +35,8 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        changePasswordRequest = new ChangePasswordRequest("testuser", "oldPass123", "newPass123");
+        changePasswordRequest = new ChangePasswordRequest("testuser", "oldPass123",
+                "newPass123");
     }
 
     @Test

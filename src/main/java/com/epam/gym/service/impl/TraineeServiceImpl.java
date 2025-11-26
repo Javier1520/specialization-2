@@ -93,12 +93,14 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Transactional(readOnly = true)
     public Trainee getByUsername(String username) {
-        return traineeRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+        return traineeRepository.findByUsername(username)
+            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
     }
 
     @Transactional(readOnly = true)
     public Trainee getByUsernameWithTrainers(String username) {
-        return traineeRepository.findByUsernameWithTrainers(username).orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+        return traineeRepository.findByUsernameWithTrainers(username)
+            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
     }
 
     public void changePassword(String username, String newPassword) {
@@ -115,7 +117,8 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     public Trainee updateTrainee(String username, Trainee update) {
-        Trainee existing = traineeRepository.findByUsernameWithTrainers(username).orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+        Trainee existing = traineeRepository.findByUsernameWithTrainers(username)
+            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
 
         validateTraineePayload(update);
 
@@ -159,18 +162,21 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Training> getTraineeTrainings(String username, Date from, Date to, String trainerName, TrainingType.Type trainingType) {
+    public List<Training> getTraineeTrainings(String username, Date from, Date to, String trainerName,
+                                              TrainingType.Type trainingType) {
         return trainingRepository.findByTraineeUsernameAndCriteria(username, from, to, trainerName, trainingType);
     }
 
     @Transactional(readOnly = true)
     public List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername) {
-        Trainee t = traineeRepository.findByUsername(traineeUsername).orElseThrow( () -> new NotFoundException("Trainee not found: " + traineeUsername));
+        Trainee t = traineeRepository.findByUsername(traineeUsername)
+            .orElseThrow( () -> new NotFoundException("Trainee not found: " + traineeUsername));
         return trainerRepository.findNotAssignedToTrainee(t.getId());
     }
 
     public void updateTraineeTrainers(String traineeUsername, List<Long> trainerIds) {
-        Trainee t = traineeRepository.findByUsername(traineeUsername).orElseThrow( () -> new NotFoundException("Trainee not found: " + traineeUsername));
+        Trainee t = traineeRepository.findByUsername(traineeUsername)
+            .orElseThrow( () -> new NotFoundException("Trainee not found: " + traineeUsername));
 
         List<Trainer> trainers = trainerRepository.findAllById(trainerIds);
         if (trainers.size() != trainerIds.size()) {

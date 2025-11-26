@@ -33,7 +33,8 @@ public interface TrainerMapper {
     @Mapping(target = "trainees", ignore = true)
     void updateEntityFromRequest(UpdateTrainerRequest request, @MappingTarget Trainer entity);
 
-    @Mapping(target = "trainees", expression = "java(trainer.getTrainees() != null ? traineesToInfoResponseList(trainer.getTrainees()) : null)")
+    @Mapping(target = "trainees", expression =
+            "java(trainer.getTrainees() != null ? traineesToInfoResponseList(trainer.getTrainees()) : null)")
     TrainerProfileResponse toProfileResponse(Trainer trainer);
 
     @Mapping(target = "trainerUsername", source = "username")

@@ -99,7 +99,8 @@ class TraineeControllerTest {
     void register_success_returnsCreated() {
         // Given
         Date dateOfBirth = new Date();
-        TraineeRegistrationRequest request = new TraineeRegistrationRequest("John", "Doe", dateOfBirth, "123 Main St");
+        TraineeRegistrationRequest request = new TraineeRegistrationRequest("John", "Doe",
+                dateOfBirth, "123 Main St");
 
         Trainee createdTrainee = Trainee.builder()
                 .username("john.doe")
@@ -127,7 +128,8 @@ class TraineeControllerTest {
         // Given
         String username = "john.doe";
         TraineeProfileResponse profileResponse = new TraineeProfileResponse(
-                "john.doe", "John", "Doe", null, null, true, List.of());
+                "john.doe", "John", "Doe", null, null, true,
+                List.of());
 
         when(traineeService.getByUsernameWithTrainers(username)).thenReturn(trainee);
         when(traineeMapper.toProfileResponse(trainee)).thenReturn(profileResponse);
@@ -196,7 +198,8 @@ class TraineeControllerTest {
 
         List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(
-                new TrainingResponse("Training1", new Date(), TrainingType.Type.CARDIO, 60, "Trainer1", "Trainee1"));
+                new TrainingResponse("Training1", new Date(), TrainingType.Type.CARDIO, 60,
+                        "Trainer1", "Trainee1"));
 
         when(traineeService.getTraineeTrainings(username, periodFrom, periodTo, trainerName, trainingType))
                 .thenReturn(trainings);
@@ -244,7 +247,8 @@ class TraineeControllerTest {
         UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(List.of(trainerRequest));
 
         List<TrainerInfoResponse> trainerResponses = List.of(
-                new TrainerInfoResponse("trainer1", "Trainer", "One", TrainingType.Type.CARDIO));
+                new TrainerInfoResponse("trainer1", "Trainer", "One",
+                        TrainingType.Type.CARDIO));
 
         when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.of(trainer));
         doNothing().when(traineeService).updateTraineeTrainers(username, List.of(1L));

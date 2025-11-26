@@ -14,7 +14,8 @@ public class TransactionIdInterceptor implements HandlerInterceptor {
     private static final String TRANSACTION_ID_MDC_KEY = "transactionId";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
         String transactionId = request.getHeader(TRANSACTION_ID_HEADER);
         if (transactionId == null || transactionId.isBlank()) {
             transactionId = TransactionIdGenerator.generate();
@@ -29,7 +30,8 @@ public class TransactionIdInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+                                Exception ex) throws Exception {
         MDC.remove(TRANSACTION_ID_MDC_KEY);
     }
 }

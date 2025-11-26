@@ -150,7 +150,8 @@ class TraineeServiceTest {
     @Test
     void changePassword_userNotFound_throwsNotFound() {
         when(traineeRepository.findByUsername("no")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> traineeService.changePassword("no", "password90"));
+        assertThrows(NotFoundException.class, () -> traineeService.changePassword("no",
+                "password90"));
     }
 
     @Test
@@ -226,7 +227,8 @@ class TraineeServiceTest {
     @Test
     void getTraineeTrainings_convertsDatesAndCallsRepository() {
         Training t = Training.builder().id(99L).build();
-        when(trainingRepository.findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class), isNull(), isNull()))
+        when(trainingRepository.findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),
+                isNull(), isNull()))
                 .thenReturn(List.of(t));
 
         // Convert LocalDate to Date
@@ -235,7 +237,8 @@ class TraineeServiceTest {
 
         List<Training> result = traineeService.getTraineeTrainings("u", fromDate, toDate, null, null);
         assertEquals(1, result.size());
-        verify(trainingRepository).findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class), isNull(), isNull());
+        verify(trainingRepository).findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),
+                isNull(), isNull());
     }
 
     @Test
@@ -252,7 +255,8 @@ class TraineeServiceTest {
     @Test
     void getTrainersNotAssignedToTrainee_notFound_throws() {
         when(traineeRepository.findByUsername("bad")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> traineeService.getTrainersNotAssignedToTrainee("bad"));
+        assertThrows(NotFoundException.class, () -> traineeService.getTrainersNotAssignedToTrainee(
+                "bad"));
     }
 
     @Test
@@ -288,12 +292,14 @@ class TraineeServiceTest {
         // repo returns only one but requested two ids -> mismatch
         when(trainerRepository.findAllById(List.of(2L,3L))).thenReturn(List.of(Trainer.builder().id(2L).build()));
 
-        assertThrows(ValidationException.class, () -> traineeService.updateTraineeTrainers("u", List.of(2L,3L)));
+        assertThrows(ValidationException.class, () -> traineeService.updateTraineeTrainers("u",
+                List.of(2L,3L)));
     }
 
     @Test
     void updateTraineeTrainers_traineeNotFound_throws() {
         when(traineeRepository.findByUsername("no")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> traineeService.updateTraineeTrainers("no", List.of(1L)));
+        assertThrows(NotFoundException.class, () -> traineeService.updateTraineeTrainers("no",
+                List.of(1L)));
     }
 }

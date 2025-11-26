@@ -92,7 +92,8 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Transactional(readOnly = true)
     public Trainer getByUsernameWithTrainees(String username) {
-        return trainerRepository.findByUsernameWithTrainees(username).orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
+        return trainerRepository.findByUsernameWithTrainees(username)
+            .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
     }
 
     public void changePassword(String username, String newPassword) {

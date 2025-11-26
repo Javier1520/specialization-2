@@ -51,7 +51,8 @@ class TrainerServiceTest {
 
     @Test
     void createTrainer_success_generatesUsernameAndSaves() {
-        when(usernamePasswordGenerator.generateUsername(eq("Tr"), eq("Ai"), any())).thenReturn("tr.ai");
+        when(usernamePasswordGenerator.generateUsername(eq("Tr"), eq("Ai"), any()))
+                .thenReturn("tr.ai");
         when(usernamePasswordGenerator.generatePassword()).thenReturn("pw");
         Trainer saved = Trainer.builder().id(5L).username("tr.ai").isActive(true).build();
         when(trainerRepository.save(any())).thenReturn(saved);
@@ -83,7 +84,8 @@ class TrainerServiceTest {
     @Test
     void changePassword_userNotFound_throws() {
         when(trainerRepository.findByUsername("u")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> trainerService.changePassword("u", "strongpass"));
+        assertThrows(NotFoundException.class, () -> trainerService.changePassword("u",
+                "strongpass"));
     }
 
     @Test
@@ -153,11 +155,14 @@ class TrainerServiceTest {
     @Test
     void getTrainerTrainings_callsRepositoryWithConvertedDates() {
         Training tr = Training.builder().id(1L).build();
-        when(trainingRepository.findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class), isNull()))
+        when(trainingRepository.findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class),
+                isNull()))
                 .thenReturn(List.of(tr));
 
-                List<Training> out = trainerService.getTrainerTrainings("t1", new Date(0), new Date(), null);
+                List<Training> out = trainerService.getTrainerTrainings("t1", new Date(0), new Date(),
+                        null);
         assertEquals(1, out.size());
-        verify(trainingRepository).findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class), isNull());
+        verify(trainingRepository).findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class),
+                isNull());
     }
 }

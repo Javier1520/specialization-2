@@ -14,8 +14,12 @@ public interface TrainingMapper {
     @Mapping(target = "trainingDate", source = "date")
     @Mapping(target = "trainingType", source = "specialization")
     @Mapping(target = "trainingDuration", source = "duration")
-    @Mapping(target = "trainerName", expression = "java(training.getTrainer() != null ? training.getTrainer().getFirstName() + \" \" + training.getTrainer().getLastName() : null)")
-    @Mapping(target = "traineeName", expression = "java(training.getTrainee() != null ? training.getTrainee().getFirstName() + \" \" + training.getTrainee().getLastName() : null)")
+    @Mapping(target = "trainerName",
+            expression = "java(training.getTrainer() != null ? training.getTrainer().getFirstName() + " +
+                    "\" \" + training.getTrainer().getLastName() : null)")
+    @Mapping(target = "traineeName",
+            expression = "java(training.getTrainee() != null ? training.getTrainee().getFirstName() + " +
+                    "\" \" + training.getTrainee().getLastName() : null)")
     TrainingResponse toResponse(Training training);
 
     List<TrainingResponse> toResponseList(List<Training> trainings);

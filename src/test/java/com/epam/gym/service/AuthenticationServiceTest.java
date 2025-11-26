@@ -255,7 +255,8 @@ class AuthenticationServiceTest {
         // When & Then
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> authenticationService.changePassword("trainee1", "oldpass123", null)
+                () -> authenticationService.changePassword("trainee1", "oldpass123",
+                        null)
         );
         assertEquals("New password must be at least 10 characters", exception.getMessage());
         verify(traineeRepository, never()).findByUsername(any());
@@ -267,7 +268,8 @@ class AuthenticationServiceTest {
         // When & Then
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> authenticationService.changePassword("trainee1", "oldpass123", "short")
+                () -> authenticationService.changePassword("trainee1", "oldpass123",
+                        "short")
         );
         assertEquals("New password must be at least 10 characters", exception.getMessage());
         verify(traineeRepository, never()).findByUsername(any());
@@ -281,7 +283,8 @@ class AuthenticationServiceTest {
         when(traineeRepository.save(any(Trainee.class))).thenReturn(activeTrainee);
 
         // When & Then
-        assertDoesNotThrow(() -> authenticationService.changePassword("trainee1", "password123", "newpass123"));
+        assertDoesNotThrow(() -> authenticationService.changePassword("trainee1", "password123",
+                "newpass123"));
         verify(traineeRepository).findByUsername("trainee1");
         verify(traineeRepository).save(any(Trainee.class));
         verify(trainerRepository, never()).findByUsername(any());
@@ -294,7 +297,8 @@ class AuthenticationServiceTest {
         when(traineeRepository.save(any(Trainee.class))).thenReturn(activeTrainee);
 
         // When
-        authenticationService.changePassword("trainee1", "password123", "newpassword123");
+        authenticationService.changePassword("trainee1", "password123",
+                "newpassword123");
 
         // Then
         assertEquals("newpassword123", activeTrainee.getPassword());
@@ -311,7 +315,8 @@ class AuthenticationServiceTest {
         // When & Then
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> authenticationService.changePassword("trainee1", "wrongoldpass", "newpassword123")
+                () -> authenticationService.changePassword("trainee1", "wrongoldpass",
+                        "newpassword123")
         );
         assertEquals("Invalid old password", exception.getMessage());
         verify(traineeRepository).findByUsername("trainee1");
@@ -327,7 +332,8 @@ class AuthenticationServiceTest {
         when(trainerRepository.save(any(Trainer.class))).thenReturn(activeTrainer);
 
         // When
-        authenticationService.changePassword("trainer1", "password123", "newpassword123");
+        authenticationService.changePassword("trainer1", "password123",
+                "newpassword123");
 
         // Then
         assertEquals("newpassword123", activeTrainer.getPassword());
@@ -344,7 +350,8 @@ class AuthenticationServiceTest {
         when(trainerRepository.save(any(Trainer.class))).thenReturn(activeTrainer);
 
         // When
-        authenticationService.changePassword("trainer1", "password123", "newpassword123");
+        authenticationService.changePassword("trainer1", "password123",
+                "newpassword123");
 
         // Then
         assertEquals("newpassword123", activeTrainer.getPassword());
@@ -362,7 +369,8 @@ class AuthenticationServiceTest {
         // When & Then
         ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> authenticationService.changePassword("trainer1", "wrongoldpass", "newpassword123")
+                () -> authenticationService.changePassword("trainer1", "wrongoldpass",
+                        "newpassword123")
         );
         assertEquals("Invalid old password", exception.getMessage());
         verify(traineeRepository).findByUsername("trainer1");
@@ -379,7 +387,8 @@ class AuthenticationServiceTest {
         // When & Then
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> authenticationService.changePassword("unknown", "oldpass123", "newpassword123")
+                () -> authenticationService.changePassword("unknown", "oldpass123",
+                        "newpassword123")
         );
         assertEquals("User not found: unknown", exception.getMessage());
         verify(traineeRepository).findByUsername("unknown");
@@ -404,7 +413,8 @@ class AuthenticationServiceTest {
         when(traineeRepository.save(any(Trainee.class))).thenReturn(traineeWithNullActive);
 
         // When
-        authenticationService.changePassword("trainee3", "password123", "newpassword123");
+        authenticationService.changePassword("trainee3", "password123",
+                "newpassword123");
 
         // Then
         assertEquals("newpassword123", traineeWithNullActive.getPassword());

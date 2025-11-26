@@ -32,10 +32,12 @@ public class TrainingController {
                 request.traineeUsername(), request.trainerUsername(), request.trainingName());
 
         com.epam.gym.model.Trainee trainee = traineeRepository.findByUsername(request.traineeUsername())
-                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainee not found: " + request.traineeUsername()));
+                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainee not found: " +
+                        request.traineeUsername()));
 
         com.epam.gym.model.Trainer trainer = trainerRepository.findByUsername(request.trainerUsername())
-                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainer not found: " + request.trainerUsername()));
+                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainer not found: " +
+                        request.trainerUsername()));
 
         Training training = Training.builder()
                 .name(request.trainingName())

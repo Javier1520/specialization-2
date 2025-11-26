@@ -66,7 +66,8 @@ class TrainingControllerTest {
                 .build();
 
         Date trainingDate = new Date();
-        request = new AddTrainingRequest("trainee1", "trainer1", "Morning Run", trainingDate, 60);
+        request = new AddTrainingRequest("trainee1", "trainer1", "Morning Run",
+                trainingDate, 60);
     }
 
     @Test

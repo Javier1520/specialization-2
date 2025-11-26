@@ -26,7 +26,7 @@ import java.util.Properties;
 public class AppConfig {
 
     public static final String COM_EPAM_GYM_MODEL = "com.epam.gym.model";
-    
+
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
 

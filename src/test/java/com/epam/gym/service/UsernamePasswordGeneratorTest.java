@@ -93,7 +93,8 @@ class UsernamePasswordGeneratorTest {
         // Assert
         assertNotNull(password);
         assertEquals(10, password.length());
-        assertTrue(password.matches("[A-Za-z0-9]+"), "Password should only contain alphanumeric characters");
+        assertTrue(password.matches("[A-Za-z0-9]+"),
+                "Password should only contain alphanumeric characters");
     }
 
     @Test

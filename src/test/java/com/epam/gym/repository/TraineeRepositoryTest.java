@@ -56,7 +56,8 @@ class TraineeRepositoryTest {
         when(repo.findByUsername(username)).thenReturn(Optional.of(expected));
 
         // Act
-        Trainee actual = repo.findByUsername(username).orElseThrow( () -> new NotFoundException("Trainee not found: " + username));
+        Trainee actual = repo.findByUsername(username).orElseThrow( () -> new NotFoundException("Trainee not found: "
+                + username));
 
         // Assert
         assertNotNull(actual);

@@ -92,11 +92,13 @@ public class TraineeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
             @RequestParam(required = false) String trainerName,
             @RequestParam(required = false) TrainingType.Type trainingType) {
-        log.info("Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, trainingType={}",
+        log.info("Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, " +
+                        "trainingType={}",
                 username, periodFrom, periodTo, trainerName, trainingType);
 
 
-        List<Training> trainings = traineeService.getTraineeTrainings(username, periodFrom, periodTo, trainerName, trainingType);
+        List<Training> trainings = traineeService.getTraineeTrainings(
+                username, periodFrom, periodTo, trainerName, trainingType);
         List<TrainingResponse> response = trainingMapper.toResponseList(trainings);
         return ResponseEntity.ok(response);
     }

@@ -161,7 +161,8 @@ class TrainerControllerTest {
 
         List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(
-                new TrainingResponse("Morning Run", new Date(), TrainingType.Type.CARDIO, 60, "Trainer One", "John Doe"));
+                new TrainingResponse("Morning Run", new Date(), TrainingType.Type.CARDIO, 60,
+                        "Trainer One", "John Doe"));
 
         when(trainerService.getTrainerTrainings(username, periodFrom, periodTo, traineeName))
                 .thenReturn(trainings);

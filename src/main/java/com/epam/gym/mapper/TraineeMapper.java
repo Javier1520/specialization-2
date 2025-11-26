@@ -32,7 +32,8 @@ public interface TraineeMapper {
     @Mapping(target = "trainings", ignore = true)
     void updateEntityFromRequest(UpdateTraineeRequest request, @MappingTarget Trainee entity);
 
-    @Mapping(target = "trainers", expression = "java(trainee.getTrainers() != null ? trainersToInfoResponseList(trainee.getTrainers()) : null)")
+    @Mapping(target = "trainers", expression =
+            "java(trainee.getTrainers() != null ? trainersToInfoResponseList(trainee.getTrainers()) : null)")
     TraineeProfileResponse toProfileResponse(Trainee trainee);
 
     @Mapping(target = "traineeUsername", source = "username")
