@@ -33,8 +33,8 @@ public class AuthController {
 
     @PutMapping("/change-password")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        log.info("Change password request for username: {}", request.getUsername());
-        authenticationService.changePassword(request.getUsername(), request.getOldPassword(), request.getNewPassword());
+        log.info("Change password request for username: {}", request.username());
+        authenticationService.changePassword(request.username(), request.oldPassword(), request.newPassword());
         return ResponseEntity.ok().build();
     }
 }

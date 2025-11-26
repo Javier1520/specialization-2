@@ -1,18 +1,9 @@
 package com.epam.gym.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ActivateDeactivateRequest {
-    @NotNull(message = "Is Active is required")
-    private Boolean isActive;
-}
+public record ActivateDeactivateRequest(
+    @NotNull(message = "Is Active is required") Boolean isActive
+) {}
 
 

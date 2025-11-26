@@ -1,24 +1,11 @@
 package com.epam.gym.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ChangePasswordRequest {
-    @NotBlank(message = "Username is required")
-    private String username;
-
-    @NotBlank(message = "Old password is required")
-    private String oldPassword;
-
-    @NotBlank(message = "New password is required")
-    private String newPassword;
-}
+public record ChangePasswordRequest(
+    @NotBlank(message = "Username is required") String username,
+    @NotBlank(message = "Old password is required") String oldPassword,
+    @NotBlank(message = "New password is required") String newPassword
+) {}
 
 

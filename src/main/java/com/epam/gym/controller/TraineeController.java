@@ -51,13 +51,10 @@ public class TraineeController {
 
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TraineeRegistrationRequest request) {
-        log.info("Trainee registration request: firstName={}, lastName={}", request.getFirstName(), request.getLastName());
+        log.info("Trainee registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
         Trainee trainee = traineeMapper.toEntity(request);
         Trainee created = traineeService.createTrainee(trainee);
-        RegistrationResponse response = RegistrationResponse.builder()
-                .username(created.getUsername())
-                .password(created.getPassword())
-                .build();
+        RegistrationResponse response = new RegistrationResponse(created.getUsername(), created.getPassword());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -119,10 +116,10 @@ public class TraineeController {
             @PathVariable String username,
             @Valid @RequestBody UpdateTraineeTrainersRequest request) {
         log.info("Update trainee trainers request: traineeUsername={}", username);
-        List<Long> trainerIds = request.getTrainers().stream()
+        List<Long> trainerIds = request.trainers().stream()
                 .map(t -> {
-                    Trainer trainer = trainerRepository.findByUsername(t.getTrainerUsername())
-                            .orElseThrow(() -> new NotFoundException("Trainer not found: " + t.getTrainerUsername()));
+                    Trainer trainer = trainerRepository.findByUsername(t.trainerUsername())
+                            .orElseThrow(() -> new NotFoundException("Trainer not found: " + t.trainerUsername()));
                     return trainer.getId();
                 })
                 .toList();
@@ -137,8 +134,8 @@ public class TraineeController {
     public ResponseEntity<Void> activateDeactivate(
             @PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {
-        log.info("Activate/Deactivate trainee request: username={}, isActive={}", username, request.getIsActive());
-        traineeService.setActive(username, request.getIsActive());
+        log.info("Activate/Deactivate trainee request: username={}, isActive={}", username, request.isActive());
+        traineeService.setActive(username, request.isActive());
         return ResponseEntity.ok().build();
     }
 }

@@ -44,13 +44,10 @@ public class TrainerController {
 
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TrainerRegistrationRequest request) {
-        log.info("Trainer registration request: firstName={}, lastName={}", request.getFirstName(), request.getLastName());
+        log.info("Trainer registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
         Trainer trainer = trainerMapper.toEntity(request);
         Trainer created = trainerService.createTrainer(trainer);
-        RegistrationResponse response = RegistrationResponse.builder()
-                .username(created.getUsername())
-                .password(created.getPassword())
-                .build();
+        RegistrationResponse response = new RegistrationResponse(created.getUsername(), created.getPassword());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -97,8 +94,8 @@ public class TrainerController {
     public ResponseEntity<Void> activateDeactivate(
             @PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {
-        log.info("Activate/Deactivate trainer request: username={}, isActive={}", username, request.getIsActive());
-        trainerService.setActive(username, request.getIsActive());
+        log.info("Activate/Deactivate trainer request: username={}, isActive={}", username, request.isActive());
+        trainerService.setActive(username, request.isActive());
         return ResponseEntity.ok().build();
     }
 }

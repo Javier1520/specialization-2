@@ -29,18 +29,18 @@ public class TrainingController {
     @PostMapping
     public ResponseEntity<Void> addTraining(@Valid @RequestBody AddTrainingRequest request) {
         log.info("Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
-                request.getTraineeUsername(), request.getTrainerUsername(), request.getTrainingName());
+                request.traineeUsername(), request.trainerUsername(), request.trainingName());
 
-        com.epam.gym.model.Trainee trainee = traineeRepository.findByUsername(request.getTraineeUsername())
-                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainee not found: " + request.getTraineeUsername()));
+        com.epam.gym.model.Trainee trainee = traineeRepository.findByUsername(request.traineeUsername())
+                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainee not found: " + request.traineeUsername()));
 
-        com.epam.gym.model.Trainer trainer = trainerRepository.findByUsername(request.getTrainerUsername())
-                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainer not found: " + request.getTrainerUsername()));
+        com.epam.gym.model.Trainer trainer = trainerRepository.findByUsername(request.trainerUsername())
+                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainer not found: " + request.trainerUsername()));
 
         Training training = Training.builder()
-                .name(request.getTrainingName())
-                .date(request.getTrainingDate())
-                .duration(request.getTrainingDuration())
+                .name(request.trainingName())
+                .date(request.trainingDate())
+                .duration(request.trainingDuration())
                 .specialization(trainer.getSpecialization())
                 .trainee(trainee)
                 .trainer(trainer)

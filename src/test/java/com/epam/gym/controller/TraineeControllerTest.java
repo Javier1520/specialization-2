@@ -98,11 +98,8 @@ class TraineeControllerTest {
     @Test
     void register_success_returnsCreated() {
         // Given
-        TraineeRegistrationRequest request = new TraineeRegistrationRequest();
-        request.setFirstName("John");
-        request.setLastName("Doe");
-        request.setDateOfBirth(new Date());
-        request.setAddress("123 Main St");
+        Date dateOfBirth = new Date();
+        TraineeRegistrationRequest request = new TraineeRegistrationRequest("John", "Doe", dateOfBirth, "123 Main St");
 
         Trainee createdTrainee = Trainee.builder()
                 .username("john.doe")
@@ -119,8 +116,8 @@ class TraineeControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("john.doe", response.getBody().getUsername());
-        assertEquals("password123", response.getBody().getPassword());
+        assertEquals("john.doe", response.getBody().username());
+        assertEquals("password123", response.getBody().password());
         verify(traineeMapper).toEntity(request);
         verify(traineeService).createTrainee(any(Trainee.class));
     }
@@ -129,9 +126,8 @@ class TraineeControllerTest {
     void getProfile_success_returnsOk() {
         // Given
         String username = "john.doe";
-        TraineeProfileResponse profileResponse = new TraineeProfileResponse();
-        profileResponse.setFirstName("John");
-        profileResponse.setLastName("Doe");
+        TraineeProfileResponse profileResponse = new TraineeProfileResponse(
+                "john.doe", "John", "Doe", null, null, true, List.of());
 
         when(traineeService.getByUsernameWithTrainers(username)).thenReturn(trainee);
         when(traineeMapper.toProfileResponse(trainee)).thenReturn(profileResponse);
@@ -151,13 +147,11 @@ class TraineeControllerTest {
     void updateProfile_success_returnsOk() {
         // Given
         String username = "john.doe";
-        UpdateTraineeRequest request = new UpdateTraineeRequest();
-        request.setFirstName("Jane");
-        request.setLastName("Smith");
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                username, "Jane", "Smith", null, null, true);
 
-        TraineeProfileResponse profileResponse = new TraineeProfileResponse();
-        profileResponse.setFirstName("Jane");
-        profileResponse.setLastName("Smith");
+        TraineeProfileResponse profileResponse = new TraineeProfileResponse(
+                username, "Jane", "Smith", null, null, true, List.of());
 
         when(traineeService.getByUsername(username)).thenReturn(trainee);
         doNothing().when(traineeMapper).updateEntityFromRequest(request, trainee);
@@ -201,7 +195,8 @@ class TraineeControllerTest {
         TrainingType.Type trainingType = TrainingType.Type.CARDIO;
 
         List<Training> trainings = List.of(training);
-        List<TrainingResponse> trainingResponses = List.of(new TrainingResponse());
+        List<TrainingResponse> trainingResponses = List.of(
+                new TrainingResponse("Training1", new Date(), TrainingType.Type.CARDIO, 60, "Trainer1", "Trainee1"));
 
         when(traineeService.getTraineeTrainings(username, periodFrom, periodTo, trainerName, trainingType))
                 .thenReturn(trainings);
@@ -224,7 +219,8 @@ class TraineeControllerTest {
         // Given
         String username = "john.doe";
         List<Trainer> trainers = List.of(trainer);
-        TrainerInfoResponse trainerInfoResponse = new TrainerInfoResponse();
+        TrainerInfoResponse trainerInfoResponse = new TrainerInfoResponse(
+                "trainer1", "Trainer", "One", TrainingType.Type.CARDIO);
 
         when(traineeService.getTrainersNotAssignedToTrainee(username)).thenReturn(trainers);
         when(traineeMapper.trainerToInfoResponse(trainer)).thenReturn(trainerInfoResponse);
@@ -243,13 +239,12 @@ class TraineeControllerTest {
     void updateTrainers_success_returnsOk() {
         // Given
         String username = "john.doe";
-        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest();
         UpdateTraineeTrainersRequest.TrainerUsernameRequest trainerRequest =
-                new UpdateTraineeTrainersRequest.TrainerUsernameRequest();
-        trainerRequest.setTrainerUsername("trainer1");
-        request.setTrainers(List.of(trainerRequest));
+                new UpdateTraineeTrainersRequest.TrainerUsernameRequest("trainer1");
+        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(List.of(trainerRequest));
 
-        List<TrainerInfoResponse> trainerResponses = List.of(new TrainerInfoResponse());
+        List<TrainerInfoResponse> trainerResponses = List.of(
+                new TrainerInfoResponse("trainer1", "Trainer", "One", TrainingType.Type.CARDIO));
 
         when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.of(trainer));
         doNothing().when(traineeService).updateTraineeTrainers(username, List.of(1L));
@@ -273,11 +268,9 @@ class TraineeControllerTest {
     void updateTrainers_trainerNotFound_throwsException() {
         // Given
         String username = "john.doe";
-        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest();
         UpdateTraineeTrainersRequest.TrainerUsernameRequest trainerRequest =
-                new UpdateTraineeTrainersRequest.TrainerUsernameRequest();
-        trainerRequest.setTrainerUsername("nonexistent");
-        request.setTrainers(List.of(trainerRequest));
+                new UpdateTraineeTrainersRequest.TrainerUsernameRequest("nonexistent");
+        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(List.of(trainerRequest));
 
         when(trainerRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
 
@@ -294,8 +287,7 @@ class TraineeControllerTest {
     void activateDeactivate_success_returnsOk() {
         // Given
         String username = "john.doe";
-        ActivateDeactivateRequest request = new ActivateDeactivateRequest();
-        request.setIsActive(false);
+        ActivateDeactivateRequest request = new ActivateDeactivateRequest(false);
 
         doNothing().when(traineeService).setActive(username, false);
 
