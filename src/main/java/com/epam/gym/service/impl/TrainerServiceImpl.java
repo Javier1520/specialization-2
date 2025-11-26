@@ -86,52 +86,34 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Transactional(readOnly = true)
     public Trainer getByUsername(String username) {
-        return trainerRepository.findByUsername(username)
-            .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
+        return findTrainerByUsername(username);
     }
 
     @Transactional(readOnly = true)
     public Trainer getByUsernameWithTrainees(String username) {
-        return trainerRepository.findByUsernameWithTrainees(username)
-            .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
+        return findTrainerByUsernameWithTrainees(username);
     }
 
     public void changePassword(String username, String newPassword) {
-        Optional.ofNullable(newPassword)
-            .filter(pwd -> pwd.length() >= 10)
-            .orElseThrow(() -> new ValidationException("Password must be at least 10 chars"));
-
-        Trainer t = (trainerRepository.findByUsername(username))
-            .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
-
+        validatePasswordLength(newPassword);
+        Trainer t = findTrainerByUsername(username);
         t.setPassword(newPassword);
         trainerRepository.save(t);
         log.info("Changed password for trainer {}", username);
     }
 
     public Trainer updateTrainer(String username, Trainer update) {
-        Trainer existing = trainerRepository.findByUsernameWithTrainees(username)
-            .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
-
+        Trainer existing = findTrainerByUsernameWithTrainees(username);
         validateTrainerPayload(update);
-
-        existing.setFirstName(update.getFirstName());
-        existing.setLastName(update.getLastName());
-        existing.setIsActive(update.getIsActive());
-
+        updateTrainerFields(existing, update);
         trainerRepository.save(existing);
         log.info("Updated trainer {}", username);
         return existing;
     }
 
     public void setActive(String username, boolean active) {
-        Trainer t = trainerRepository.findByUsername(username)
-            .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
-
-        if (Objects.equals(t.getIsActive(), active)) {
-            throw new ValidationException("Trainer already " + (active ? "active" : "inactive"));
-        }
-
+        Trainer t = findTrainerByUsername(username);
+        validateActiveStatusChange(t.getIsActive(), active);
         t.setIsActive(active);
         trainerRepository.save(t);
         log.info("Set trainer {} active={}", username, active);
@@ -140,7 +122,34 @@ public class TrainerServiceImpl implements TrainerService {
     //Get Trainer Trainings List by trainer username and criteria (from date, to date, trainee name).
     @Transactional(readOnly = true)
     public List<Training> getTrainerTrainings(String username, Date from, Date to, String traineeName) {
-
         return trainingRepository.findByTrainerUsernameAndCriteria(username, from, to, traineeName);
+    }
+
+    private Trainer findTrainerByUsername(String username) {
+        return trainerRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
+    }
+
+    private Trainer findTrainerByUsernameWithTrainees(String username) {
+        return trainerRepository.findByUsernameWithTrainees(username)
+                .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
+    }
+
+    private void validatePasswordLength(String password) {
+        Optional.ofNullable(password)
+                .filter(pwd -> pwd.length() >= 10)
+                .orElseThrow(() -> new ValidationException("Password must be at least 10 chars"));
+    }
+
+    private void updateTrainerFields(Trainer existing, Trainer update) {
+        existing.setFirstName(update.getFirstName());
+        existing.setLastName(update.getLastName());
+        existing.setIsActive(update.getIsActive());
+    }
+
+    private void validateActiveStatusChange(Boolean current, boolean newStatus) {
+        if (Objects.equals(current, newStatus)) {
+            throw new ValidationException("Trainer already " + (newStatus ? "active" : "inactive"));
+        }
     }
 }

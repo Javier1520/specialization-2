@@ -93,70 +93,42 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Transactional(readOnly = true)
     public Trainee getByUsername(String username) {
-        return traineeRepository.findByUsername(username)
-            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+        return findTraineeByUsername(username);
     }
 
     @Transactional(readOnly = true)
     public Trainee getByUsernameWithTrainers(String username) {
-        return traineeRepository.findByUsernameWithTrainers(username)
-            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+        return findTraineeByUsernameWithTrainers(username);
     }
 
     public void changePassword(String username, String newPassword) {
-        Optional.ofNullable(newPassword)
-            .filter(password -> password.length() == PASSWORD_LENGTH)
-            .orElseThrow(() -> new ValidationException("Password must be at least 10 characters"));
-
-        Trainee trainee = traineeRepository.findByUsername(username)
-            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
-
+        validatePasswordLength(newPassword);
+        Trainee trainee = findTraineeByUsername(username);
         trainee.setPassword(newPassword);
         traineeRepository.save(trainee);
         log.info("Changed password for trainee {}", username);
     }
 
     public Trainee updateTrainee(String username, Trainee update) {
-        Trainee existing = traineeRepository.findByUsernameWithTrainers(username)
-            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
-
+        Trainee existing = findTraineeByUsernameWithTrainers(username);
         validateTraineePayload(update);
-
-        existing.setFirstName(update.getFirstName());
-        existing.setLastName(update.getLastName());
-        existing.setAddress(update.getAddress());
-        existing.setDateOfBirth(update.getDateOfBirth());
-        existing.setIsActive(update.getIsActive());
+        updateTraineeFields(existing, update);
         traineeRepository.save(existing);
         log.info("Updated trainee {}", username);
         return existing;
     }
 
     public void setActive(String username, boolean active) {
-        Trainee trainee = traineeRepository.findByUsername(username)
-            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
-
-        Optional.of(trainee.getIsActive())
-            .filter(currentActive -> Objects.equals(currentActive, active))
-            .ifPresent(currentActive -> {
-                throw new ValidationException("Trainee already " + (active ? "active" : "inactive"));
-            });
-
+        Trainee trainee = findTraineeByUsername(username);
+        validateActiveStatusChange(trainee.getIsActive(), active);
         trainee.setIsActive(active);
         traineeRepository.save(trainee);
         log.info("Set trainee {} active={}", username, active);
     }
 
     public void deleteByUsername(String username) {
-        Trainee t = traineeRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
-
-        Optional.ofNullable(t.getTrainers())
-                .ifPresent(trainers -> {
-                    trainers.forEach(trainer -> trainer.getTrainees().remove(t));
-                    trainerRepository.saveAll(trainers);
-                });
-
+        Trainee t = findTraineeByUsername(username);
+        removeTraineeFromTrainers(t);
         traineeRepository.deleteByUsername(username);
         log.info("Deleted trainee {}", username);
     }
@@ -169,32 +141,79 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Transactional(readOnly = true)
     public List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername) {
-        Trainee t = traineeRepository.findByUsername(traineeUsername)
-            .orElseThrow( () -> new NotFoundException("Trainee not found: " + traineeUsername));
+        Trainee t = findTraineeByUsername(traineeUsername);
         return trainerRepository.findNotAssignedToTrainee(t.getId());
     }
 
     public void updateTraineeTrainers(String traineeUsername, List<Long> trainerIds) {
-        Trainee t = traineeRepository.findByUsername(traineeUsername)
-            .orElseThrow( () -> new NotFoundException("Trainee not found: " + traineeUsername));
-
+        Trainee t = findTraineeByUsername(traineeUsername);
         List<Trainer> trainers = trainerRepository.findAllById(trainerIds);
+        validateTrainerIds(trainerIds, trainers);
+        updateTrainerRelationships(t, trainers);
+        traineeRepository.save(t);
+        log.info("Updated trainers for trainee {} to {}", traineeUsername, trainerIds);
+    }
+
+    private Trainee findTraineeByUsername(String username) {
+        return traineeRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+    }
+
+    private Trainee findTraineeByUsernameWithTrainers(String username) {
+        return traineeRepository.findByUsernameWithTrainers(username)
+                .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+    }
+
+    private void validatePasswordLength(String password) {
+        Optional.ofNullable(password)
+                .filter(pwd -> pwd.length() == PASSWORD_LENGTH)
+                .orElseThrow(() -> new ValidationException("Password must be at least 10 characters"));
+    }
+
+    private void updateTraineeFields(Trainee existing, Trainee update) {
+        existing.setFirstName(update.getFirstName());
+        existing.setLastName(update.getLastName());
+        existing.setAddress(update.getAddress());
+        existing.setDateOfBirth(update.getDateOfBirth());
+        existing.setIsActive(update.getIsActive());
+    }
+
+    private void validateActiveStatusChange(Boolean current, boolean newStatus) {
+        Optional.of(current)
+                .filter(currentActive -> Objects.equals(currentActive, newStatus))
+                .ifPresent(currentActive -> {
+                    throw new ValidationException("Trainee already " + (newStatus ? "active" : "inactive"));
+                });
+    }
+
+    private void removeTraineeFromTrainers(Trainee trainee) {
+        Optional.ofNullable(trainee.getTrainers())
+                .ifPresent(trainers -> {
+                    trainers.forEach(trainer -> trainer.getTrainees().remove(trainee));
+                    trainerRepository.saveAll(trainers);
+                });
+    }
+
+    private void validateTrainerIds(List<Long> trainerIds, List<Trainer> trainers) {
         if (trainers.size() != trainerIds.size()) {
             throw new ValidationException("Some trainer ids not found");
         }
+    }
 
-        // Synchronize both sides: remove existing links and set new ones
-        // Remove trainee from old trainers not in new list
-        t.getTrainers().forEach(oldTrainer -> oldTrainer.getTrainees().remove(t));
-        t.getTrainers().clear();
+    private void updateTrainerRelationships(Trainee trainee, List<Trainer> trainers) {
+        clearOldTrainerRelationships(trainee);
+        addNewTrainerRelationships(trainee, trainers);
+    }
 
-        // add new trainers
+    private void clearOldTrainerRelationships(Trainee trainee) {
+        trainee.getTrainers().forEach(oldTrainer -> oldTrainer.getTrainees().remove(trainee));
+        trainee.getTrainers().clear();
+    }
+
+    private void addNewTrainerRelationships(Trainee trainee, List<Trainer> trainers) {
         for (Trainer trainer : trainers) {
-            t.getTrainers().add(trainer);
-            trainer.getTrainees().add(t);
+            trainee.getTrainers().add(trainer);
+            trainer.getTrainees().add(trainee);
         }
-
-        traineeRepository.save(t);
-        log.info("Updated trainers for trainee {} to {}", traineeUsername, trainerIds);
     }
 }

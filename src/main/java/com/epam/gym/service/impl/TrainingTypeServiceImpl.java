@@ -18,6 +18,7 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
     }
 
     public TrainingType getById(Long id) {
-        return repo.findById(id).orElse(null);
+        return repo.findById(id)
+                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Training type not found: " + id));
     }
 }

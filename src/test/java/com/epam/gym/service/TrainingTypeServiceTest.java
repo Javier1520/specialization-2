@@ -1,8 +1,8 @@
 package com.epam.gym.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,9 +36,12 @@ class TrainingTypeServiceTest {
     }
 
     @Test
-    void getById_returnsNullWhenNotFound() {
+    void getById_throwsNotFoundExceptionWhenNotFound() {
         when(repo.findById(5L)).thenReturn(Optional.empty());
-        assertNull(service.getById(5L));
+        assertThrows(
+                com.epam.gym.exception.NotFoundException.class,
+                () -> service.getById(5L)
+        );
         verify(repo).findById(5L);
     }
 
