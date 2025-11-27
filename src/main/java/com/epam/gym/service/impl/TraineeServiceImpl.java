@@ -1,11 +1,11 @@
 package com.epam.gym.service.impl;
 
+import com.epam.gym.dto.request.TrainingFilterRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
-import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
@@ -133,9 +133,14 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Training> getTraineeTrainings(String username, Date from, Date to, String trainerName,
-                                              TrainingType.Type trainingType) {
-        return trainingRepository.findByTraineeUsernameAndCriteria(username, from, to, trainerName, trainingType);
+    public List<Training> getTraineeTrainings(String username, TrainingFilterRequest filter) {
+        return trainingRepository.findByTraineeUsernameAndCriteria(
+                username,
+                filter.periodFrom(),
+                filter.periodTo(),
+                filter.trainerName(),
+                filter.trainingType()
+        );
     }
 
     @Transactional(readOnly = true)

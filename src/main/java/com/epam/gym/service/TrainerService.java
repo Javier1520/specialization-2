@@ -1,9 +1,9 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
 
-import java.util.Date;
 import java.util.List;
 
 public interface TrainerService {
@@ -13,6 +13,6 @@ public interface TrainerService {
     void changePassword(String username, String newPassword);
     Trainer updateTrainer(String username, Trainer update);
     void setActive(String username, boolean active);
-    List<Training> getTrainerTrainings(String username, Date from, Date to, String traineeName);
+    List<Training> getTrainerTrainings(String username, TrainerTrainingFilterRequest filter);
 }
 

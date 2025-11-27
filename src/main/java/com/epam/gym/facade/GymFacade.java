@@ -1,5 +1,7 @@
 package com.epam.gym.facade;
 
+import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
+import com.epam.gym.dto.request.TrainingFilterRequest;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
@@ -40,8 +42,8 @@ public class GymFacade {
 	public void deleteTraineeByUsername(String username) { traineeService.deleteByUsername(username); }
 
 	// trainees trainings & trainers
-	public List<Training> getTraineeTrainings(String username, Date from, Date to, String trainerName, TrainingType.Type trainingType) {
-	    return traineeService.getTraineeTrainings(username, from, to, trainerName, trainingType);
+	public List<Training> getTraineeTrainings(String username, TrainingFilterRequest filter) {
+	    return traineeService.getTraineeTrainings(username, filter);
 	}
 	public List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername) {
 	    return traineeService.getTrainersNotAssignedToTrainee(traineeUsername);
@@ -59,7 +61,7 @@ public class GymFacade {
 
 	// trainer trainings
 	public List<Training> getTrainerTrainings(String username, Date from, Date to, String traineeName) {
-	    return trainerService.getTrainerTrainings(username, from, to, traineeName);
+	    return trainerService.getTrainerTrainings(username, new TrainerTrainingFilterRequest(from, to, traineeName));
 	}
 
 	// --- Training operations ---

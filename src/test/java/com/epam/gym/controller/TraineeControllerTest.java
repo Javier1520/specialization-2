@@ -200,24 +200,27 @@ class TraineeControllerTest {
         String trainerName = "Trainer One";
         TrainingType.Type trainingType = TrainingType.Type.CARDIO;
 
+        com.epam.gym.dto.request.TrainingFilterRequest filter =
+                new com.epam.gym.dto.request.TrainingFilterRequest(periodFrom, periodTo, trainerName, trainingType);
+
         List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(
                 new TrainingResponse("Training1", new Date(), TrainingType.Type.CARDIO, 60,
                         "Trainer1", "Trainee1"));
 
-        when(traineeService.getTraineeTrainings(username, periodFrom, periodTo, trainerName, trainingType))
+        when(traineeService.getTraineeTrainings(username, filter))
                 .thenReturn(trainings);
         when(trainingMapper.toResponseList(trainings)).thenReturn(trainingResponses);
 
         // When
         ResponseEntity<List<TrainingResponse>> response = traineeController.getTrainings(
-                username, periodFrom, periodTo, trainerName, trainingType);
+                username, filter);
 
         // Then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        verify(traineeService).getTraineeTrainings(username, periodFrom, periodTo, trainerName, trainingType);
+        verify(traineeService).getTraineeTrainings(username, filter);
         verify(trainingMapper).toResponseList(trainings);
     }
 

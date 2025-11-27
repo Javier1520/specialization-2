@@ -1,24 +1,23 @@
 package com.epam.gym.controller;
 
-import java.util.Date;
 import java.util.List;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.gym.dto.request.ActivateDeactivateRequest;
 import com.epam.gym.dto.request.TraineeRegistrationRequest;
+import com.epam.gym.dto.request.TrainingFilterRequest;
 import com.epam.gym.dto.request.UpdateTraineeRequest;
 import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
 import com.epam.gym.dto.response.RegistrationResponse;
@@ -31,10 +30,10 @@ import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
-import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.TraineeService;
 import com.epam.gym.util.LogUtils;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,17 +86,16 @@ public class TraineeController {
     @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingResponse>> getTrainings(
             @PathVariable String username,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
-            @RequestParam(required = false) String trainerName,
-            @RequestParam(required = false) TrainingType.Type trainingType) {
-        logUtils.info(log, "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, " +
-                        "trainerName={}, " + "trainingType={}",
-                username, periodFrom, periodTo, trainerName, trainingType);
+            @ModelAttribute TrainingFilterRequest filter
+    ) {
+        logUtils.info(log,
+                "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, " +
+                        "trainingType={}", username, filter.periodFrom(), filter.periodTo(), filter.trainerName(),
+                        filter.trainingType());
 
+        List<Training> trainings =
+                traineeService.getTraineeTrainings(username, filter);
 
-        List<Training> trainings = traineeService.getTraineeTrainings(
-                username, periodFrom, periodTo, trainerName, trainingType);
         return ResponseEntity.ok(trainingMapper.toResponseList(trainings));
     }
 

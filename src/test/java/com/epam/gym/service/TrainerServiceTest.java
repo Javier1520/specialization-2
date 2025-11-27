@@ -161,8 +161,9 @@ class TrainerServiceTest {
                 isNull()))
                 .thenReturn(List.of(tr));
 
-                List<Training> out = trainerService.getTrainerTrainings("t1", new Date(0), new Date(),
-                        null);
+        com.epam.gym.dto.request.TrainerTrainingFilterRequest filter =
+                new com.epam.gym.dto.request.TrainerTrainingFilterRequest(new Date(0), new Date(), null);
+        List<Training> out = trainerService.getTrainerTrainings("t1", filter);
         assertEquals(1, out.size());
         verify(trainingRepository).findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class),
                 isNull());

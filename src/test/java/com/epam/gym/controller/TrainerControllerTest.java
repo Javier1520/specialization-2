@@ -163,24 +163,27 @@ class TrainerControllerTest {
         Date periodTo = new Date();
         String traineeName = "John Doe";
 
+        com.epam.gym.dto.request.TrainerTrainingFilterRequest filter =
+                new com.epam.gym.dto.request.TrainerTrainingFilterRequest(periodFrom, periodTo, traineeName);
+
         List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(
                 new TrainingResponse("Morning Run", new Date(), TrainingType.Type.CARDIO, 60,
                         "Trainer One", "John Doe"));
 
-        when(trainerService.getTrainerTrainings(username, periodFrom, periodTo, traineeName))
+        when(trainerService.getTrainerTrainings(username, filter))
                 .thenReturn(trainings);
         when(trainingMapper.toResponseList(trainings)).thenReturn(trainingResponses);
 
         // When
         ResponseEntity<List<TrainingResponse>> response = trainerController.getTrainings(
-                username, periodFrom, periodTo, traineeName);
+                username, filter);
 
         // Then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        verify(trainerService).getTrainerTrainings(username, periodFrom, periodTo, traineeName);
+        verify(trainerService).getTrainerTrainings(username, filter);
         verify(trainingMapper).toResponseList(trainings);
     }
 
@@ -192,9 +195,12 @@ class TrainerControllerTest {
         Date periodTo = new Date(); // Today
         String traineeName = null;
 
+        com.epam.gym.dto.request.TrainerTrainingFilterRequest filter =
+                new com.epam.gym.dto.request.TrainerTrainingFilterRequest(periodFrom, periodTo, traineeName);
+
         // When & Then
         try {
-            trainerController.getTrainings(username, periodFrom, periodTo, traineeName);
+            trainerController.getTrainings(username, filter);
         } catch (ValidationException e) {
             assertEquals("periodFrom cannot be after periodTo", e.getMessage());
         }

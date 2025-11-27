@@ -131,14 +131,17 @@ class GymFacadeTest {
         Date from = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000)); // 1 day ago
         Date to = new Date(); // current date
 
-        when(traineeService.getTraineeTrainings("t.one", from, to, "r", TrainingType.Type.CARDIO))
+        com.epam.gym.dto.request.TrainingFilterRequest filter =
+                new com.epam.gym.dto.request.TrainingFilterRequest(from, to, "r", TrainingType.Type.CARDIO);
+
+        when(traineeService.getTraineeTrainings("t.one", filter))
                 .thenReturn(List.of(sampleTraining));
 
-        List<Training> out = facade.getTraineeTrainings("t.one", from, to, "r", TrainingType.Type.CARDIO);
+        List<Training> out = facade.getTraineeTrainings("t.one", filter);
 
         assertEquals(1, out.size());
         assertSame(sampleTraining, out.get(0));
-        verify(traineeService).getTraineeTrainings("t.one", from, to, "r", TrainingType.Type.CARDIO);
+        verify(traineeService).getTraineeTrainings("t.one", filter);
     }
 
     @Test
@@ -215,13 +218,16 @@ class GymFacadeTest {
         Date from = new Date(System.currentTimeMillis() - (2L * 24 * 60 * 60 * 1000)); // 2 days ago
         Date to = new Date(); // current date and time
 
-        when(trainerService.getTrainerTrainings("r.two", from, to, "t"))
+        com.epam.gym.dto.request.TrainerTrainingFilterRequest filter =
+                new com.epam.gym.dto.request.TrainerTrainingFilterRequest(from, to, "t");
+
+        when(trainerService.getTrainerTrainings("r.two", filter))
                 .thenReturn(List.of(sampleTraining));
 
         List<Training> out = facade.getTrainerTrainings("r.two", from, to, "t");
 
         assertEquals(1, out.size());
-        verify(trainerService).getTrainerTrainings("r.two", from, to, "t");
+        verify(trainerService).getTrainerTrainings("r.two", filter);
     }
 
     @Test

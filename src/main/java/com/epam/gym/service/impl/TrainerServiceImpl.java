@@ -1,5 +1,6 @@
 package com.epam.gym.service.impl;
 
+import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.model.Trainer;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -118,10 +118,14 @@ public class TrainerServiceImpl implements TrainerService {
         logUtils.info(log, "Set trainer {} active={}", username, active);
     }
 
-    //Get Trainer Trainings List by trainer username and criteria (from date, to date, trainee name).
     @Transactional(readOnly = true)
-    public List<Training> getTrainerTrainings(String username, Date from, Date to, String traineeName) {
-        return trainingRepository.findByTrainerUsernameAndCriteria(username, from, to, traineeName);
+    public List<Training> getTrainerTrainings(String username, TrainerTrainingFilterRequest filter) {
+        return trainingRepository.findByTrainerUsernameAndCriteria(
+                username,
+                filter.periodFrom(),
+                filter.periodTo(),
+                filter.traineeName()
+        );
     }
 
     private Trainer findTrainerByUsername(String username) {
