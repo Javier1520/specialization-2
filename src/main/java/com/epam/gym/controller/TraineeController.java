@@ -64,8 +64,7 @@ public class TraineeController {
     public ResponseEntity<TraineeProfileResponse> getProfile(@PathVariable String username) {
         logUtils.info(log, "Get trainee profile request: username={}", username);
         Trainee trainee = traineeService.getByUsernameWithTrainers(username);
-        TraineeProfileResponse response = traineeMapper.toProfileResponse(trainee);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(traineeMapper.toProfileResponse(trainee));
     }
 
     @PutMapping("/{username}")
@@ -75,8 +74,7 @@ public class TraineeController {
         Trainee existing = traineeService.getByUsername(username);
         traineeMapper.updateEntityFromRequest(request, existing);
         Trainee updated = traineeService.updateTrainee(username, existing);
-        TraineeProfileResponse response = traineeMapper.toProfileResponse(updated);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(traineeMapper.toProfileResponse(updated));
     }
 
     @DeleteMapping("/{username}")
@@ -100,8 +98,7 @@ public class TraineeController {
 
         List<Training> trainings = traineeService.getTraineeTrainings(
                 username, periodFrom, periodTo, trainerName, trainingType);
-        List<TrainingResponse> response = trainingMapper.toResponseList(trainings);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(trainingMapper.toResponseList(trainings));
     }
 
     @GetMapping("/{username}/trainers/not-assigned")
@@ -128,8 +125,7 @@ public class TraineeController {
 
         traineeService.updateTraineeTrainers(username, trainerIds);
         Trainee trainee = traineeService.getByUsernameWithTrainers(username);
-        List<TrainerInfoResponse> response = traineeMapper.trainersToInfoResponseList(trainee.getTrainers());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(traineeMapper.trainersToInfoResponseList(trainee.getTrainers()));
     }
 
     @PatchMapping("/{username}/activate")

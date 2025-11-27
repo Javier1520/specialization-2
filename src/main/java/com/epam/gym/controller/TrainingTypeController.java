@@ -26,8 +26,7 @@ public class TrainingTypeController {
     @GetMapping
     public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
         logUtils.info(log, "Get training types request");
-        List<TrainingTypeResponse> response = trainingTypeMapper.toResponseList(trainingTypeService.listAll());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(trainingTypeMapper.toResponseList(trainingTypeService.listAll()));
     }
 }
 

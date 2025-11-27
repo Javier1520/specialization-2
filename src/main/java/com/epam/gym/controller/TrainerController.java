@@ -57,8 +57,7 @@ public class TrainerController {
     public ResponseEntity<TrainerProfileResponse> getProfile(@PathVariable String username) {
         logUtils.info(log, "Get trainer profile request: username={}", username);
         Trainer trainer = trainerService.getByUsernameWithTrainees(username);
-        TrainerProfileResponse response = trainerMapper.toProfileResponse(trainer);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(trainerMapper.toProfileResponse(trainer));
     }
 
     @PutMapping("/{username}")
@@ -68,8 +67,7 @@ public class TrainerController {
         Trainer existing = trainerService.getByUsername(username);
         trainerMapper.updateEntityFromRequest(request, existing);
         Trainer updated = trainerService.updateTrainer(username, existing);
-        TrainerProfileResponse response = trainerMapper.toProfileResponse(updated);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(trainerMapper.toProfileResponse(updated));
     }
 
     @GetMapping("/{username}/trainings")
@@ -87,8 +85,7 @@ public class TrainerController {
         }
 
         List<Training> trainings = trainerService.getTrainerTrainings(username, periodFrom, periodTo, traineeName);
-        List<TrainingResponse> response = trainingMapper.toResponseList(trainings);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(trainingMapper.toResponseList(trainings));
     }
 
     @PatchMapping("/{username}/activate")
