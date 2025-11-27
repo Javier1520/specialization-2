@@ -16,6 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
+
     private final AuthenticationService authenticationService;
     private final LogUtils logUtils;
 
@@ -30,35 +31,58 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     );
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+                             Object handler) throws Exception {
+
         String path = request.getRequestURI();
         HttpMethod method = HttpMethod.valueOf(request.getMethod());
 
-        // Check if this is a public endpoint
-        if (isPublicEndpoint(path, method)) {
-            logUtils.debug(log, "Allowing access to public endpoint: {} {}", method, path);
+        if (shouldAllowPublicAccess(path, method)) {
             return true;
         }
 
-        // Extract credentials from headers
         String username = request.getHeader(USERNAME_HEADER);
         String password = request.getHeader(PASSWORD_HEADER);
 
-        // Validate credentials presence
-        if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
-                "Authentication required. Please provide username and password headers.");
+        if (!credentialsPresent(username, password, response)) {
             return false;
         }
 
-        // Authenticate user
+        return handleAuthentication(username, password, request, response);
+    }
+
+    private boolean shouldAllowPublicAccess(String path, HttpMethod method) {
+        boolean isPublic = isPublicEndpoint(path, method);
+        if (isPublic) {
+            logUtils.debug(log, "Allowing access to public endpoint: {} {}", method, path);
+        }
+        return isPublic;
+    }
+
+    private boolean credentialsPresent(String username, String password, HttpServletResponse response
+    ) throws Exception {
+
+        boolean missing = username == null || username.isBlank()
+                       || password == null || password.isBlank();
+
+        if (missing) {
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+                    "Authentication required. Please provide username and password headers.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean handleAuthentication(String username, String password, HttpServletRequest request,
+            HttpServletResponse response
+    ) throws Exception {
+
         try {
             authenticationService.authenticate(username, password);
-            // Store username in request attribute for use in controllers
-            request.setAttribute(AUTHENTICATED_USERNAME_ATTRIBUTE, username);
+            attachAuthenticatedUser(username, request);
             logUtils.debug(log, "Authentication successful for user: {}", username);
             return true;
+
         } catch (Exception e) {
             logUtils.warn(log, "Authentication failed for username: {}", username, e);
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
@@ -66,18 +90,22 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         }
     }
 
+    private void attachAuthenticatedUser(String username, HttpServletRequest request) {
+        request.setAttribute(AUTHENTICATED_USERNAME_ATTRIBUTE, username);
+    }
+
     private boolean isPublicEndpoint(String path, HttpMethod method) {
         return PUBLIC_ENDPOINTS.stream()
                 .anyMatch(endpoint -> endpoint.matches(path, method));
     }
 
-    private void sendErrorResponse(HttpServletResponse response, int status, String message) throws Exception {
+    private void sendErrorResponse(HttpServletResponse response, int status, String message
+    ) throws Exception {
         response.setStatus(status);
         response.setContentType("application/json");
         response.getWriter().write("{\"error\":\"" + message + "\"}");
     }
 
-    // Helper class to define public endpoints
     private static class PublicEndpoint {
         private final String path;
         private final HttpMethod method;
