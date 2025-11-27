@@ -52,7 +52,8 @@ public class TraineeController {
 
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TraineeRegistrationRequest request) {
-        logUtils.info(log, "Trainee registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
+        logUtils.info(log, "Trainee registration request: firstName={}, lastName={}", request.firstName(),
+                request.lastName());
         Trainee trainee = traineeMapper.toEntity(request);
         Trainee created = traineeService.createTrainee(trainee);
         RegistrationResponse response = new RegistrationResponse(created.getUsername(), created.getPassword());
@@ -92,8 +93,8 @@ public class TraineeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
             @RequestParam(required = false) String trainerName,
             @RequestParam(required = false) TrainingType.Type trainingType) {
-        logUtils.info(log, "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, " +
-                        "trainingType={}",
+        logUtils.info(log, "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, " +
+                        "trainerName={}, " + "trainingType={}",
                 username, periodFrom, periodTo, trainerName, trainingType);
 
 
@@ -134,7 +135,8 @@ public class TraineeController {
     @PatchMapping("/{username}/activate")
     public ResponseEntity<Void> activateDeactivate(@PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {
-        logUtils.info(log, "Activate/Deactivate trainee request: username={}, isActive={}", username, request.isActive());
+        logUtils.info(log, "Activate/Deactivate trainee request: username={}, isActive={}", username,
+                request.isActive());
         traineeService.setActive(username, request.isActive());
         return ResponseEntity.ok().build();
     }
