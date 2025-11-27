@@ -1,6 +1,7 @@
 package com.epam.gym.util;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -57,7 +58,7 @@ class TransactionIdInterceptorTest {
 
         // Then
         assertTrue(result);
-        verify(response).setHeader(eq("X-Transaction-Id"), org.mockito.ArgumentMatchers.anyString());
+        verify(response).setHeader(eq("X-Transaction-Id"), anyString());
         // Verify MDC contains a transaction ID
         assertTrue(MDC.get("transactionId") != null);
     }
@@ -74,7 +75,7 @@ class TransactionIdInterceptorTest {
 
         // Then
         assertTrue(result);
-        verify(response).setHeader(eq("X-Transaction-Id"), org.mockito.ArgumentMatchers.anyString());
+        verify(response).setHeader(eq("X-Transaction-Id"), anyString());
         // Verify MDC contains a transaction ID
         assertTrue(MDC.get("transactionId") != null);
     }
