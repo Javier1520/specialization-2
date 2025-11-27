@@ -1,5 +1,8 @@
 package com.epam.gym.controller;
 
+import com.epam.gym.exception.NotFoundException;
+import com.epam.gym.model.Trainee;
+import com.epam.gym.model.Trainer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,12 +36,12 @@ public class TrainingController {
         logUtils.info(log, "Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
                 request.traineeUsername(), request.trainerUsername(), request.trainingName());
 
-        com.epam.gym.model.Trainee trainee = traineeRepository.findByUsername(request.traineeUsername())
-                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainee not found: " +
+        Trainee trainee = traineeRepository.findByUsername(request.traineeUsername())
+                .orElseThrow(() -> new NotFoundException("Trainee not found: " +
                         request.traineeUsername()));
 
-        com.epam.gym.model.Trainer trainer = trainerRepository.findByUsername(request.trainerUsername())
-                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Trainer not found: " +
+        Trainer trainer = trainerRepository.findByUsername(request.trainerUsername())
+                .orElseThrow(() -> new NotFoundException("Trainer not found: " +
                         request.trainerUsername()));
 
         Training training = Training.builder()

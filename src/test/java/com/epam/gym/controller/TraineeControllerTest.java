@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.epam.gym.dto.request.ActivateDeactivateRequest;
 import com.epam.gym.dto.request.TraineeRegistrationRequest;
+import com.epam.gym.dto.request.TrainingFilterRequest;
 import com.epam.gym.dto.request.UpdateTraineeRequest;
 import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
 import com.epam.gym.dto.response.RegistrationResponse;
@@ -200,8 +201,8 @@ class TraineeControllerTest {
         String trainerName = "Trainer One";
         TrainingType.Type trainingType = TrainingType.Type.CARDIO;
 
-        com.epam.gym.dto.request.TrainingFilterRequest filter =
-                new com.epam.gym.dto.request.TrainingFilterRequest(periodFrom, periodTo, trainerName, trainingType);
+        TrainingFilterRequest filter =
+                new TrainingFilterRequest(periodFrom, periodTo, trainerName, trainingType);
 
         List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(

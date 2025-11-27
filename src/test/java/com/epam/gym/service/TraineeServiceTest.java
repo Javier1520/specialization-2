@@ -30,6 +30,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.epam.gym.dto.request.TrainingFilterRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.model.Trainee;
@@ -237,8 +238,8 @@ class TraineeServiceTest {
         Date fromDate = new Date(0); // epoch start (Jan 1, 1970)
         Date toDate = new Date(); // current date
 
-        com.epam.gym.dto.request.TrainingFilterRequest filter =
-                new com.epam.gym.dto.request.TrainingFilterRequest(fromDate, toDate, null, null);
+        TrainingFilterRequest filter =
+                new TrainingFilterRequest(fromDate, toDate, null, null);
         List<Training> result = traineeService.getTraineeTrainings("u", filter);
         assertEquals(1, result.size());
         verify(trainingRepository).findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),

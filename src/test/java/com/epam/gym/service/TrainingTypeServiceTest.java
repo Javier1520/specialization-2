@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainingTypeRepository;
 import com.epam.gym.service.impl.TrainingTypeServiceImpl;
@@ -39,7 +40,7 @@ class TrainingTypeServiceTest {
     void getById_throwsNotFoundExceptionWhenNotFound() {
         when(repo.findById(5L)).thenReturn(Optional.empty());
         assertThrows(
-                com.epam.gym.exception.NotFoundException.class,
+                NotFoundException.class,
                 () -> service.getById(5L)
         );
         verify(repo).findById(5L);

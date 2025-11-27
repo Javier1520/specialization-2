@@ -102,7 +102,7 @@ public class TraineeController {
     @GetMapping("/{username}/trainers/not-assigned")
     public ResponseEntity<List<TrainerInfoResponse>> getNotAssignedTrainers(@PathVariable String username) {
         logUtils.info(log, "Get not assigned trainers request: traineeUsername={}", username);
-        List<com.epam.gym.model.Trainer> trainers = traineeService.getTrainersNotAssignedToTrainee(username);
+        List<Trainer> trainers = traineeService.getTrainersNotAssignedToTrainee(username);
         List<TrainerInfoResponse> response = trainers.stream()
                 .map(traineeMapper::trainerToInfoResponse)
                 .toList();

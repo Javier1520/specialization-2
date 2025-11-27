@@ -1,5 +1,6 @@
 package com.epam.gym.service.impl;
 
+import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainingTypeRepository;
 import com.epam.gym.service.TrainingTypeService;
@@ -19,6 +20,6 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 
     public TrainingType getById(Long id) {
         return repo.findById(id)
-                .orElseThrow(() -> new com.epam.gym.exception.NotFoundException("Training type not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Training type not found: " + id));
     }
 }

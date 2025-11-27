@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.model.Trainer;
@@ -161,8 +162,8 @@ class TrainerServiceTest {
                 isNull()))
                 .thenReturn(List.of(tr));
 
-        com.epam.gym.dto.request.TrainerTrainingFilterRequest filter =
-                new com.epam.gym.dto.request.TrainerTrainingFilterRequest(new Date(0), new Date(), null);
+        TrainerTrainingFilterRequest filter =
+                new TrainerTrainingFilterRequest(new Date(0), new Date(), null);
         List<Training> out = trainerService.getTrainerTrainings("t1", filter);
         assertEquals(1, out.size());
         verify(trainingRepository).findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class),

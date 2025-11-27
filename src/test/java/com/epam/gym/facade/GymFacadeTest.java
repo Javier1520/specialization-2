@@ -19,6 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
+import com.epam.gym.dto.request.TrainingFilterRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
@@ -131,8 +133,8 @@ class GymFacadeTest {
         Date from = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000)); // 1 day ago
         Date to = new Date(); // current date
 
-        com.epam.gym.dto.request.TrainingFilterRequest filter =
-                new com.epam.gym.dto.request.TrainingFilterRequest(from, to, "r", TrainingType.Type.CARDIO);
+        TrainingFilterRequest filter =
+                new TrainingFilterRequest(from, to, "r", TrainingType.Type.CARDIO);
 
         when(traineeService.getTraineeTrainings("t.one", filter))
                 .thenReturn(List.of(sampleTraining));
@@ -218,8 +220,8 @@ class GymFacadeTest {
         Date from = new Date(System.currentTimeMillis() - (2L * 24 * 60 * 60 * 1000)); // 2 days ago
         Date to = new Date(); // current date and time
 
-        com.epam.gym.dto.request.TrainerTrainingFilterRequest filter =
-                new com.epam.gym.dto.request.TrainerTrainingFilterRequest(from, to, "t");
+        TrainerTrainingFilterRequest filter =
+                new TrainerTrainingFilterRequest(from, to, "t");
 
         when(trainerService.getTrainerTrainings("r.two", filter))
                 .thenReturn(List.of(sampleTraining));
