@@ -34,7 +34,7 @@ import com.epam.gym.model.Training;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.TraineeService;
-
+import com.epam.gym.util.LogUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,10 +48,11 @@ public class TraineeController {
     private final TraineeMapper traineeMapper;
     private final TrainingMapper trainingMapper;
     private final TrainerRepository trainerRepository;
+    private final LogUtils logUtils;
 
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TraineeRegistrationRequest request) {
-        log.info("Trainee registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
+        logUtils.info(log, "Trainee registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
         Trainee trainee = traineeMapper.toEntity(request);
         Trainee created = traineeService.createTrainee(trainee);
         RegistrationResponse response = new RegistrationResponse(created.getUsername(), created.getPassword());
@@ -60,7 +61,7 @@ public class TraineeController {
 
     @GetMapping("/{username}")
     public ResponseEntity<TraineeProfileResponse> getProfile(@PathVariable String username) {
-        log.info("Get trainee profile request: username={}", username);
+        logUtils.info(log, "Get trainee profile request: username={}", username);
         Trainee trainee = traineeService.getByUsernameWithTrainers(username);
         TraineeProfileResponse response = traineeMapper.toProfileResponse(trainee);
         return ResponseEntity.ok(response);
@@ -69,7 +70,7 @@ public class TraineeController {
     @PutMapping("/{username}")
     public ResponseEntity<TraineeProfileResponse> updateProfile(@PathVariable String username,
             @Valid @RequestBody UpdateTraineeRequest request) {
-        log.info("Update trainee profile request: username={}", username);
+        logUtils.info(log, "Update trainee profile request: username={}", username);
         Trainee existing = traineeService.getByUsername(username);
         traineeMapper.updateEntityFromRequest(request, existing);
         Trainee updated = traineeService.updateTrainee(username, existing);
@@ -79,7 +80,7 @@ public class TraineeController {
 
     @DeleteMapping("/{username}")
     public ResponseEntity<Void> deleteProfile(@PathVariable String username) {
-        log.info("Delete trainee profile request: username={}", username);
+        logUtils.info(log, "Delete trainee profile request: username={}", username);
         traineeService.deleteByUsername(username);
         return ResponseEntity.ok().build();
     }
@@ -91,7 +92,7 @@ public class TraineeController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
             @RequestParam(required = false) String trainerName,
             @RequestParam(required = false) TrainingType.Type trainingType) {
-        log.info("Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, " +
+        logUtils.info(log, "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, " +
                         "trainingType={}",
                 username, periodFrom, periodTo, trainerName, trainingType);
 
@@ -104,7 +105,7 @@ public class TraineeController {
 
     @GetMapping("/{username}/trainers/not-assigned")
     public ResponseEntity<List<TrainerInfoResponse>> getNotAssignedTrainers(@PathVariable String username) {
-        log.info("Get not assigned trainers request: traineeUsername={}", username);
+        logUtils.info(log, "Get not assigned trainers request: traineeUsername={}", username);
         List<com.epam.gym.model.Trainer> trainers = traineeService.getTrainersNotAssignedToTrainee(username);
         List<TrainerInfoResponse> response = trainers.stream()
                 .map(traineeMapper::trainerToInfoResponse)
@@ -115,7 +116,7 @@ public class TraineeController {
     @PutMapping("/{username}/trainers")
     public ResponseEntity<List<TrainerInfoResponse>> updateTrainers(@PathVariable String username,
             @Valid @RequestBody UpdateTraineeTrainersRequest request) {
-        log.info("Update trainee trainers request: traineeUsername={}", username);
+        logUtils.info(log, "Update trainee trainers request: traineeUsername={}", username);
         List<Long> trainerIds = request.trainers().stream()
                 .map(t -> {
                     Trainer trainer = trainerRepository.findByUsername(t.trainerUsername())
@@ -133,7 +134,7 @@ public class TraineeController {
     @PatchMapping("/{username}/activate")
     public ResponseEntity<Void> activateDeactivate(@PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {
-        log.info("Activate/Deactivate trainee request: username={}, isActive={}", username, request.isActive());
+        logUtils.info(log, "Activate/Deactivate trainee request: username={}, isActive={}", username, request.isActive());
         traineeService.setActive(username, request.isActive());
         return ResponseEntity.ok().build();
     }

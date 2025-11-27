@@ -12,6 +12,7 @@ import com.epam.gym.model.Training;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.TrainingService;
+import com.epam.gym.util.LogUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +26,11 @@ public class TrainingController {
     private final TrainingService trainingService;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
+    private final LogUtils logUtils;
 
     @PostMapping
     public ResponseEntity<Void> addTraining(@Valid @RequestBody AddTrainingRequest request) {
-        log.info("Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
+        logUtils.info(log, "Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
                 request.traineeUsername(), request.trainerUsername(), request.trainingName());
 
         com.epam.gym.model.Trainee trainee = traineeRepository.findByUsername(request.traineeUsername())

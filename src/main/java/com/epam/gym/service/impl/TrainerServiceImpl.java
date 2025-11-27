@@ -9,6 +9,7 @@ import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainerService;
 import com.epam.gym.service.UsernamePasswordGenerator;
+import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainingRepository trainingRepository;
     private final TraineeRepository traineeRepository;
     private final UsernamePasswordGenerator usernamePasswordGenerator;
+    private final LogUtils logUtils;
 
     public Trainer createTrainer(Trainer payload) {
         validateTrainerPayload(payload);
@@ -35,8 +37,7 @@ public class TrainerServiceImpl implements TrainerService {
         prepareTrainer(payload);
 
         Trainer saved = trainerRepository.save(payload);
-        printLog("Created trainer", saved);
-        log.info("Created trainer username={} id={}", saved.getUsername(), saved.getId());
+        logUtils.info(log, "Created trainer username={} id={}", saved.getUsername(), saved.getId());
         return saved;
     }
 
@@ -61,9 +62,7 @@ public class TrainerServiceImpl implements TrainerService {
         return usernamePasswordGenerator.generatePassword();
     }
 
-    private static void printLog(String message, Trainer saved) {
-        log.info("{} username={} id={}", message, saved.getUsername(), saved.getId());
-    }
+
 
     private void validateTrainerPayload(Trainer t) {
         if (t == null) {
@@ -99,7 +98,7 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer t = findTrainerByUsername(username);
         t.setPassword(newPassword);
         trainerRepository.save(t);
-        log.info("Changed password for trainer {}", username);
+        logUtils.info(log, "Changed password for trainer {}", username);
     }
 
     public Trainer updateTrainer(String username, Trainer update) {
@@ -107,7 +106,7 @@ public class TrainerServiceImpl implements TrainerService {
         validateTrainerPayload(update);
         updateTrainerFields(existing, update);
         trainerRepository.save(existing);
-        log.info("Updated trainer {}", username);
+        logUtils.info(log, "Updated trainer {}", username);
         return existing;
     }
 
@@ -116,7 +115,7 @@ public class TrainerServiceImpl implements TrainerService {
         validateActiveStatusChange(t.getIsActive(), active);
         t.setIsActive(active);
         trainerRepository.save(t);
-        log.info("Set trainer {} active={}", username, active);
+        logUtils.info(log, "Set trainer {} active={}", username, active);
     }
 
     //Get Trainer Trainings List by trainer username and criteria (from date, to date, trainee name).

@@ -27,6 +27,7 @@ import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.impl.TrainingServiceImpl;
+import com.epam.gym.util.LogUtils;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingServiceTest {
@@ -34,6 +35,7 @@ class TrainingServiceTest {
     @Mock TrainingRepository trainingRepository;
     @Mock TraineeRepository traineeRepository;
     @Mock TrainerRepository trainerRepository;
+    @Mock LogUtils logUtils;
 
     @InjectMocks TrainingServiceImpl trainingService;
 

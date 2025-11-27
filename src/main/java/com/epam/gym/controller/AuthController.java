@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.gym.dto.request.ChangePasswordRequest;
 import com.epam.gym.service.AuthenticationService;
-
+import com.epam.gym.util.LogUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,17 +21,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthController {
     private final AuthenticationService authenticationService;
+    private final LogUtils logUtils;
 
     @GetMapping("/login")
     public ResponseEntity<Void> login(@RequestParam String username, @RequestParam String password) {
-        log.info("Login attempt for username: {}", username);
+        logUtils.info(log, "Login attempt for username: {}", username);
         authenticationService.authenticate(username, password);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/change-password")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        log.info("Change password request for username: {}", request.username());
+        logUtils.info(log, "Change password request for username: {}", request.username());
         authenticationService.changePassword(request.username(), request.oldPassword(), request.newPassword());
         return ResponseEntity.ok().build();
     }

@@ -7,6 +7,7 @@ import com.epam.gym.model.Trainer;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.AuthenticationService;
+import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public static final int PASSWORD_LENGTH = 10;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
+    private final LogUtils logUtils;
 
     @Transactional(readOnly = true)
     public void authenticate(String username, String password) {
@@ -64,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (trainee != null) {
             verifyPassword(password, trainee.getPassword());
             verifyUserActive(trainee.getIsActive(), "Trainee");
-            log.info("Authenticated trainee: {}", username);
+            logUtils.info(log, "Authenticated trainee: {}", username);
             return true;
         }
         return false;
@@ -75,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (trainer != null) {
             verifyPassword(password, trainer.getPassword());
             verifyUserActive(trainer.getIsActive(), "Trainer");
-            log.info("Authenticated trainer: {}", username);
+            logUtils.info(log, "Authenticated trainer: {}", username);
             return true;
         }
         return false;
@@ -109,7 +111,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             verifyPassword(oldPassword, trainee.getPassword(), "Invalid old password");
             trainee.setPassword(newPassword);
             traineeRepository.save(trainee);
-            log.info("Changed password for trainee: {}", username);
+            logUtils.info(log, "Changed password for trainee: {}", username);
             return true;
         }
         return false;
@@ -121,7 +123,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             verifyPassword(oldPassword, trainer.getPassword(), "Invalid old password");
             trainer.setPassword(newPassword);
             trainerRepository.save(trainer);
-            log.info("Changed password for trainer: {}", username);
+            logUtils.info(log, "Changed password for trainer: {}", username);
             return true;
         }
         return false;

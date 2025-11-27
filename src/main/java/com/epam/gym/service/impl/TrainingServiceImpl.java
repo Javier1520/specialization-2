@@ -9,6 +9,8 @@ import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainingService;
+import com.epam.gym.util.LogUtils;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainingRepository trainingRepository;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
+    private final LogUtils logUtils;
 
     private static final int MAX_TRAINING_YEARS_AHEAD = 5;
 
@@ -33,7 +36,10 @@ public class TrainingServiceImpl implements TrainingService {
         prepareTrainingPayload(payload);
 
         Training saved = trainingRepository.save(payload);
-        printLog("Created training", saved);
+        logUtils.info(log, "Created training id={} trainee={} trainer={}",
+                saved.getId(),
+                saved.getTrainee().getUsername(),
+                saved.getTrainer().getUsername());
 
         return saved;
     }
@@ -98,11 +104,5 @@ public class TrainingServiceImpl implements TrainingService {
         return value < 0;
     }
 
-    private static void printLog(String message, Training saved) {
-        log.info("{} id={} trainee={} trainer={}",
-                message,
-                saved.getId(),
-                saved.getTrainee().getUsername(),
-                saved.getTrainer().getUsername());
-    }
+
 }

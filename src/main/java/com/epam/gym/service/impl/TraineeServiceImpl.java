@@ -11,6 +11,7 @@ import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TraineeService;
 import com.epam.gym.service.UsernamePasswordGenerator;
+import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
     private final UsernamePasswordGenerator usernamePasswordGenerator;
+    private final LogUtils logUtils;
 
     private static final int PASSWORD_LENGTH = 10;
 
@@ -37,8 +39,7 @@ public class TraineeServiceImpl implements TraineeService {
         validateTraineePayload(payload);
         prepareTrainee(payload);
         Trainee saved = traineeRepository.save(payload);
-        printLog("Created trainee", saved);
-        log.info("Created trainee username={} id={}", saved.getUsername(), saved.getId());
+        logUtils.info(log, "Created trainee username={} id={}", saved.getUsername(), saved.getId());
         return saved;
     }
 
@@ -63,9 +64,7 @@ public class TraineeServiceImpl implements TraineeService {
         return usernamePasswordGenerator.generatePassword();
     }
 
-    private static void printLog(String message, Trainee saved) {
-        log.info("{} username={} id={}", message, saved.getUsername(), saved.getId());
-    }
+
 
     private void validateTraineePayload(Trainee t) {
         if (t == null) {
@@ -106,7 +105,7 @@ public class TraineeServiceImpl implements TraineeService {
         Trainee trainee = findTraineeByUsername(username);
         trainee.setPassword(newPassword);
         traineeRepository.save(trainee);
-        log.info("Changed password for trainee {}", username);
+        logUtils.info(log, "Changed password for trainee {}", username);
     }
 
     public Trainee updateTrainee(String username, Trainee update) {
@@ -114,7 +113,7 @@ public class TraineeServiceImpl implements TraineeService {
         validateTraineePayload(update);
         updateTraineeFields(existing, update);
         traineeRepository.save(existing);
-        log.info("Updated trainee {}", username);
+        logUtils.info(log, "Updated trainee {}", username);
         return existing;
     }
 
@@ -123,14 +122,14 @@ public class TraineeServiceImpl implements TraineeService {
         validateActiveStatusChange(trainee.getIsActive(), active);
         trainee.setIsActive(active);
         traineeRepository.save(trainee);
-        log.info("Set trainee {} active={}", username, active);
+        logUtils.info(log, "Set trainee {} active={}", username, active);
     }
 
     public void deleteByUsername(String username) {
         Trainee t = findTraineeByUsername(username);
         removeTraineeFromTrainers(t);
         traineeRepository.deleteByUsername(username);
-        log.info("Deleted trainee {}", username);
+        logUtils.info(log, "Deleted trainee {}", username);
     }
 
     @Transactional(readOnly = true)
@@ -151,7 +150,7 @@ public class TraineeServiceImpl implements TraineeService {
         validateTrainerIds(trainerIds, trainers);
         updateTrainerRelationships(t, trainers);
         traineeRepository.save(t);
-        log.info("Updated trainers for trainee {} to {}", traineeUsername, trainerIds);
+        logUtils.info(log, "Updated trainers for trainee {} to {}", traineeUsername, trainerIds);
     }
 
     private Trainee findTraineeByUsername(String username) {

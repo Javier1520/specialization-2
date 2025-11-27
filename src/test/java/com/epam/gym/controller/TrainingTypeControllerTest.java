@@ -20,6 +20,7 @@ import com.epam.gym.dto.response.TrainingTypeResponse;
 import com.epam.gym.mapper.TrainingTypeMapper;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.service.TrainingTypeService;
+import com.epam.gym.util.LogUtils;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingTypeControllerTest {
@@ -29,6 +30,9 @@ class TrainingTypeControllerTest {
 
     @Mock
     private TrainingTypeMapper trainingTypeMapper;
+
+    @Mock
+    private LogUtils logUtils;
 
     @InjectMocks
     private TrainingTypeController trainingTypeController;

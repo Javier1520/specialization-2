@@ -20,9 +20,12 @@ class TransactionIdInterceptorTest {
     private HttpServletRequest request;
     private HttpServletResponse response;
 
+    private LogUtils logUtils;
+
     @BeforeEach
     void setUp() {
-        interceptor = new TransactionIdInterceptor();
+        logUtils = mock(LogUtils.class);
+        interceptor = new TransactionIdInterceptor(logUtils);
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
         MDC.clear();

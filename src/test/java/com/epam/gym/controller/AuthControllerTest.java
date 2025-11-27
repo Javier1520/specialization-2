@@ -21,12 +21,16 @@ import com.epam.gym.dto.request.ChangePasswordRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.service.AuthenticationService;
+import com.epam.gym.util.LogUtils;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
     @Mock
     private AuthenticationService authenticationService;
+
+    @Mock
+    private LogUtils logUtils;
 
     @InjectMocks
     private AuthController authController;

@@ -28,6 +28,7 @@ import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
 import com.epam.gym.service.TrainerService;
+import com.epam.gym.util.LogUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +42,11 @@ public class TrainerController {
     private final TrainerService trainerService;
     private final TrainerMapper trainerMapper;
     private final TrainingMapper trainingMapper;
+    private final LogUtils logUtils;
 
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TrainerRegistrationRequest request) {
-        log.info("Trainer registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
+        logUtils.info(log, "Trainer registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
         Trainer trainer = trainerMapper.toEntity(request);
         Trainer created = trainerService.createTrainer(trainer);
         RegistrationResponse response = new RegistrationResponse(created.getUsername(), created.getPassword());
@@ -53,7 +55,7 @@ public class TrainerController {
 
     @GetMapping("/{username}")
     public ResponseEntity<TrainerProfileResponse> getProfile(@PathVariable String username) {
-        log.info("Get trainer profile request: username={}", username);
+        logUtils.info(log, "Get trainer profile request: username={}", username);
         Trainer trainer = trainerService.getByUsernameWithTrainees(username);
         TrainerProfileResponse response = trainerMapper.toProfileResponse(trainer);
         return ResponseEntity.ok(response);
@@ -62,7 +64,7 @@ public class TrainerController {
     @PutMapping("/{username}")
     public ResponseEntity<TrainerProfileResponse> updateProfile(@PathVariable String username,
             @Valid @RequestBody UpdateTrainerRequest request) {
-        log.info("Update trainer profile request: username={}", username);
+        logUtils.info(log, "Update trainer profile request: username={}", username);
         Trainer existing = trainerService.getByUsername(username);
         trainerMapper.updateEntityFromRequest(request, existing);
         Trainer updated = trainerService.updateTrainer(username, existing);
@@ -77,7 +79,7 @@ public class TrainerController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
             @RequestParam(required = false) String traineeName) {
 
-        log.info("Get trainer trainings request: username={}, periodFrom={}, periodTo={}, traineeName={}",
+        logUtils.info(log, "Get trainer trainings request: username={}, periodFrom={}, periodTo={}, traineeName={}",
                 username, periodFrom, periodTo, traineeName);
 
         if (periodFrom != null && periodTo != null && periodFrom.after(periodTo)) {
@@ -92,7 +94,7 @@ public class TrainerController {
     @PatchMapping("/{username}/activate")
     public ResponseEntity<Void> activateDeactivate(@PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {
-        log.info("Activate/Deactivate trainer request: username={}, isActive={}", username, request.isActive());
+        logUtils.info(log, "Activate/Deactivate trainer request: username={}, isActive={}", username, request.isActive());
         trainerService.setActive(username, request.isActive());
         return ResponseEntity.ok().build();
     }

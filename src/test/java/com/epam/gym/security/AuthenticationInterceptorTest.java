@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.service.AuthenticationService;
+import com.epam.gym.util.LogUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,6 +39,9 @@ class AuthenticationInterceptorTest {
 
     @Mock
     private HttpServletResponse response;
+
+    @Mock
+    private LogUtils logUtils;
 
     @InjectMocks
     private AuthenticationInterceptor authenticationInterceptor;

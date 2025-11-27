@@ -38,6 +38,7 @@ import com.epam.gym.model.Training;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.TraineeService;
+import com.epam.gym.util.LogUtils;
 
 @ExtendWith(MockitoExtension.class)
 class TraineeControllerTest {
@@ -53,6 +54,9 @@ class TraineeControllerTest {
 
     @Mock
     private TrainerRepository trainerRepository;
+
+    @Mock
+    private LogUtils logUtils;
 
     @InjectMocks
     private TraineeController traineeController;

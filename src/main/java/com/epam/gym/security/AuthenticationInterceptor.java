@@ -1,6 +1,7 @@
 package com.epam.gym.security;
 
 import com.epam.gym.service.AuthenticationService;
+import com.epam.gym.util.LogUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +17,12 @@ import java.util.Set;
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
     private final AuthenticationService authenticationService;
+    private final LogUtils logUtils;
 
     private static final String USERNAME_HEADER = "username";
     private static final String PASSWORD_HEADER = "password";
     private static final String AUTHENTICATED_USERNAME_ATTRIBUTE = "authenticatedUsername";
 
-    // Define public endpoints that don't require authentication
     private static final Set<PublicEndpoint> PUBLIC_ENDPOINTS = Set.of(
         new PublicEndpoint("/api/v1/trainees/register", HttpMethod.POST),
         new PublicEndpoint("/api/v1/trainers/register", HttpMethod.POST),
@@ -36,7 +37,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         // Check if this is a public endpoint
         if (isPublicEndpoint(path, method)) {
-            log.debug("Allowing access to public endpoint: {} {}", method, path);
+            logUtils.debug(log, "Allowing access to public endpoint: {} {}", method, path);
             return true;
         }
 
@@ -56,10 +57,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             authenticationService.authenticate(username, password);
             // Store username in request attribute for use in controllers
             request.setAttribute(AUTHENTICATED_USERNAME_ATTRIBUTE, username);
-            log.debug("Authentication successful for user: {}", username);
+            logUtils.debug(log, "Authentication successful for user: {}", username);
             return true;
         } catch (Exception e) {
-            log.warn("Authentication failed for username: {}", username, e);
+            logUtils.warn(log, "Authentication failed for username: {}", username, e);
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             return false;
         }

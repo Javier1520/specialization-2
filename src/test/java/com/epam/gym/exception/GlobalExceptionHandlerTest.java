@@ -15,9 +15,14 @@ import org.springframework.http.ResponseEntity;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import com.epam.gym.util.LogUtils;
+import org.mockito.Mock;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
+
+    @Mock
+    private LogUtils logUtils;
 
     @InjectMocks
     private GlobalExceptionHandler globalExceptionHandler;

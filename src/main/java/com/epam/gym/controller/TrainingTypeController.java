@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.epam.gym.dto.response.TrainingTypeResponse;
 import com.epam.gym.mapper.TrainingTypeMapper;
 import com.epam.gym.service.TrainingTypeService;
-
+import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,10 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 public class TrainingTypeController {
     private final TrainingTypeService trainingTypeService;
     private final TrainingTypeMapper trainingTypeMapper;
+    private final LogUtils logUtils;
 
     @GetMapping
     public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
-        log.info("Get training types request");
+        logUtils.info(log, "Get training types request");
         List<TrainingTypeResponse> response = trainingTypeMapper.toResponseList(trainingTypeService.listAll());
         return ResponseEntity.ok(response);
     }
