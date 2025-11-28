@@ -5,7 +5,7 @@ import com.epam.gym.model.TrainingType;
 import java.util.List;
 
 public interface TrainingTypeService {
-    List<TrainingType> listAll();
+    List<TrainingType.Type> listAll();
     TrainingType getById(Long id);
 }
 

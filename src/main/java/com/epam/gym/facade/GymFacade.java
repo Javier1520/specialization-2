@@ -67,5 +67,5 @@ public class GymFacade {
 	// --- Training operations ---
 	public Training createTraining(Training t) { return trainingService.addTraining(t); }
 
-    public List<TrainingType> listTrainingTypes() { return trainingTypeService.listAll(); }
+    public List<TrainingType.Type> listTrainingTypes() { return trainingTypeService.listAll(); }
 }

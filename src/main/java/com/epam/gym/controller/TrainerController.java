@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.epam.gym.openapi.annotation.operation.CreateOperation;
+import com.epam.gym.openapi.annotation.operation.GetAllOperation;
+import com.epam.gym.openapi.annotation.operation.GetByIdOperation;
+import com.epam.gym.openapi.annotation.operation.UpdateOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.gym.dto.request.ActivateDeactivateRequest;
@@ -32,6 +37,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "Trainers", description = "Operations in Trainers")
 @RestController
 @RequestMapping("/api/v1/trainers")
 @RequiredArgsConstructor
@@ -42,6 +48,7 @@ public class TrainerController {
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
 
+    @CreateOperation(summary = "Create Trainer", description = "Create a new Trainer in Gym CRM")
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TrainerRegistrationRequest request) {
         logUtils.info(log, "Trainer registration request: firstName={}, lastName={}", request.firstName(),
@@ -52,6 +59,7 @@ public class TrainerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetByIdOperation(summary = "Get Trainer Profile", description = "Get Trainer Profile by Username")
     @GetMapping("/{username}")
     public ResponseEntity<TrainerProfileResponse> getProfile(@PathVariable String username) {
         logUtils.info(log, "Get trainer profile request: username={}", username);
@@ -59,6 +67,7 @@ public class TrainerController {
         return ResponseEntity.ok(trainerMapper.toProfileResponse(trainer));
     }
 
+    @UpdateOperation(summary = "Update Trainer Profile", description = "Update Trainer Profile by Username")
     @PutMapping("/{username}")
     public ResponseEntity<TrainerProfileResponse> updateProfile(@PathVariable String username,
             @Valid @RequestBody UpdateTrainerRequest request) {
@@ -69,6 +78,7 @@ public class TrainerController {
         return ResponseEntity.ok(trainerMapper.toProfileResponse(updated));
     }
 
+    @GetAllOperation(summary = "Get Trainer Trainings", description = "Get Trainer Trainings by Username and Filter")
     @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingResponse>> getTrainings(
             @PathVariable String username,
@@ -83,6 +93,7 @@ public class TrainerController {
         return ResponseEntity.ok(trainingMapper.toResponseList(trainings));
     }
 
+    @UpdateOperation(summary = "Activate/Deactivate Trainer", description = "Activate or Deactivate Trainer Profile")
     @PatchMapping("/{username}/activate")
     public ResponseEntity<Void> activateDeactivate(@PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {

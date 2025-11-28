@@ -37,22 +37,12 @@ class TrainingTypeControllerTest {
     @InjectMocks
     private TrainingTypeController trainingTypeController;
 
-    private List<TrainingType> trainingTypes;
+    private List<TrainingType.Type> trainingTypes;
     private List<TrainingTypeResponse> trainingTypeResponses;
 
     @BeforeEach
     void setUp() {
-        TrainingType cardio = TrainingType.builder()
-                .id(1L)
-                .name("Cardio")
-                .build();
-
-        TrainingType strength = TrainingType.builder()
-                .id(2L)
-                .name("Strength")
-                .build();
-
-        trainingTypes = List.of(cardio, strength);
+        trainingTypes = List.of(TrainingType.Type.CARDIO, TrainingType.Type.STRENGTH);
 
         TrainingTypeResponse cardioResponse = new TrainingTypeResponse(1L, "Cardio");
         TrainingTypeResponse strengthResponse = new TrainingTypeResponse(2L, "Strength");
