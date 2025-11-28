@@ -27,11 +27,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void authenticate(String username, String password) {
         validateCredentials(username, password);
 
-        if (authenticateTrainee(username, password)) {
-            return;
-        }
-
-        if (authenticateTrainer(username, password)) {
+        if (authenticateTrainee(username, password) ||authenticateTrainer(username, password)) {
             return;
         }
 
@@ -62,26 +58,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private boolean authenticateTrainee(String username, String password) {
-        Trainee trainee = traineeRepository.findByUsername(username).orElse(null);
-        if (trainee != null) {
+    return traineeRepository.findByUsername(username)
+        .map(trainee -> {
             verifyPassword(password, trainee.getPassword());
             verifyUserActive(trainee.getIsActive(), "Trainee");
             logUtils.info(log, "Authenticated trainee: {}", username);
             return true;
-        }
-        return false;
-    }
+        })
+        .orElse(false);
+}
 
     private boolean authenticateTrainer(String username, String password) {
-        Trainer trainer = trainerRepository.findByUsername(username).orElse(null);
-        if (trainer != null) {
+    return trainerRepository.findByUsername(username)
+        .map(trainer -> {
             verifyPassword(password, trainer.getPassword());
             verifyUserActive(trainer.getIsActive(), "Trainer");
             logUtils.info(log, "Authenticated trainer: {}", username);
             return true;
-        }
-        return false;
-    }
+        })
+        .orElse(false);
+}
 
     private void verifyPassword(String provided, String stored) {
         verifyPassword(provided, stored, "Invalid username or password");
