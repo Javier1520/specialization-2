@@ -30,8 +30,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         new PublicEndpoint("/api/v1/auth/login", HttpMethod.GET),
 
         // Swagger UI + OpenAPI
-    new PublicEndpoint("/swagger-ui", HttpMethod.GET),
-    new PublicEndpoint("/v3/api-docs", HttpMethod.GET)
+        new PublicEndpoint("/swagger-ui", HttpMethod.GET),
+        new PublicEndpoint("/v3/api-docs", HttpMethod.GET)
     );
 
     @Override
