@@ -40,17 +40,7 @@ class TrainingTypeMapperTest {
     @Test
     void toResponseList_mapsListCorrectly() {
         // Given
-        TrainingType cardio = TrainingType.builder()
-                .id(1L)
-                .name("Cardio")
-                .build();
-
-        TrainingType strength = TrainingType.builder()
-                .id(2L)
-                .name("Strength")
-                .build();
-
-        List<TrainingType> trainingTypes = List.of(cardio, strength);
+        List<TrainingType.Type> trainingTypes = List.of(TrainingType.Type.CARDIO, TrainingType.Type.STRENGTH);
 
         // When
         List<TrainingTypeResponse> result = trainingTypeMapper.toResponseList(trainingTypes);
@@ -58,16 +48,14 @@ class TrainingTypeMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals(1L, result.get(0).trainingTypeId());
-        assertEquals("Cardio", result.get(0).trainingType());
-        assertEquals(2L, result.get(1).trainingTypeId());
-        assertEquals("Strength", result.get(1).trainingType());
+        assertEquals("CARDIO", result.get(0).trainingType());
+        assertEquals("STRENGTH", result.get(1).trainingType());
     }
 
     @Test
     void toResponseList_emptyList_returnsEmptyList() {
         // Given
-        List<TrainingType> trainingTypes = List.of();
+        List<TrainingType.Type> trainingTypes = List.of();
 
         // When
         List<TrainingTypeResponse> result = trainingTypeMapper.toResponseList(trainingTypes);

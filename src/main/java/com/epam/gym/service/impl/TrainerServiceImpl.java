@@ -65,21 +65,19 @@ public class TrainerServiceImpl implements TrainerService {
 
 
     private void validateTrainerPayload(Trainer t) {
-        if (t == null) {
-            throw new ValidationException("Trainer payload required");
-        }
+        Optional.ofNullable(t)
+                .orElseThrow(() -> new ValidationException("Trainer payload required"));
 
-        if (t.getFirstName() == null || t.getFirstName().isBlank()) {
-            throw new ValidationException("firstName required");
-        }
+        Optional.ofNullable(t.getFirstName())
+                .filter(name -> !name.isBlank())
+                .orElseThrow(() -> new ValidationException("firstName required"));
 
-        if (t.getLastName() == null || t.getLastName().isBlank()) {
-            throw new ValidationException("lastName required");
-        }
+        Optional.ofNullable(t.getLastName())
+                .filter(name -> !name.isBlank())
+                .orElseThrow(() -> new ValidationException("lastName required"));
 
-        if (t.getSpecialization() == null) {
-            throw new ValidationException("specialization required");
-        }
+        Optional.ofNullable(t.getSpecialization())
+                .orElseThrow(() -> new ValidationException("specialization required"));
     }
 
 
@@ -151,8 +149,10 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     private void validateActiveStatusChange(Boolean current, boolean newStatus) {
-        if (Objects.equals(current, newStatus)) {
-            throw new ValidationException("Trainer already " + (newStatus ? "active" : "inactive"));
-        }
+        Optional.ofNullable(current)
+                .filter(c -> Objects.equals(c, newStatus))
+                .ifPresent(c -> {
+                    throw new ValidationException("Trainer already " + (newStatus ? "active" : "inactive"));
+                });
     }
 }

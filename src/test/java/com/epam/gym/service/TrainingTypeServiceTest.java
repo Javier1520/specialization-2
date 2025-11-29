@@ -27,13 +27,10 @@ class TrainingTypeServiceTest {
     @InjectMocks TrainingTypeServiceImpl service;
 
     @Test
-    void listAll_callsRepoAndReturns() {
-        TrainingType t1 = new TrainingType(1L, "Cardio", null, null);
-        when(repo.findAll()).thenReturn(List.of(t1));
-
-        List<TrainingType> out = service.listAll();
-        assertEquals(1, out.size());
-        verify(repo).findAll();
+    void listAll_returnsAllEnumValues() {
+        List<TrainingType.Type> out = service.listAll();
+        assertEquals(5, out.size()); // CARDIO, STRENGTH, YOGA, HIIT, PILATES
+        assertEquals(TrainingType.Type.CARDIO, out.get(0));
     }
 
     @Test

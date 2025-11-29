@@ -2,8 +2,6 @@ package com.epam.gym.service.impl;
 
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
-import com.epam.gym.model.Trainee;
-import com.epam.gym.model.Trainer;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.service.AuthenticationService;
@@ -12,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,12 +49,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private void validateCredentials(String username, String password) {
-        if (username == null || username.isBlank()) {
-            throw new ValidationException("Username is required");
-        }
-        if (password == null || password.isBlank()) {
-            throw new ValidationException("Password is required");
-        }
+        Optional.ofNullable(username)
+                .filter(u -> !u.isBlank())
+                .orElseThrow(() -> new ValidationException("Username is required"));
+
+        Optional.ofNullable(password)
+                .filter(p -> !p.isBlank())
+                .orElseThrow(() -> new ValidationException("Password is required"));
     }
 
     private boolean authenticateTrainee(String username, String password) {
@@ -90,39 +91,39 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private void verifyUserActive(Boolean isActive, String userType) {
-        if (!Boolean.TRUE.equals(isActive)) {
-            throw new ValidationException(userType + " account is inactive");
-        }
+        Optional.ofNullable(isActive)
+                .filter(Boolean.TRUE::equals)
+                .orElseThrow(() -> new ValidationException(userType + " account is inactive"));
     }
 
     private void validateNewPassword(String newPassword) {
-        if (newPassword == null || newPassword.length() < PASSWORD_LENGTH) {
-            throw new ValidationException("New password must be at least " + PASSWORD_LENGTH + " characters");
-        }
+        Optional.ofNullable(newPassword)
+                .filter(p -> p.length() >= PASSWORD_LENGTH)
+                .orElseThrow(() -> new ValidationException("New password must be at least " + PASSWORD_LENGTH + " characters"));
     }
 
     private boolean changeTraineePassword(String username, String oldPassword, String newPassword) {
-        Trainee trainee = traineeRepository.findByUsername(username).orElse(null);
-        if (trainee != null) {
-            verifyPassword(oldPassword, trainee.getPassword(), "Invalid old password");
-            trainee.setPassword(newPassword);
-            traineeRepository.save(trainee);
-            logUtils.info(log, "Changed password for trainee: {}", username);
-            return true;
-        }
-        return false;
+        return traineeRepository.findByUsername(username)
+                .map(trainee -> {
+                    verifyPassword(oldPassword, trainee.getPassword(), "Invalid old password");
+                    trainee.setPassword(newPassword);
+                    traineeRepository.save(trainee);
+                    logUtils.info(log, "Changed password for trainee: {}", username);
+                    return true;
+                })
+                .orElse(false);
     }
 
     private boolean changeTrainerPassword(String username, String oldPassword, String newPassword) {
-        Trainer trainer = trainerRepository.findByUsername(username).orElse(null);
-        if (trainer != null) {
-            verifyPassword(oldPassword, trainer.getPassword(), "Invalid old password");
-            trainer.setPassword(newPassword);
-            trainerRepository.save(trainer);
-            logUtils.info(log, "Changed password for trainer: {}", username);
-            return true;
-        }
-        return false;
+        return trainerRepository.findByUsername(username)
+                .map(trainer -> {
+                    verifyPassword(oldPassword, trainer.getPassword(), "Invalid old password");
+                    trainer.setPassword(newPassword);
+                    trainerRepository.save(trainer);
+                    logUtils.info(log, "Changed password for trainer: {}", username);
+                    return true;
+                })
+                .orElse(false);
     }
 }
 

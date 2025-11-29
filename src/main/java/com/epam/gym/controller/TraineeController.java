@@ -13,6 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.epam.gym.openapi.annotation.operation.CreateOperation;
+import com.epam.gym.openapi.annotation.operation.DeleteOperation;
+import com.epam.gym.openapi.annotation.operation.GetAllOperation;
+import com.epam.gym.openapi.annotation.operation.GetByIdOperation;
+import com.epam.gym.openapi.annotation.operation.UpdateOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.gym.dto.request.ActivateDeactivateRequest;
@@ -38,6 +44,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "Trainees", description = "Operations in Trainees")
 @RestController
 @RequestMapping("/api/v1/trainees")
 @RequiredArgsConstructor
@@ -49,6 +56,7 @@ public class TraineeController {
     private final TrainerRepository trainerRepository;
     private final LogUtils logUtils;
 
+    @CreateOperation(summary = "Create Trainee", description = "Create a new Trainee in Gym CRM")
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TraineeRegistrationRequest request) {
         logUtils.info(log, "Trainee registration request: firstName={}, lastName={}", request.firstName(),
@@ -59,6 +67,7 @@ public class TraineeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetByIdOperation(summary = "Get Trainee Profile", description = "Get Trainee Profile by Username")
     @GetMapping("/{username}")
     public ResponseEntity<TraineeProfileResponse> getProfile(@PathVariable String username) {
         logUtils.info(log, "Get trainee profile request: username={}", username);
@@ -66,6 +75,7 @@ public class TraineeController {
         return ResponseEntity.ok(traineeMapper.toProfileResponse(trainee));
     }
 
+    @UpdateOperation(summary = "Update Trainee Profile", description = "Update Trainee Profile by Username")
     @PutMapping("/{username}")
     public ResponseEntity<TraineeProfileResponse> updateProfile(@PathVariable String username,
             @Valid @RequestBody UpdateTraineeRequest request) {
@@ -76,6 +86,7 @@ public class TraineeController {
         return ResponseEntity.ok(traineeMapper.toProfileResponse(updated));
     }
 
+    @DeleteOperation(summary = "Delete Trainee Profile", description = "Delete Trainee Profile by Username")
     @DeleteMapping("/{username}")
     public ResponseEntity<Void> deleteProfile(@PathVariable String username) {
         logUtils.info(log, "Delete trainee profile request: username={}", username);
@@ -83,6 +94,7 @@ public class TraineeController {
         return ResponseEntity.ok().build();
     }
 
+    @GetAllOperation(summary = "Get Trainee Trainings", description = "Get Trainee Trainings by Username and Filter")
     @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingResponse>> getTrainings(
             @PathVariable String username,
@@ -99,6 +111,7 @@ public class TraineeController {
         return ResponseEntity.ok(trainingMapper.toResponseList(trainings));
     }
 
+    @GetAllOperation(summary = "Get Not Assigned Trainers", description = "Get Trainers Not Assigned to Trainee")
     @GetMapping("/{username}/trainers/not-assigned")
     public ResponseEntity<List<TrainerInfoResponse>> getNotAssignedTrainers(@PathVariable String username) {
         logUtils.info(log, "Get not assigned trainers request: traineeUsername={}", username);
@@ -109,6 +122,7 @@ public class TraineeController {
         return ResponseEntity.ok(response);
     }
 
+    @UpdateOperation(summary = "Update Trainee Trainers", description = "Update Trainee Trainers List")
     @PutMapping("/{username}/trainers")
     public ResponseEntity<List<TrainerInfoResponse>> updateTrainers(@PathVariable String username,
             @Valid @RequestBody UpdateTraineeTrainersRequest request) {
@@ -126,6 +140,7 @@ public class TraineeController {
         return ResponseEntity.ok(traineeMapper.trainersToInfoResponseList(trainee.getTrainers()));
     }
 
+    @UpdateOperation(summary = "Activate/Deactivate Trainee", description = "Activate or Deactivate Trainee Profile")
     @PatchMapping("/{username}/activate")
     public ResponseEntity<Void> activateDeactivate(@PathVariable String username,
             @Valid @RequestBody ActivateDeactivateRequest request) {

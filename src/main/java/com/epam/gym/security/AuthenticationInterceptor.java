@@ -27,7 +27,11 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     private static final Set<PublicEndpoint> PUBLIC_ENDPOINTS = Set.of(
         new PublicEndpoint("/api/v1/trainees/register", HttpMethod.POST),
         new PublicEndpoint("/api/v1/trainers/register", HttpMethod.POST),
-        new PublicEndpoint("/api/v1/auth/login", HttpMethod.GET)
+        new PublicEndpoint("/api/v1/auth/login", HttpMethod.GET),
+
+        // Swagger UI + OpenAPI
+        new PublicEndpoint("/swagger-ui", HttpMethod.GET),
+        new PublicEndpoint("/v3/api-docs", HttpMethod.GET)
     );
 
     @Override

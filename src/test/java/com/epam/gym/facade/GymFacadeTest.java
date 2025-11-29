@@ -44,8 +44,6 @@ class GymFacadeTest {
     private Trainee sampleTrainee;
     private Trainer sampleTrainer;
     private Training sampleTraining;
-    private TrainingType sampleType;
-
     @BeforeEach
     void setUp() {
         sampleTrainee = Trainee.builder()
@@ -67,7 +65,7 @@ class GymFacadeTest {
                 .name("Sesh")
                 .build();
 
-        sampleType = new TrainingType(1L, "Cardio", null, null);
+        new TrainingType(1L, "Cardio", null, null);
     }
 
     @Test
@@ -244,14 +242,17 @@ class GymFacadeTest {
 
     @Test
     void listTrainingTypes_delegatesAndReturns() {
+        TrainingType.Type sampleType = TrainingType.Type.CARDIO;
+
         when(trainingTypeService.listAll()).thenReturn(List.of(sampleType));
 
-        List<TrainingType> out = facade.listTrainingTypes();
+        List<TrainingType.Type> out = facade.listTrainingTypes();
 
         assertEquals(1, out.size());
         assertSame(sampleType, out.get(0));
         verify(trainingTypeService).listAll();
     }
+
 
     @Test
     void exceptionsFromServices_propagateThroughFacade() {

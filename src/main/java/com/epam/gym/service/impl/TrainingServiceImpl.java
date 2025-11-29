@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,41 +46,41 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     private void validateTrainingPayload(Training p) {
-        if (p == null) {
-            throw new ValidationException("Training payload required");
-        }
+        Optional.ofNullable(p)
+                .orElseThrow(() -> new ValidationException("Training payload required"));
 
-        if (p.getName() == null || p.getName().isBlank()) {
-            throw new ValidationException("Training name required");
-        }
+        Optional.ofNullable(p.getName())
+                .filter(name -> !name.isBlank())
+                .orElseThrow(() -> new ValidationException("Training name required"));
 
-        Date trainingDate = p.getDate();
-        if (trainingDate == null) {
-            throw new ValidationException("Training date required");
-        }
+        Optional.ofNullable(p.getDate())
+                .orElseThrow(() -> new ValidationException("Training date required"));
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, MAX_TRAINING_YEARS_AHEAD);
         Date maxDate = cal.getTime();
-        if (trainingDate.after(maxDate)) {
-            throw new ValidationException("Training date unreasonable");
-        }
+        Optional.of(p.getDate())
+                .filter(date -> date.after(maxDate))
+                .ifPresent(date -> {
+                    throw new ValidationException("Training date unreasonable");
+                });
 
-        if (p.getDuration() == null || isNotPositive(p.getDuration())) {
-            throw new ValidationException("Duration must be positive");
-        }
+        Optional.ofNullable(p.getDuration())
+                .filter(d -> !isNotPositive(d))
+                .orElseThrow(() -> new ValidationException("Duration must be positive"));
 
-        if (p.getTrainee() == null || p.getTrainee().getUsername() == null || p.getTrainee().getUsername().isBlank()) {
-            throw new ValidationException("Trainee username required");
-        }
+        Optional.ofNullable(p.getTrainee())
+                .map(Trainee::getUsername)
+                .filter(username -> !username.isBlank())
+                .orElseThrow(() -> new ValidationException("Trainee username required"));
 
-        if (p.getTrainer() == null || p.getTrainer().getUsername() == null || p.getTrainer().getUsername().isBlank()) {
-            throw new ValidationException("Trainer username required");
-        }
+        Optional.ofNullable(p.getTrainer())
+                .map(Trainer::getUsername)
+                .filter(username -> !username.isBlank())
+                .orElseThrow(() -> new ValidationException("Trainer username required"));
 
-        if (p.getSpecialization() == null) {
-            throw new ValidationException("Training type required");
-        }
+        Optional.ofNullable(p.getSpecialization())
+                .orElseThrow(() -> new ValidationException("Training type required"));
     }
 
     private void prepareTrainingPayload(Training payload) {

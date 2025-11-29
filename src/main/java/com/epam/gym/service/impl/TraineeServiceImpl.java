@@ -67,28 +67,28 @@ public class TraineeServiceImpl implements TraineeService {
 
 
     private void validateTraineePayload(Trainee t) {
-        if (t == null) {
-            throw new ValidationException("Trainee payload required");
-        }
+        Optional.ofNullable(t)
+                .orElseThrow(() -> new ValidationException("Trainee payload required"));
 
-        if (t.getFirstName().isBlank()) {
-            throw new ValidationException("firstName required");
-        }
+        Optional.of(t.getFirstName())
+                .filter(name -> !name.isBlank())
+                .orElseThrow(() -> new ValidationException("firstName required"));
 
-        if (t.getLastName().isBlank()) {
-            throw new ValidationException("lastName required");
-        }
+        Optional.of(t.getLastName())
+                .filter(name -> !name.isBlank())
+                .orElseThrow(() -> new ValidationException("lastName required"));
 
-        if (t.getDateOfBirth() != null) {
-        throwIfInFuture(t.getDateOfBirth());
-        }
+        Optional.ofNullable(t.getDateOfBirth())
+                .ifPresent(this::throwIfInFuture);
     }
 
     private void throwIfInFuture(Date date) {
-        if (date.after(new Date())) {
-            throw new ValidationException("dateOfBirth cannot be in the future");
+        Optional.of(date)
+                .filter(d -> d.after(new Date()))
+                .ifPresent(d -> {
+                    throw new ValidationException("dateOfBirth cannot be in the future");
+                });
     }
-}
 
     @Transactional(readOnly = true)
     public Trainee getByUsername(String username) {

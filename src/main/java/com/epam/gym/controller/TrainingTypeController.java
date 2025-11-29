@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.epam.gym.openapi.annotation.operation.GetAllOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epam.gym.dto.response.TrainingTypeResponse;
@@ -14,6 +16,7 @@ import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "Training Types", description = "Operations in Training Types")
 @RestController
 @RequestMapping("/api/v1/training-types")
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class TrainingTypeController {
     private final TrainingTypeMapper trainingTypeMapper;
     private final LogUtils logUtils;
 
+    @GetAllOperation(summary = "Get Training Types", description = "Get All Training Types")
     @GetMapping
     public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
         logUtils.info(log, "Get training types request");
