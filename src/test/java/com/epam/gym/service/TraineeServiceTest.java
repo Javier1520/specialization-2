@@ -1,5 +1,30 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.request.TrainingFilterRequest;
+import com.epam.gym.exception.NotFoundException;
+import com.epam.gym.exception.ValidationException;
+import com.epam.gym.model.Trainee;
+import com.epam.gym.model.Trainer;
+import com.epam.gym.model.Training;
+import com.epam.gym.repository.TraineeRepository;
+import com.epam.gym.repository.TrainerRepository;
+import com.epam.gym.repository.TrainingRepository;
+import com.epam.gym.service.impl.TraineeServiceImpl;
+import com.epam.gym.util.LogUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,32 +40,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.epam.gym.dto.request.TrainingFilterRequest;
-import com.epam.gym.exception.NotFoundException;
-import com.epam.gym.exception.ValidationException;
-import com.epam.gym.model.Trainee;
-import com.epam.gym.model.Trainer;
-import com.epam.gym.model.Training;
-import com.epam.gym.repository.TraineeRepository;
-import com.epam.gym.repository.TrainerRepository;
-import com.epam.gym.repository.TrainingRepository;
-import com.epam.gym.service.impl.TraineeServiceImpl;
-import com.epam.gym.util.LogUtils;
 
 @ExtendWith(MockitoExtension.class)
 class TraineeServiceTest {

@@ -1,6 +1,7 @@
 package com.epam.gym.openapi.annotation.base.response.server_error;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

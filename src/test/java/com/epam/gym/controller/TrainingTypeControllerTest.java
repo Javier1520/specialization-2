@@ -1,12 +1,10 @@
 package com.epam.gym.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-
+import com.epam.gym.dto.response.TrainingTypeResponse;
+import com.epam.gym.mapper.TrainingTypeMapper;
+import com.epam.gym.model.TrainingType;
+import com.epam.gym.service.TrainingTypeService;
+import com.epam.gym.util.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,11 +14,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.epam.gym.dto.response.TrainingTypeResponse;
-import com.epam.gym.mapper.TrainingTypeMapper;
-import com.epam.gym.model.TrainingType;
-import com.epam.gym.service.TrainingTypeService;
-import com.epam.gym.util.LogUtils;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingTypeControllerTest {

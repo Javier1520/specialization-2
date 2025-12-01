@@ -1,16 +1,15 @@
 package com.epam.gym.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.List;
-
+import com.epam.gym.dto.response.TrainingTypeResponse;
+import com.epam.gym.model.TrainingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import com.epam.gym.dto.response.TrainingTypeResponse;
-import com.epam.gym.model.TrainingType;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TrainingTypeMapperTest {
 

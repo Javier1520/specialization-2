@@ -1,24 +1,5 @@
 package com.epam.gym.controller;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import com.epam.gym.openapi.annotation.operation.CreateOperation;
-import com.epam.gym.openapi.annotation.operation.GetAllOperation;
-import com.epam.gym.openapi.annotation.operation.GetByIdOperation;
-import com.epam.gym.openapi.annotation.operation.UpdateOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.epam.gym.dto.request.ActivateDeactivateRequest;
 import com.epam.gym.dto.request.TrainerRegistrationRequest;
 import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
@@ -30,12 +11,29 @@ import com.epam.gym.mapper.TrainerMapper;
 import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
+import com.epam.gym.openapi.annotation.operation.CreateOperation;
+import com.epam.gym.openapi.annotation.operation.GetAllOperation;
+import com.epam.gym.openapi.annotation.operation.GetByIdOperation;
+import com.epam.gym.openapi.annotation.operation.UpdateOperation;
 import com.epam.gym.service.TrainerService;
 import com.epam.gym.util.LogUtils;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Tag(name = "Trainers", description = "Operations in Trainers")
 @RestController

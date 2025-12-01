@@ -1,13 +1,10 @@
 package com.epam.gym.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
+import com.epam.gym.dto.request.ChangePasswordRequest;
+import com.epam.gym.exception.NotFoundException;
+import com.epam.gym.exception.ValidationException;
+import com.epam.gym.service.AuthenticationService;
+import com.epam.gym.util.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.epam.gym.dto.request.ChangePasswordRequest;
-import com.epam.gym.exception.NotFoundException;
-import com.epam.gym.exception.ValidationException;
-import com.epam.gym.service.AuthenticationService;
-import com.epam.gym.util.LogUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {

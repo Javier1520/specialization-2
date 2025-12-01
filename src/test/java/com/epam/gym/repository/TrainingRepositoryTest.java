@@ -1,5 +1,15 @@
 package com.epam.gym.repository;
 
+import com.epam.gym.model.Trainee;
+import com.epam.gym.model.Training;
+import com.epam.gym.model.TrainingType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Date;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,17 +19,6 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.Date;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.epam.gym.model.Trainee;
-import com.epam.gym.model.Training;
-import com.epam.gym.model.TrainingType;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingRepositoryTest {

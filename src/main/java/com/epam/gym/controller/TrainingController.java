@@ -1,27 +1,25 @@
 package com.epam.gym.controller;
 
+import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
+import com.epam.gym.model.Training;
+import com.epam.gym.openapi.annotation.operation.CreateOperation;
+import com.epam.gym.repository.TraineeRepository;
+import com.epam.gym.repository.TrainerRepository;
+import com.epam.gym.service.TrainingService;
+import com.epam.gym.util.LogUtils;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.epam.gym.openapi.annotation.operation.CreateOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.epam.gym.dto.request.AddTrainingRequest;
-import com.epam.gym.model.Training;
-import com.epam.gym.repository.TraineeRepository;
-import com.epam.gym.repository.TrainerRepository;
-import com.epam.gym.service.TrainingService;
-import com.epam.gym.util.LogUtils;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Tag(name = "Trainings", description = "Operations in Trainings")
 @RestController
