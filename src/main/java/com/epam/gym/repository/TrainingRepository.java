@@ -14,16 +14,16 @@ import java.util.List;
 public interface TrainingRepository extends JpaRepository<Training, Long> {
     // List trainings by trainee username with optional filters
     @Query("""
-        SELECT tr FROM Training tr
-        JOIN FETCH tr.trainee te
-        LEFT JOIN FETCH tr.trainer trn
-        WHERE te.username = :username
-          AND (:fromDate IS NULL OR tr.date >= :fromDate)
-          AND (:toDate IS NULL OR tr.date <= :toDate)
-          AND (:trainerName IS NULL OR trn.username LIKE %:trainerName%)
-          AND (:trainingType IS NULL OR tr.specialization = :trainingType)
-        ORDER BY tr.date DESC
-    """)
+                SELECT tr FROM Training tr
+                JOIN FETCH tr.trainee te
+                LEFT JOIN FETCH tr.trainer trn
+                WHERE te.username = :username
+                  AND (:fromDate IS NULL OR tr.date >= :fromDate)
+                  AND (:toDate IS NULL OR tr.date <= :toDate)
+                  AND (:trainerName IS NULL OR trn.username LIKE %:trainerName%)
+                  AND (:trainingType IS NULL OR tr.specialization = :trainingType)
+                ORDER BY tr.date DESC
+            """)
     List<Training> findByTraineeUsernameAndCriteria(
             @Param("username") String username,
             @Param("fromDate") Date fromDate,
@@ -33,15 +33,15 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
 
     // List trainings by trainer username with optional filters
     @Query("""
-        SELECT tr FROM Training tr
-        JOIN FETCH tr.trainer t
-        LEFT JOIN FETCH tr.trainee te
-        WHERE t.username = :username
-          AND (:fromDate IS NULL OR tr.date >= :fromDate)
-          AND (:toDate IS NULL OR tr.date <= :toDate)
-          AND (:traineeName IS NULL OR te.username LIKE %:traineeName%)
-        ORDER BY tr.date DESC
-    """)
+                SELECT tr FROM Training tr
+                JOIN FETCH tr.trainer t
+                LEFT JOIN FETCH tr.trainee te
+                WHERE t.username = :username
+                  AND (:fromDate IS NULL OR tr.date >= :fromDate)
+                  AND (:toDate IS NULL OR tr.date <= :toDate)
+                  AND (:traineeName IS NULL OR te.username LIKE %:traineeName%)
+                ORDER BY tr.date DESC
+            """)
     List<Training> findByTrainerUsernameAndCriteria(
             @Param("username") String username,
             @Param("fromDate") Date fromDate,

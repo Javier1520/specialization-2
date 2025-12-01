@@ -19,10 +19,10 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     Optional<Trainer> findByUsernameWithTrainees(@Param("username") String username);
 
     @Query("""
-        SELECT t FROM Trainer t
-        WHERE t.id NOT IN (
-            SELECT tr.id FROM Trainer tr JOIN tr.trainees te WHERE te.id = :traineeId
-        )
-        """)
+            SELECT t FROM Trainer t
+            WHERE t.id NOT IN (
+                SELECT tr.id FROM Trainer tr JOIN tr.trainees te WHERE te.id = :traineeId
+            )
+            """)
     List<Trainer> findNotAssignedToTrainee(@Param("traineeId") Long traineeId);
 }
