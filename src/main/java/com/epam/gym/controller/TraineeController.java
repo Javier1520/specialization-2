@@ -103,9 +103,7 @@ public class TraineeController {
                         "trainingType={}", username, filter.periodFrom(), filter.periodTo(), filter.trainerName(),
                         filter.trainingType());
 
-        List<Training> trainings =
-                traineeService.getTraineeTrainings(username, filter);
-
+        List<Training> trainings = traineeService.getTraineeTrainings(username, filter);
         return ResponseEntity.ok(trainingMapper.toResponseList(trainings));
     }
 

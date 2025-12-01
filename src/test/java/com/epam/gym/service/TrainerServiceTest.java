@@ -161,8 +161,8 @@ class TrainerServiceTest {
                 isNull()))
                 .thenReturn(List.of(tr));
 
-        TrainerTrainingFilterRequest filter =
-                new TrainerTrainingFilterRequest(new Date(0), new Date(), null);
+        TrainerTrainingFilterRequest filter = new TrainerTrainingFilterRequest(new Date(0), new Date(),
+                null);
         List<Training> out = trainerService.getTrainerTrainings("t1", filter);
         assertEquals(1, out.size());
         verify(trainingRepository).findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class),

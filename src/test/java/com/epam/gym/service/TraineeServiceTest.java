@@ -233,12 +233,10 @@ class TraineeServiceTest {
                 isNull(), isNull()))
                 .thenReturn(List.of(t));
 
-        // Convert LocalDate to Date
         Date fromDate = new Date(0); // epoch start (Jan 1, 1970)
         Date toDate = new Date(); // current date
 
-        TrainingFilterRequest filter =
-                new TrainingFilterRequest(fromDate, toDate, null, null);
+        TrainingFilterRequest filter = new TrainingFilterRequest(fromDate, toDate, null, null);
         List<Training> result = traineeService.getTraineeTrainings("u", filter);
         assertEquals(1, result.size());
         verify(trainingRepository).findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),

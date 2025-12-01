@@ -163,8 +163,7 @@ class TrainerControllerTest {
         Date periodTo = new Date();
         String traineeName = "John Doe";
 
-        TrainerTrainingFilterRequest filter =
-                new TrainerTrainingFilterRequest(periodFrom, periodTo, traineeName);
+        TrainerTrainingFilterRequest filter = new TrainerTrainingFilterRequest(periodFrom, periodTo, traineeName);
 
         List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(
@@ -195,8 +194,7 @@ class TrainerControllerTest {
         Date periodTo = new Date(); // Today
         String traineeName = null;
 
-        TrainerTrainingFilterRequest filter =
-                new TrainerTrainingFilterRequest(periodFrom, periodTo, traineeName);
+        TrainerTrainingFilterRequest filter = new TrainerTrainingFilterRequest(periodFrom, periodTo, traineeName);
 
         // When & Then
         try {

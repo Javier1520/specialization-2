@@ -130,8 +130,7 @@ class GymFacadeTest {
         Date from = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000)); // 1 day ago
         Date to = new Date(); // current date
 
-        TrainingFilterRequest filter =
-                new TrainingFilterRequest(from, to, "r", TrainingType.Type.CARDIO);
+        TrainingFilterRequest filter = new TrainingFilterRequest(from, to, "r", TrainingType.Type.CARDIO);
 
         when(traineeService.getTraineeTrainings("t.one", filter))
                 .thenReturn(List.of(sampleTraining));
@@ -217,8 +216,7 @@ class GymFacadeTest {
         Date from = new Date(System.currentTimeMillis() - (2L * 24 * 60 * 60 * 1000)); // 2 days ago
         Date to = new Date(); // current date and time
 
-        TrainerTrainingFilterRequest filter =
-                new TrainerTrainingFilterRequest(from, to, "t");
+        TrainerTrainingFilterRequest filter = new TrainerTrainingFilterRequest(from, to, "t");
 
         when(trainerService.getTrainerTrainings("r.two", filter))
                 .thenReturn(List.of(sampleTraining));

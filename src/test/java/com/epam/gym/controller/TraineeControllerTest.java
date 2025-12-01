@@ -200,8 +200,7 @@ class TraineeControllerTest {
         String trainerName = "Trainer One";
         TrainingType.Type trainingType = TrainingType.Type.CARDIO;
 
-        TrainingFilterRequest filter =
-                new TrainingFilterRequest(periodFrom, periodTo, trainerName, trainingType);
+        TrainingFilterRequest filter = new TrainingFilterRequest(periodFrom, periodTo, trainerName, trainingType);
 
         List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(
