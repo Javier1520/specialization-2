@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     boolean existsByUsername(String username);
+
     Optional<Trainer> findByUsername(String username);
 
     @Query("SELECT t FROM Trainer t LEFT JOIN FETCH t.trainees WHERE t.username = :username")
