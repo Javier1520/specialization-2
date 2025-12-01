@@ -10,6 +10,7 @@ import com.epam.gym.model.Trainer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
@@ -33,8 +34,7 @@ public interface TrainerMapper {
     @Mapping(target = "trainees", ignore = true)
     void updateEntityFromRequest(UpdateTrainerRequest request, @MappingTarget Trainer entity);
 
-    @Mapping(target = "trainees", expression =
-            "java(trainer.getTrainees() != null ? traineesToInfoResponseList(trainer.getTrainees()) : null)")
+    @Mapping(target = "trainees", qualifiedByName = "traineesToInfoResponseList")
     TrainerProfileResponse toProfileResponse(Trainer trainer);
 
     @Mapping(target = "trainerUsername", source = "username")
@@ -43,13 +43,12 @@ public interface TrainerMapper {
     @Mapping(target = "trainerSpecialization", source = "specialization")
     TrainerInfoResponse toInfoResponse(Trainer trainer);
 
+    @Named("traineesToInfoResponseList")
     default List<TraineeInfoResponse> traineesToInfoResponseList(List<Trainee> trainees) {
-        if (trainees == null) {
-            return null;
-        }
-        return trainees.stream()
-                .map(this::traineeToInfoResponse)
-                .toList();
+        return trainees == null ? null :
+                trainees.stream()
+                        .map(this::traineeToInfoResponse)
+                        .toList();
     }
 
     @Mapping(target = "traineeUsername", source = "username")
