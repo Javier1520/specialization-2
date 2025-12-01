@@ -23,12 +23,15 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     private final LogUtils logUtils;
 
+    public static final String ERROR = "error";
+    public static final String ERRORS = "errors";
+
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException ex) {
         logUtils.error(log, "Not found exception: {}", ex.getMessage());
         Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
+        error.put(ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
@@ -37,7 +40,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
         logUtils.error(log, "Validation exception: {}", ex.getMessage());
         Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
+        error.put(ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
@@ -52,7 +55,7 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         Map<String, Object> response = new HashMap<>();
-        response.put("errors", errors);
+        response.put(ERRORS, errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
@@ -66,7 +69,7 @@ public class GlobalExceptionHandler {
                         ConstraintViolation::getMessage
                 ));
         Map<String, Object> response = new HashMap<>();
-        response.put("errors", errors);
+        response.put(ERRORS, errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
@@ -75,7 +78,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
         logUtils.error(log, "Unexpected error: ", ex);
         Map<String, String> error = new HashMap<>();
-        error.put("error", "An unexpected error occurred");
+        error.put(ERROR, "An unexpected error occurred");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
