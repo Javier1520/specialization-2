@@ -248,9 +248,8 @@ class TraineeControllerTest {
     void updateTrainers_success_returnsOk() {
         // Given
         String username = "john.doe";
-        UpdateTraineeTrainersRequest.TrainerUsernameRequest trainerRequest =
-                new UpdateTraineeTrainersRequest.TrainerUsernameRequest("trainer1");
-        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(List.of(trainerRequest));
+        var trainerRequest = new UpdateTraineeTrainersRequest.TrainerUsernameRequest("trainer1");
+        var request = new UpdateTraineeTrainersRequest(List.of(trainerRequest));
 
         List<TrainerInfoResponse> trainerResponses = List.of(
                 new TrainerInfoResponse("trainer1", "Trainer", "One",
@@ -278,9 +277,8 @@ class TraineeControllerTest {
     void updateTrainers_trainerNotFound_throwsException() {
         // Given
         String username = "john.doe";
-        UpdateTraineeTrainersRequest.TrainerUsernameRequest trainerRequest =
-                new UpdateTraineeTrainersRequest.TrainerUsernameRequest("nonexistent");
-        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(List.of(trainerRequest));
+        var trainerRequest = new UpdateTraineeTrainersRequest.TrainerUsernameRequest("nonexistent");
+        var request = new UpdateTraineeTrainersRequest(List.of(trainerRequest));
 
         when(trainerRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
 
