@@ -49,7 +49,7 @@ public class TrainingServiceImpl implements TrainingService {
                 .orElseThrow(() -> new ValidationException("Training payload required"));
 
         Optional.ofNullable(p.getName())
-                .filter(name -> !name.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("Training name required"));
 
         Optional.ofNullable(p.getDate())
@@ -65,17 +65,17 @@ public class TrainingServiceImpl implements TrainingService {
                 });
 
         Optional.ofNullable(p.getDuration())
-                .filter(d -> !isNotPositive(d))
+                .filter(this::isPositive)
                 .orElseThrow(() -> new ValidationException("Duration must be positive"));
 
         Optional.ofNullable(p.getTrainee())
                 .map(Trainee::getUsername)
-                .filter(username -> !username.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("Trainee username required"));
 
         Optional.ofNullable(p.getTrainer())
                 .map(Trainer::getUsername)
-                .filter(username -> !username.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("Trainer username required"));
 
         Optional.ofNullable(p.getSpecialization())
@@ -100,8 +100,12 @@ public class TrainingServiceImpl implements TrainingService {
                 .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
     }
 
-    private boolean isNotPositive(Integer value) {
-        return value < 0;
+    private boolean isNotBlank(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private boolean isPositive(Integer value) {
+        return value > 0;
     }
 
 

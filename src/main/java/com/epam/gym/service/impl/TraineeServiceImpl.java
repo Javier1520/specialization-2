@@ -71,15 +71,19 @@ public class TraineeServiceImpl implements TraineeService {
                 .orElseThrow(() -> new ValidationException("Trainee payload required"));
 
         Optional.of(t.getFirstName())
-                .filter(name -> !name.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("firstName required"));
 
         Optional.of(t.getLastName())
-                .filter(name -> !name.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("lastName required"));
 
         Optional.ofNullable(t.getDateOfBirth())
                 .ifPresent(this::throwIfInFuture);
+    }
+
+    private boolean isNotBlank(String value) {
+        return value != null && !value.isBlank();
     }
 
     private void throwIfInFuture(Date date) {
@@ -199,9 +203,14 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     private void validateTrainerIds(List<Long> trainerIds, List<Trainer> trainers) {
-        if (trainers.size() != trainerIds.size()) {
-            throw new ValidationException("Some trainer ids not found");
+        if (allTrainersFound(trainers, trainerIds)) {
+            return;
         }
+        throw new ValidationException("Some trainer ids not found");
+    }
+
+    private boolean allTrainersFound(List<Trainer> trainers, List<Long> trainerIds) {
+        return trainers.size() == trainerIds.size();
     }
 
     private void updateTrainerRelationships(Trainee trainee, List<Trainer> trainers) {

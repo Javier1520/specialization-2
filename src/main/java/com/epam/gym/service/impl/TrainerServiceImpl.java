@@ -69,15 +69,19 @@ public class TrainerServiceImpl implements TrainerService {
                 .orElseThrow(() -> new ValidationException("Trainer payload required"));
 
         Optional.ofNullable(t.getFirstName())
-                .filter(name -> !name.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("firstName required"));
 
         Optional.ofNullable(t.getLastName())
-                .filter(name -> !name.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("lastName required"));
 
         Optional.ofNullable(t.getSpecialization())
                 .orElseThrow(() -> new ValidationException("specialization required"));
+    }
+
+    private boolean isNotBlank(String value) {
+        return value != null && !value.isBlank();
     }
 
 

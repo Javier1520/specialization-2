@@ -51,12 +51,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private void validateCredentials(String username, String password) {
         Optional.ofNullable(username)
-                .filter(u -> !u.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("Username is required"));
 
         Optional.ofNullable(password)
-                .filter(p -> !p.isBlank())
+                .filter(this::isNotBlank)
                 .orElseThrow(() -> new ValidationException("Password is required"));
+    }
+
+    private boolean isNotBlank(String value) {
+        return value != null && !value.isBlank();
     }
 
     private boolean authenticateTrainee(String username, String password) {
@@ -86,9 +90,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private void verifyPassword(String provided, String stored, String errorMessage) {
-        if (!stored.equals(provided)) {
-            throw new ValidationException(errorMessage);
+        if (passwordsMatch(provided, stored)) {
+            return;
         }
+        throw new ValidationException(errorMessage);
+    }
+
+    private boolean passwordsMatch(String provided, String stored) {
+        return stored.equals(provided);
     }
 
     private void verifyUserActive(Boolean isActive, String userType) {
