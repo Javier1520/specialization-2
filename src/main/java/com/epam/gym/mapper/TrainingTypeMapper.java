@@ -17,11 +17,8 @@ public interface TrainingTypeMapper {
     List<TrainingTypeResponse> toResponseList(List<TrainingType.Type> trainingTypes);
 
     default TrainingTypeResponse toResponse(TrainingType.Type type) {
-        if (type == null) {
-            return null;
-        }
-        // Map enum ordinal + 1 as ID (since DB IDs start at 1) and enum name as the type
-        return new TrainingTypeResponse((long) (type.ordinal() + 1), type.name());
+        return type == null ? null :
+                new TrainingTypeResponse((long) (type.ordinal() + 1), type.name());
     }
 }
 
