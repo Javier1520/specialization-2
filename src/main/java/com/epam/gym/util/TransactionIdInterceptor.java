@@ -13,6 +13,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 public class TransactionIdInterceptor implements HandlerInterceptor {
     private final LogUtils logUtils;
+
     private static final String TRANSACTION_ID_HEADER = "X-Transaction-Id";
     private static final String TRANSACTION_ID_MDC_KEY = "transactionId";
 

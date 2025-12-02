@@ -18,10 +18,11 @@ import java.util.Optional;
 @Slf4j
 @Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
-    public static final int PASSWORD_LENGTH = 10;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final LogUtils logUtils;
+
+    private static final int PASSWORD_LENGTH = 10;
 
     @Transactional(readOnly = true)
     public void authenticate(String username, String password) {
