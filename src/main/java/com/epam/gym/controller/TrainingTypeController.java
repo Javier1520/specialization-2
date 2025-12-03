@@ -1,7 +1,7 @@
 package com.epam.gym.controller;
 
 import com.epam.gym.dto.response.TrainingTypeResponse;
-import com.epam.gym.mapper.TrainingTypeMapper;
+
 import com.epam.gym.openapi.annotation.operation.GetAllOperation;
 import com.epam.gym.service.TrainingTypeService;
 import com.epam.gym.util.LogUtils;
@@ -22,14 +22,13 @@ import java.util.List;
 @Slf4j
 public class TrainingTypeController {
     private final TrainingTypeService trainingTypeService;
-    private final TrainingTypeMapper trainingTypeMapper;
     private final LogUtils logUtils;
 
     @GetAllOperation(summary = "Get Training Types", description = "Get All Training Types")
     @GetMapping
     public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
         logUtils.info(log, "Get training types request");
-        return ResponseEntity.ok(trainingTypeMapper.toResponseList(trainingTypeService.listAll()));
+        return ResponseEntity.ok(trainingTypeService.listAll());
     }
 }
 

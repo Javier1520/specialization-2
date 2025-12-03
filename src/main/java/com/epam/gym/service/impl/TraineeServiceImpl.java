@@ -1,8 +1,17 @@
 package com.epam.gym.service.impl;
 
+import com.epam.gym.dto.request.TraineeRegistrationRequest;
 import com.epam.gym.dto.request.TrainingFilterRequest;
+import com.epam.gym.dto.request.UpdateTraineeRequest;
+import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
+import com.epam.gym.dto.response.RegistrationResponse;
+import com.epam.gym.dto.response.TraineeProfileResponse;
+import com.epam.gym.dto.response.TrainerInfoResponse;
+import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
+import com.epam.gym.mapper.TraineeMapper;
+import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
@@ -17,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,16 +39,19 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
     private final UsernamePasswordGenerator usernamePasswordGenerator;
+    private final TraineeMapper traineeMapper;
+    private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
 
     private static final int PASSWORD_LENGTH = 10;
 
-    public Trainee createTrainee(Trainee payload) {
-        validateTraineePayload(payload);
-        prepareTrainee(payload);
-        Trainee saved = traineeRepository.save(payload);
+    public RegistrationResponse createTrainee(TraineeRegistrationRequest request) {
+        logUtils.info(log, "Trainee registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
+        Trainee trainee = traineeMapper.toEntity(request);
+        prepareTrainee(trainee);
+        Trainee saved = traineeRepository.save(trainee);
         logUtils.info(log, "Created trainee username={} id={}", saved.getUsername(), saved.getId());
-        return saved;
+        return new RegistrationResponse(saved.getUsername(), saved.getPassword());
     }
 
     private void prepareTrainee(Trainee payload) {
@@ -64,44 +75,11 @@ public class TraineeServiceImpl implements TraineeService {
         return usernamePasswordGenerator.generatePassword();
     }
 
-
-
-    private void validateTraineePayload(Trainee t) {
-        Optional.ofNullable(t)
-                .orElseThrow(() -> new ValidationException("Trainee payload required"));
-
-        Optional.of(t.getFirstName())
-                .filter(this::isNotBlank)
-                .orElseThrow(() -> new ValidationException("firstName required"));
-
-        Optional.of(t.getLastName())
-                .filter(this::isNotBlank)
-                .orElseThrow(() -> new ValidationException("lastName required"));
-
-        Optional.ofNullable(t.getDateOfBirth())
-                .ifPresent(this::throwIfInFuture);
-    }
-
-    private boolean isNotBlank(String value) {
-        return value != null && !value.isBlank();
-    }
-
-    private void throwIfInFuture(Date date) {
-        Optional.of(date)
-                .filter(d -> d.after(new Date()))
-                .ifPresent(d -> {
-                    throw new ValidationException("dateOfBirth cannot be in the future");
-                });
-    }
-
     @Transactional(readOnly = true)
-    public Trainee getByUsername(String username) {
-        return findTraineeByUsername(username);
-    }
-
-    @Transactional(readOnly = true)
-    public Trainee getByUsernameWithTrainers(String username) {
-        return findTraineeByUsernameWithTrainers(username);
+    public TraineeProfileResponse getByUsername(String username) {
+        logUtils.info(log, "Get trainee profile request: username={}", username);
+        Trainee trainee = findTraineeByUsernameWithTrainers(username);
+        return traineeMapper.toProfileResponse(trainee);
     }
 
     public void changePassword(String username, String newPassword) {
@@ -112,16 +90,17 @@ public class TraineeServiceImpl implements TraineeService {
         logUtils.info(log, "Changed password for trainee {}", username);
     }
 
-    public Trainee updateTrainee(String username, Trainee update) {
-        Trainee existing = findTraineeByUsernameWithTrainers(username);
-        validateTraineePayload(update);
-        updateTraineeFields(existing, update);
+    public TraineeProfileResponse updateTrainee(String username, UpdateTraineeRequest request) {
+        logUtils.info(log, "Update trainee profile request: username={}", username);
+        Trainee existing = findTraineeByUsername(username);
+        traineeMapper.updateEntityFromRequest(request, existing);
         traineeRepository.save(existing);
         logUtils.info(log, "Updated trainee {}", username);
-        return existing;
+        return traineeMapper.toProfileResponse(existing);
     }
 
     public void setActive(String username, boolean active) {
+        logUtils.info(log, "Activate/Deactivate trainee request: username={}, isActive={}", username, active);
         Trainee trainee = findTraineeByUsername(username);
         validateActiveStatusChange(trainee.getIsActive(), active);
         trainee.setIsActive(active);
@@ -130,6 +109,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     public void deleteByUsername(String username) {
+        logUtils.info(log, "Delete trainee profile request: username={}", username);
         Trainee t = findTraineeByUsername(username);
         removeTraineeFromTrainers(t);
         traineeRepository.deleteByUsername(username);
@@ -137,29 +117,50 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Training> getTraineeTrainings(String username, TrainingFilterRequest filter) {
-        return trainingRepository.findByTraineeUsernameAndCriteria(
+    public List<TrainingResponse> getTraineeTrainings(String username, TrainingFilterRequest filter) {
+        logUtils.info(log,
+                "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, " +
+                        "trainingType={}", username, filter.periodFrom(), filter.periodTo(), filter.trainerName(),
+                        filter.trainingType());
+        List<Training> trainings = trainingRepository.findByTraineeUsernameAndCriteria(
                 username,
                 filter.periodFrom(),
                 filter.periodTo(),
                 filter.trainerName(),
                 filter.trainingType()
         );
+        return trainingMapper.toResponseList(trainings);
     }
 
     @Transactional(readOnly = true)
-    public List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername) {
+    public List<TrainerInfoResponse> getTrainersNotAssignedToTrainee(String traineeUsername) {
+        logUtils.info(log, "Get not assigned trainers request: traineeUsername={}", traineeUsername);
         Trainee t = findTraineeByUsername(traineeUsername);
-        return trainerRepository.findNotAssignedToTrainee(t.getId());
+        List<Trainer> trainers = trainerRepository.findNotAssignedToTrainee(t.getId());
+        return trainers.stream()
+                .map(traineeMapper::trainerToInfoResponse)
+                .toList();
     }
 
-    public void updateTraineeTrainers(String traineeUsername, List<Long> trainerIds) {
+    public List<TrainerInfoResponse> updateTraineeTrainers(String traineeUsername, UpdateTraineeTrainersRequest request) {
+        logUtils.info(log, "Update trainee trainers request: traineeUsername={}", traineeUsername);
         Trainee t = findTraineeByUsername(traineeUsername);
+
+        List<Long> trainerIds = request.trainers().stream()
+                .map(tr -> {
+                    Trainer trainer = trainerRepository.findByUsername(tr.trainerUsername())
+                            .orElseThrow(() -> new NotFoundException("Trainer not found: " + tr.trainerUsername()));
+                    return trainer.getId();
+                })
+                .toList();
+
         List<Trainer> trainers = trainerRepository.findAllById(trainerIds);
         validateTrainerIds(trainerIds, trainers);
         updateTrainerRelationships(t, trainers);
         traineeRepository.save(t);
         logUtils.info(log, "Updated trainers for trainee {} to {}", traineeUsername, trainerIds);
+
+        return traineeMapper.trainersToInfoResponseList(t.getTrainers());
     }
 
     private Trainee findTraineeByUsername(String username) {
@@ -176,14 +177,6 @@ public class TraineeServiceImpl implements TraineeService {
         Optional.ofNullable(password)
                 .filter(pwd -> pwd.length() == PASSWORD_LENGTH)
                 .orElseThrow(() -> new ValidationException("Password must be at least 10 characters"));
-    }
-
-    private void updateTraineeFields(Trainee existing, Trainee update) {
-        existing.setFirstName(update.getFirstName());
-        existing.setLastName(update.getLastName());
-        existing.setAddress(update.getAddress());
-        existing.setDateOfBirth(update.getDateOfBirth());
-        existing.setIsActive(update.getIsActive());
     }
 
     private void validateActiveStatusChange(Boolean current, boolean newStatus) {

@@ -7,10 +7,6 @@ import com.epam.gym.dto.request.UpdateTrainerRequest;
 import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.dto.response.TrainingResponse;
-import com.epam.gym.mapper.TrainerMapper;
-import com.epam.gym.mapper.TrainingMapper;
-import com.epam.gym.model.Trainer;
-import com.epam.gym.model.Training;
 import com.epam.gym.openapi.annotation.operation.CreateOperation;
 import com.epam.gym.openapi.annotation.operation.GetAllOperation;
 import com.epam.gym.openapi.annotation.operation.GetByIdOperation;
@@ -42,8 +38,6 @@ import java.util.List;
 @Slf4j
 public class TrainerController {
     private final TrainerService trainerService;
-    private final TrainerMapper trainerMapper;
-    private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
 
     @CreateOperation(summary = "Create Trainer", description = "Create a new Trainer in Gym CRM")
@@ -51,9 +45,7 @@ public class TrainerController {
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody TrainerRegistrationRequest request) {
         logUtils.info(log, "Trainer registration request: firstName={}, lastName={}", request.firstName(),
                 request.lastName());
-        Trainer trainer = trainerMapper.toEntity(request);
-        Trainer created = trainerService.createTrainer(trainer);
-        RegistrationResponse response = new RegistrationResponse(created.getUsername(), created.getPassword());
+        RegistrationResponse response = trainerService.createTrainer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -61,8 +53,7 @@ public class TrainerController {
     @GetMapping("/{username}")
     public ResponseEntity<TrainerProfileResponse> getProfile(@PathVariable String username) {
         logUtils.info(log, "Get trainer profile request: username={}", username);
-        Trainer trainer = trainerService.getByUsernameWithTrainees(username);
-        return ResponseEntity.ok(trainerMapper.toProfileResponse(trainer));
+        return ResponseEntity.ok(trainerService.getByUsername(username));
     }
 
     @UpdateOperation(summary = "Update Trainer Profile", description = "Update Trainer Profile by Username")
@@ -70,10 +61,7 @@ public class TrainerController {
     public ResponseEntity<TrainerProfileResponse> updateProfile(@PathVariable String username,
             @Valid @RequestBody UpdateTrainerRequest request) {
         logUtils.info(log, "Update trainer profile request: username={}", username);
-        Trainer existing = trainerService.getByUsername(username);
-        trainerMapper.updateEntityFromRequest(request, existing);
-        Trainer updated = trainerService.updateTrainer(username, existing);
-        return ResponseEntity.ok(trainerMapper.toProfileResponse(updated));
+        return ResponseEntity.ok(trainerService.updateTrainer(username, request));
     }
 
     @GetAllOperation(summary = "Get Trainer Trainings", description = "Get Trainer Trainings by Username and Filter")
@@ -87,8 +75,7 @@ public class TrainerController {
                 "Get trainer trainings request: username={}, periodFrom={}, periodTo={}, traineeName={}",
                 username, filter.periodFrom(), filter.periodTo(), filter.traineeName());
 
-        List<Training> trainings = trainerService.getTrainerTrainings(username, filter);
-        return ResponseEntity.ok(trainingMapper.toResponseList(trainings));
+        return ResponseEntity.ok(trainerService.getTrainerTrainings(username, filter));
     }
 
     @UpdateOperation(summary = "Activate/Deactivate Trainer", description = "Activate or Deactivate Trainer Profile")

@@ -1,5 +1,6 @@
 package com.epam.gym.mapper;
 
+import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.model.Training;
 import com.epam.gym.model.User;
@@ -27,4 +28,13 @@ public interface TrainingMapper {
         return user == null ? null :
                 user.getFirstName() + " " + user.getLastName();
     }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "trainingName")
+    @Mapping(target = "date", source = "trainingDate")
+    @Mapping(target = "duration", source = "trainingDuration")
+    @Mapping(target = "specialization", ignore = true)
+    @Mapping(target = "trainee", ignore = true)
+    @Mapping(target = "trainer", ignore = true)
+    Training toEntity(AddTrainingRequest request);
 }

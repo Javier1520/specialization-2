@@ -1,7 +1,7 @@
 package com.epam.gym.service;
 
-import com.epam.gym.model.Training;
+import com.epam.gym.dto.request.AddTrainingRequest;
 
 public interface TrainingService {
-    Training addTraining(Training payload);
+    void addTraining(AddTrainingRequest request);
 }

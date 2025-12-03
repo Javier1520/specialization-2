@@ -1,11 +1,11 @@
 package com.epam.gym.service;
 
-import com.epam.gym.model.TrainingType;
+import com.epam.gym.dto.response.TrainingTypeResponse;
 
 import java.util.List;
 
 public interface TrainingTypeService {
-    List<TrainingType.Type> listAll();
-    TrainingType getById(Long id);
+    List<TrainingTypeResponse> listAll();
+    TrainingTypeResponse getById(Long id);
 }
 

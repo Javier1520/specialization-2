@@ -1,18 +1,20 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.request.TrainerRegistrationRequest;
 import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
-import com.epam.gym.model.Trainer;
-import com.epam.gym.model.Training;
+import com.epam.gym.dto.request.UpdateTrainerRequest;
+import com.epam.gym.dto.response.RegistrationResponse;
+import com.epam.gym.dto.response.TrainerProfileResponse;
+import com.epam.gym.dto.response.TrainingResponse;
 
 import java.util.List;
 
 public interface TrainerService {
-    Trainer createTrainer(Trainer payload);
-    Trainer getByUsername(String username);
-    Trainer getByUsernameWithTrainees(String username);
+    RegistrationResponse createTrainer(TrainerRegistrationRequest request);
+    TrainerProfileResponse getByUsername(String username);
+    TrainerProfileResponse updateTrainer(String username, UpdateTrainerRequest request);
     void changePassword(String username, String newPassword);
-    Trainer updateTrainer(String username, Trainer update);
     void setActive(String username, boolean active);
-    List<Training> getTrainerTrainings(String username, TrainerTrainingFilterRequest filter);
+    List<TrainingResponse> getTrainerTrainings(String username, TrainerTrainingFilterRequest filter);
 }
 

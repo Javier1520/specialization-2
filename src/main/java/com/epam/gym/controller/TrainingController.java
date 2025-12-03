@@ -1,13 +1,9 @@
 package com.epam.gym.controller;
 
 import com.epam.gym.dto.request.AddTrainingRequest;
-import com.epam.gym.exception.NotFoundException;
-import com.epam.gym.model.Trainee;
-import com.epam.gym.model.Trainer;
-import com.epam.gym.model.Training;
+
 import com.epam.gym.openapi.annotation.operation.CreateOperation;
-import com.epam.gym.repository.TraineeRepository;
-import com.epam.gym.repository.TrainerRepository;
+
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class TrainingController {
     private final TrainingService trainingService;
-    private final TraineeRepository traineeRepository;
-    private final TrainerRepository trainerRepository;
     private final LogUtils logUtils;
 
     @CreateOperation(summary = "Add Training", description = "Add a new Training in Gym CRM")
@@ -38,24 +32,7 @@ public class TrainingController {
         logUtils.info(log, "Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
                 request.traineeUsername(), request.trainerUsername(), request.trainingName());
 
-        Trainee trainee = traineeRepository.findByUsername(request.traineeUsername())
-                .orElseThrow(() -> new NotFoundException("Trainee not found: " +
-                        request.traineeUsername()));
-
-        Trainer trainer = trainerRepository.findByUsername(request.trainerUsername())
-                .orElseThrow(() -> new NotFoundException("Trainer not found: " +
-                        request.trainerUsername()));
-
-        Training training = Training.builder()
-                .name(request.trainingName())
-                .date(request.trainingDate())
-                .duration(request.trainingDuration())
-                .specialization(trainer.getSpecialization())
-                .trainee(trainee)
-                .trainer(trainer)
-                .build();
-
-        trainingService.addTraining(training);
+        trainingService.addTraining(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

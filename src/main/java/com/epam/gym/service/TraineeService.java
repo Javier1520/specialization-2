@@ -1,22 +1,25 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.request.TraineeRegistrationRequest;
 import com.epam.gym.dto.request.TrainingFilterRequest;
-import com.epam.gym.model.Trainee;
-import com.epam.gym.model.Trainer;
-import com.epam.gym.model.Training;
+import com.epam.gym.dto.request.UpdateTraineeRequest;
+import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
+import com.epam.gym.dto.response.RegistrationResponse;
+import com.epam.gym.dto.response.TraineeProfileResponse;
+import com.epam.gym.dto.response.TrainerInfoResponse;
+import com.epam.gym.dto.response.TrainingResponse;
 
 import java.util.List;
 
 public interface TraineeService {
-    Trainee createTrainee(Trainee payload);
-    Trainee getByUsername(String username);
-    Trainee getByUsernameWithTrainers(String username);
+    RegistrationResponse createTrainee(TraineeRegistrationRequest request);
+    TraineeProfileResponse getByUsername(String username);
+    TraineeProfileResponse updateTrainee(String username, UpdateTraineeRequest request);
     void changePassword(String username, String newPassword);
-    Trainee updateTrainee(String username, Trainee update);
     void setActive(String username, boolean active);
     void deleteByUsername(String username);
-    List<Training> getTraineeTrainings(String username, TrainingFilterRequest filter);
-    List<Trainer> getTrainersNotAssignedToTrainee(String traineeUsername);
-    void updateTraineeTrainers(String traineeUsername, List<Long> trainerIds);
+    List<TrainingResponse> getTraineeTrainings(String username, TrainingFilterRequest filter);
+    List<TrainerInfoResponse> getTrainersNotAssignedToTrainee(String traineeUsername);
+    List<TrainerInfoResponse> updateTraineeTrainers(String traineeUsername, UpdateTraineeTrainersRequest request);
 }
 
