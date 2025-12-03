@@ -8,8 +8,10 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
 
-@Component("customDatabaseHealth")
+@Component
 public class DatabaseHealthIndicator implements HealthIndicator {
+
+    private static final String DATABASE = "databaseState";
 
     private final DataSource dataSource;
 
@@ -22,9 +24,9 @@ public class DatabaseHealthIndicator implements HealthIndicator {
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute("SELECT 1");
-            return Health.up().withDetail("database", "Available").build();
+            return Health.up().withDetail(DATABASE, "Available").build();
         } catch (Exception e) {
-            return Health.down().withDetail("database", "Not Available").withException(e).build();
+            return Health.down().withDetail(DATABASE, "Not Available").withException(e).build();
         }
     }
 }
