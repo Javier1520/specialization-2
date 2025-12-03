@@ -1,6 +1,8 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.response.TrainingTypeResponse;
 import com.epam.gym.exception.NotFoundException;
+import com.epam.gym.mapper.TrainingTypeMapper;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainingTypeRepository;
 import com.epam.gym.service.impl.TrainingTypeServiceImpl;
@@ -23,13 +25,24 @@ import static org.mockito.Mockito.when;
 class TrainingTypeServiceTest {
 
     @Mock TrainingTypeRepository repo;
+    @Mock TrainingTypeMapper mapper;
     @InjectMocks TrainingTypeServiceImpl service;
 
     @Test
-    void listAll_returnsAllEnumValues() {
-        List<TrainingType.Type> out = service.listAll();
-        assertEquals(5, out.size()); // CARDIO, STRENGTH, YOGA, HIIT, PILATES
-        assertEquals(TrainingType.Type.CARDIO, out.get(0));
+    void listAll_returnsAllTrainingTypeResponses() {
+        TrainingType type1 = new TrainingType(1L, "CARDIO", null, null);
+        TrainingType type2 = new TrainingType(2L, "STRENGTH", null, null);
+        TrainingTypeResponse response1 = new TrainingTypeResponse(1L, "CARDIO");
+        TrainingTypeResponse response2 = new TrainingTypeResponse(2L, "STRENGTH");
+
+        when(repo.findAll()).thenReturn(List.of(type1, type2));
+        when(mapper.toResponse(type1)).thenReturn(response1);
+        when(mapper.toResponse(type2)).thenReturn(response2);
+
+        List<TrainingTypeResponse> out = service.listAll();
+        assertEquals(2, out.size());
+        assertEquals("CARDIO", out.get(0).trainingType());
+        assertEquals("STRENGTH", out.get(1).trainingType());
     }
 
     @Test
@@ -43,10 +56,14 @@ class TrainingTypeServiceTest {
     }
 
     @Test
-    void getById_returnsEntityWhenFound() {
+    void getById_returnsTrainingTypeResponseWhenFound() {
         TrainingType t = new TrainingType(2L, "Y", null, null);
+        TrainingTypeResponse response = new TrainingTypeResponse(2L, "Y");
         when(repo.findById(2L)).thenReturn(Optional.of(t));
-        assertSame(t, service.getById(2L));
+        when(mapper.toResponse(t)).thenReturn(response);
+        TrainingTypeResponse result = service.getById(2L);
+        assertSame(response, result);
+        verify(repo).findById(2L);
+        verify(mapper).toResponse(t);
     }
 }
-

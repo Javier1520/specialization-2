@@ -8,10 +8,6 @@ import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.exception.ValidationException;
-import com.epam.gym.mapper.TrainerMapper;
-import com.epam.gym.mapper.TrainingMapper;
-import com.epam.gym.model.Trainer;
-import com.epam.gym.model.Training;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.service.TrainerService;
 import com.epam.gym.util.LogUtils;
@@ -24,13 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,42 +36,14 @@ class TrainerControllerTest {
     private TrainerService trainerService;
 
     @Mock
-    private TrainerMapper trainerMapper;
-
-    @Mock
-    private TrainingMapper trainingMapper;
-
-    @Mock
     private LogUtils logUtils;
 
     @InjectMocks
     private TrainerController trainerController;
 
-    private Trainer trainer;
-    private Training training;
-
     @BeforeEach
     void setUp() {
-        trainer = Trainer.builder()
-                .id(1L)
-                .username("trainer1")
-                .password("password123")
-                .firstName("Trainer")
-                .lastName("One")
-                .isActive(true)
-                .specialization(TrainingType.Type.CARDIO)
-                .trainings(new ArrayList<>())
-                .trainees(new ArrayList<>())
-                .build();
-
-        training = Training.builder()
-                .id(1L)
-                .name("Morning Run")
-                .date(new Date())
-                .duration(60)
-                .specialization(TrainingType.Type.CARDIO)
-                .trainer(trainer)
-                .build();
+        // No setup needed - tests use DTOs directly
     }
 
     @Test
@@ -86,13 +52,8 @@ class TrainerControllerTest {
         TrainerRegistrationRequest request = new TrainerRegistrationRequest(
                 "Trainer", "One", TrainingType.Type.CARDIO);
 
-        Trainer createdTrainer = Trainer.builder()
-                .username("trainer1")
-                .password("password123")
-                .build();
-
-        when(trainerMapper.toEntity(request)).thenReturn(trainer);
-        when(trainerService.createTrainer(any(Trainer.class))).thenReturn(createdTrainer);
+        RegistrationResponse registrationResponse = new RegistrationResponse("trainer1", "password123");
+        when(trainerService.createTrainer(request)).thenReturn(registrationResponse);
 
         // When
         ResponseEntity<RegistrationResponse> response = trainerController.register(request);
@@ -103,8 +64,7 @@ class TrainerControllerTest {
         assertNotNull(response.getBody());
         assertEquals("trainer1", response.getBody().username());
         assertEquals("password123", response.getBody().password());
-        verify(trainerMapper).toEntity(request);
-        verify(trainerService).createTrainer(any(Trainer.class));
+        verify(trainerService).createTrainer(request);
     }
 
     @Test
@@ -114,8 +74,7 @@ class TrainerControllerTest {
         TrainerProfileResponse profileResponse = new TrainerProfileResponse(
                 username, "Trainer", "One", TrainingType.Type.CARDIO, true, List.of());
 
-        when(trainerService.getByUsernameWithTrainees(username)).thenReturn(trainer);
-        when(trainerMapper.toProfileResponse(trainer)).thenReturn(profileResponse);
+        when(trainerService.getByUsername(username)).thenReturn(profileResponse);
 
         // When
         ResponseEntity<TrainerProfileResponse> response = trainerController.getProfile(username);
@@ -124,8 +83,7 @@ class TrainerControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        verify(trainerService).getByUsernameWithTrainees(username);
-        verify(trainerMapper).toProfileResponse(trainer);
+        verify(trainerService).getByUsername(username);
     }
 
     @Test
@@ -138,10 +96,7 @@ class TrainerControllerTest {
         TrainerProfileResponse profileResponse = new TrainerProfileResponse(
                 username, "Updated", "Trainer", TrainingType.Type.CARDIO, true, List.of());
 
-        when(trainerService.getByUsername(username)).thenReturn(trainer);
-        doNothing().when(trainerMapper).updateEntityFromRequest(request, trainer);
-        when(trainerService.updateTrainer(username, trainer)).thenReturn(trainer);
-        when(trainerMapper.toProfileResponse(trainer)).thenReturn(profileResponse);
+        when(trainerService.updateTrainer(username, request)).thenReturn(profileResponse);
 
         // When
         ResponseEntity<TrainerProfileResponse> response = trainerController.updateProfile(username, request);
@@ -149,10 +104,7 @@ class TrainerControllerTest {
         // Then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(trainerService).getByUsername(username);
-        verify(trainerMapper).updateEntityFromRequest(request, trainer);
-        verify(trainerService).updateTrainer(username, trainer);
-        verify(trainerMapper).toProfileResponse(trainer);
+        verify(trainerService).updateTrainer(username, request);
     }
 
     @Test
@@ -165,14 +117,12 @@ class TrainerControllerTest {
 
         TrainerTrainingFilterRequest filter = new TrainerTrainingFilterRequest(periodFrom, periodTo, traineeName);
 
-        List<Training> trainings = List.of(training);
         List<TrainingResponse> trainingResponses = List.of(
                 new TrainingResponse("Morning Run", new Date(), TrainingType.Type.CARDIO, 60,
                         "Trainer One", "John Doe"));
 
         when(trainerService.getTrainerTrainings(username, filter))
-                .thenReturn(trainings);
-        when(trainingMapper.toResponseList(trainings)).thenReturn(trainingResponses);
+                .thenReturn(trainingResponses);
 
         // When
         ResponseEntity<List<TrainingResponse>> response = trainerController.getTrainings(
@@ -183,7 +133,6 @@ class TrainerControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         verify(trainerService).getTrainerTrainings(username, filter);
-        verify(trainingMapper).toResponseList(trainings);
     }
 
     @Test

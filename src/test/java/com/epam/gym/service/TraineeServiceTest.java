@@ -1,15 +1,26 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.request.TraineeRegistrationRequest;
 import com.epam.gym.dto.request.TrainingFilterRequest;
+import com.epam.gym.dto.request.UpdateTraineeRequest;
+import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
+import com.epam.gym.dto.response.RegistrationResponse;
+import com.epam.gym.dto.response.TraineeProfileResponse;
+import com.epam.gym.dto.response.TrainerInfoResponse;
+import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
+import com.epam.gym.mapper.TraineeMapper;
+import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
+import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.impl.TraineeServiceImpl;
+import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +30,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,17 +37,17 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyIterable;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,87 +57,73 @@ class TraineeServiceTest {
     @Mock TrainerRepository trainerRepository;
     @Mock TrainingRepository trainingRepository;
     @Mock UsernamePasswordGenerator usernamePasswordGenerator;
+    @Mock TraineeMapper traineeMapper;
+    @Mock TrainingMapper trainingMapper;
     @Mock LogUtils logUtils;
 
     @InjectMocks TraineeServiceImpl traineeService;
 
-    private Trainee samplePayload;
+    private TraineeRegistrationRequest registrationRequest;
 
     @BeforeEach
     void setUp() {
-        samplePayload = Trainee.builder()
+        registrationRequest = new TraineeRegistrationRequest(
+                "John", "Doe", new Date(0), "Addr");
+    }
+
+    @Test
+    void createTrainee_success_generatesUsernameAndSaves() {
+        Trainee mappedTrainee = Trainee.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .dateOfBirth(new Date(0))
                 .address("Addr")
                 .build();
-    }
-
-    @Test
-    void createTrainee_success_generatesUsernameAndSaves() {
-        when(usernamePasswordGenerator.generateUsername(eq("John"), eq("Doe"), any()))
-                .thenReturn("john.doe");
-        when(usernamePasswordGenerator.generatePassword()).thenReturn("pass1234");
         Trainee saved = Trainee.builder()
                 .id(1L)
                 .firstName("John").lastName("Doe")
-                .username("john.doe").password("pass1234").isActive(true)
+                .username("john.doe").password("pass123456").isActive(true)
                 .build();
+
+        when(traineeMapper.toEntity(registrationRequest)).thenReturn(mappedTrainee);
+        doReturn("john.doe")
+        .when(usernamePasswordGenerator)
+        .generateUsername(anyString(), anyString(), any());
+
+        when(usernamePasswordGenerator.generatePassword()).thenReturn("pass123456");
+        lenient().when(traineeRepository.existsByUsername("john.doe")).thenReturn(false);
+        lenient().when(trainerRepository.existsByUsername("john.doe")).thenReturn(false);
         when(traineeRepository.save(any(Trainee.class))).thenReturn(saved);
 
-        Trainee result = traineeService.createTrainee(samplePayload);
+        RegistrationResponse result = traineeService.createTrainee(registrationRequest);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("john.doe", result.getUsername());
-        assertTrue(result.getIsActive());
+        assertEquals("john.doe", result.username());
+        assertEquals("pass123456", result.password());
+        verify(traineeMapper).toEntity(registrationRequest);
         verify(usernamePasswordGenerator).generateUsername(eq("John"), eq("Doe"), any());
         verify(traineeRepository).save(any(Trainee.class));
     }
 
     @Test
-    void createTrainee_validation_nullPayload_throws() {
-        assertThrows(ValidationException.class, () -> traineeService.createTrainee(null));
-    }
-
-    @Test
-    void createTrainee_futureDate_throwsValidationException() {
-
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrow = cal.getTime();
-
-        Trainee futurePayload = Trainee.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .dateOfBirth(tomorrow)
-                .address("Addr")
-                .build();
-
-        ValidationException ex = assertThrows(
-                ValidationException.class,
-                () -> traineeService.createTrainee(futurePayload)
-        );
-
-        assertEquals("dateOfBirth cannot be in the future", ex.getMessage());
-        verifyNoInteractions(usernamePasswordGenerator);
-        verify(traineeRepository, never()).save(any());
-    }
-
-
-    @Test
-    void getByUsername_found_returnsTrainee() {
+    void getByUsername_found_returnsTraineeProfileResponse() {
         Trainee t = Trainee.builder().username("u1").build();
-        when(traineeRepository.findByUsername("u1")).thenReturn(Optional.of(t));
+        TraineeProfileResponse response = new TraineeProfileResponse(
+                "u1", "John", "Doe", new Date(0), "Addr", true, List.of());
 
-        Trainee result = traineeService.getByUsername("u1");
-        assertSame(t, result);
-        verify(traineeRepository).findByUsername("u1");
+        when(traineeRepository.findByUsernameWithTrainers("u1")).thenReturn(Optional.of(t));
+        when(traineeMapper.toProfileResponse(t)).thenReturn(response);
+
+        TraineeProfileResponse result = traineeService.getByUsername("u1");
+        assertNotNull(result);
+        assertEquals("u1", result.username());
+        verify(traineeRepository).findByUsernameWithTrainers("u1");
+        verify(traineeMapper).toProfileResponse(t);
     }
 
     @Test
     void getByUsername_notFound_throws() {
-        when(traineeRepository.findByUsername("x")).thenReturn(Optional.empty());
+        when(traineeRepository.findByUsernameWithTrainers("x")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> traineeService.getByUsername("x"));
     }
 
@@ -160,22 +155,30 @@ class TraineeServiceTest {
     void updateTrainee_happyPath_updatesFields() {
         Trainee existing = Trainee.builder()
                 .username("u").firstName("A").lastName("B").address("old").dateOfBirth(new Date(0)).build();
-        when(traineeRepository.findByUsernameWithTrainers("u")).thenReturn(Optional.of(existing));
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                "u", "X", "Y", new Date(1), "new", true);
+        TraineeProfileResponse response = new TraineeProfileResponse(
+                "u", "X", "Y", new Date(1), "new", true, List.of());
+
+        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(existing));
         when(traineeRepository.save(any())).thenReturn(existing);
+        when(traineeMapper.toProfileResponse(existing)).thenReturn(response);
 
-        Trainee update = Trainee.builder().firstName("X").lastName("Y").address("new").dateOfBirth(new Date(1)).build();
-        Trainee result = traineeService.updateTrainee("u", update);
+        TraineeProfileResponse result = traineeService.updateTrainee("u", request);
 
-        assertEquals("X", result.getFirstName());
-        assertEquals("Y", result.getLastName());
-        assertEquals("new", result.getAddress());
+        assertEquals("X", result.firstName());
+        assertEquals("Y", result.lastName());
+        assertEquals("new", result.address());
+        verify(traineeMapper).updateEntityFromRequest(request, existing);
         verify(traineeRepository).save(existing);
     }
 
     @Test
     void updateTrainee_notFound_throwsNotFound() {
-        when(traineeRepository.findByUsernameWithTrainers("missing")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> traineeService.updateTrainee("missing", new Trainee()));
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                "missing", "X", "Y", new Date(1), "new", true);
+        when(traineeRepository.findByUsername("missing")).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> traineeService.updateTrainee("missing", request));
     }
 
     @Test
@@ -229,28 +232,41 @@ class TraineeServiceTest {
     @Test
     void getTraineeTrainings_convertsDatesAndCallsRepository() {
         Training t = Training.builder().id(99L).build();
+        TrainingResponse trainingResponse = new TrainingResponse(
+                "Training1", new Date(), TrainingType.Type.CARDIO, 60, "Trainer1", "Trainee1");
+
         when(trainingRepository.findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),
                 isNull(), isNull()))
                 .thenReturn(List.of(t));
+        when(trainingMapper.toResponseList(List.of(t))).thenReturn(List.of(trainingResponse));
 
         Date fromDate = new Date(0); // epoch start (Jan 1, 1970)
         Date toDate = new Date(); // current date
 
         TrainingFilterRequest filter = new TrainingFilterRequest(fromDate, toDate, null, null);
-        List<Training> result = traineeService.getTraineeTrainings("u", filter);
+        List<TrainingResponse> result = traineeService.getTraineeTrainings("u", filter);
         assertEquals(1, result.size());
         verify(trainingRepository).findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),
                 isNull(), isNull());
+        verify(trainingMapper).toResponseList(List.of(t));
     }
 
     @Test
     void getTrainersNotAssignedToTrainee_found_callsTrainerRepo() {
         Trainee t = Trainee.builder().id(15L).username("u").build();
-        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
-        when(trainerRepository.findNotAssignedToTrainee(15L)).thenReturn(Collections.emptyList());
+        Trainer trainer = Trainer.builder().id(1L).username("trainer1")
+                .firstName("Trainer").lastName("One")
+                .specialization(TrainingType.Type.CARDIO).build();
+        TrainerInfoResponse trainerInfo = new TrainerInfoResponse(
+                "trainer1", "Trainer", "One", TrainingType.Type.CARDIO);
 
-        List<Trainer> out = traineeService.getTrainersNotAssignedToTrainee("u");
+        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
+        when(trainerRepository.findNotAssignedToTrainee(15L)).thenReturn(List.of(trainer));
+        when(traineeMapper.trainerToInfoResponse(trainer)).thenReturn(trainerInfo);
+
+        List<TrainerInfoResponse> out = traineeService.getTrainersNotAssignedToTrainee("u");
         assertNotNull(out);
+        assertEquals(1, out.size());
         verify(trainerRepository).findNotAssignedToTrainee(15L);
     }
 
@@ -273,35 +289,58 @@ class TraineeServiceTest {
         Trainer new1 = Trainer.builder().id(2L).username("n1").trainees(new ArrayList<>()).build();
         Trainer new2 = Trainer.builder().id(3L).username("n2").trainees(new ArrayList<>()).build();
 
-        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
-        when(trainerRepository.findAllById(List.of(2L,3L))).thenReturn(List.of(new1, new2));
-        when(traineeRepository.save(any())).thenReturn(t);
+        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(
+                List.of(
+                        new UpdateTraineeTrainersRequest.TrainerUsernameRequest("n1"),
+                        new UpdateTraineeTrainersRequest.TrainerUsernameRequest("n2")
+                ));
 
-        traineeService.updateTraineeTrainers("u", List.of(2L,3L));
+        TrainerInfoResponse info1 = new TrainerInfoResponse("n1", "First", "Name", TrainingType.Type.CARDIO);
+        TrainerInfoResponse info2 = new TrainerInfoResponse("n2", "Second", "Name", TrainingType.Type.STRENGTH);
+
+        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
+        when(trainerRepository.findByUsername("n1")).thenReturn(Optional.of(new1));
+        when(trainerRepository.findByUsername("n2")).thenReturn(Optional.of(new2));
+        when(trainerRepository.findAllById(List.of(2L, 3L))).thenReturn(List.of(new1, new2));
+        when(traineeRepository.save(any())).thenReturn(t);
+        when(traineeMapper.trainersToInfoResponseList(any())).thenReturn(List.of(info1, info2));
+
+        List<TrainerInfoResponse> result = traineeService.updateTraineeTrainers("u", request);
 
         // old trainer should no longer reference trainee
         assertFalse(old.getTrainees().contains(t));
         // new trainers should reference trainee
         assertTrue(new1.getTrainees().contains(t));
         assertTrue(new2.getTrainees().contains(t));
+        assertEquals(2, result.size());
         verify(traineeRepository).save(t);
     }
 
     @Test
     void updateTraineeTrainers_missingTrainerIds_throwsValidation() {
         Trainee t = Trainee.builder().username("u").id(20L).trainers(new ArrayList<>()).build();
-        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
-        // repo returns only one but requested two ids -> mismatch
-        when(trainerRepository.findAllById(List.of(2L,3L))).thenReturn(List.of(Trainer.builder().id(2L).build()));
+        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(
+                List.of(
+                        new UpdateTraineeTrainersRequest.TrainerUsernameRequest("n1"),
+                        new UpdateTraineeTrainersRequest.TrainerUsernameRequest("n2")
+                ));
 
-        assertThrows(ValidationException.class, () -> traineeService.updateTraineeTrainers("u",
-                List.of(2L,3L)));
+        Trainer new1 = Trainer.builder().id(2L).username("n1").build();
+
+        when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
+        when(trainerRepository.findByUsername("n1")).thenReturn(Optional.of(new1));
+        when(trainerRepository.findByUsername("n2")).thenReturn(Optional.of(new1));
+        // repo returns only one but requested two ids -> mismatch
+        when(trainerRepository.findAllById(List.of(2L, 2L))).thenReturn(List.of(new1));
+
+        assertThrows(ValidationException.class, () -> traineeService.updateTraineeTrainers("u", request));
     }
 
     @Test
     void updateTraineeTrainers_traineeNotFound_throws() {
+        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(
+                List.of(new UpdateTraineeTrainersRequest.TrainerUsernameRequest("n1")));
         when(traineeRepository.findByUsername("no")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> traineeService.updateTraineeTrainers("no",
-                List.of(1L)));
+        assertThrows(NotFoundException.class, () -> traineeService.updateTraineeTrainers("no", request));
     }
 }

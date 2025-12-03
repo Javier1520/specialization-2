@@ -1,11 +1,20 @@
 package com.epam.gym.facade;
 
+import com.epam.gym.dto.request.AddTrainingRequest;
+import com.epam.gym.dto.request.TraineeRegistrationRequest;
+import com.epam.gym.dto.request.TrainerRegistrationRequest;
 import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
 import com.epam.gym.dto.request.TrainingFilterRequest;
+import com.epam.gym.dto.request.UpdateTraineeRequest;
+import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
+import com.epam.gym.dto.request.UpdateTrainerRequest;
+import com.epam.gym.dto.response.RegistrationResponse;
+import com.epam.gym.dto.response.TraineeProfileResponse;
+import com.epam.gym.dto.response.TrainerInfoResponse;
+import com.epam.gym.dto.response.TrainerProfileResponse;
+import com.epam.gym.dto.response.TrainingResponse;
+import com.epam.gym.dto.response.TrainingTypeResponse;
 import com.epam.gym.exception.NotFoundException;
-import com.epam.gym.model.Trainee;
-import com.epam.gym.model.Trainer;
-import com.epam.gym.model.Training;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.service.TraineeService;
 import com.epam.gym.service.TrainerService;
@@ -40,51 +49,53 @@ class GymFacadeTest {
 
     @InjectMocks private GymFacade facade;
 
-    private Trainee sampleTrainee;
-    private Trainer sampleTrainer;
-    private Training sampleTraining;
+    private TraineeRegistrationRequest traineeRegistrationRequest;
+    private TrainerRegistrationRequest trainerRegistrationRequest;
+    private AddTrainingRequest addTrainingRequest;
+    private RegistrationResponse registrationResponse;
+    private TraineeProfileResponse traineeProfileResponse;
+    private TrainerProfileResponse trainerProfileResponse;
+    private TrainingResponse trainingResponse;
+    private TrainingTypeResponse trainingTypeResponse;
+
     @BeforeEach
     void setUp() {
-        sampleTrainee = Trainee.builder()
-                .id(10L)
-                .firstName("T")
-                .lastName("One")
-                .username("t.one")
-                .build();
-
-        sampleTrainer = Trainer.builder()
-                .id(20L)
-                .firstName("R")
-                .lastName("Two")
-                .username("r.two")
-                .build();
-
-        sampleTraining = Training.builder()
-                .id(100L)
-                .name("Sesh")
-                .build();
-
-        new TrainingType(1L, "Cardio", null, null);
+        traineeRegistrationRequest = new TraineeRegistrationRequest(
+                "T", "One", new Date(0), "Address");
+        trainerRegistrationRequest = new TrainerRegistrationRequest(
+                "R", "Two", TrainingType.Type.CARDIO);
+        addTrainingRequest = new AddTrainingRequest(
+                "t.one", "r.two", "Sesh", new Date(), 60);
+        registrationResponse = new RegistrationResponse("t.one", "password123");
+        traineeProfileResponse = new TraineeProfileResponse(
+                "t.one", "T", "One", new Date(0), "Address", true, List.of());
+        trainerProfileResponse = new TrainerProfileResponse(
+                "r.two", "R", "Two", TrainingType.Type.CARDIO, true, List.of());
+        trainingResponse = new TrainingResponse(
+                "Sesh", new Date(), TrainingType.Type.CARDIO, 60, "r.two", "t.one");
+        trainingTypeResponse = new TrainingTypeResponse(1L, "CARDIO");
     }
 
     @Test
     void createTrainee_delegatesToService_andReturnsSaved() {
-        when(traineeService.createTrainee(sampleTrainee)).thenReturn(sampleTrainee);
+        when(traineeService.createTrainee(traineeRegistrationRequest)).thenReturn(registrationResponse);
 
-        Trainee out = facade.createTrainee(sampleTrainee);
+        RegistrationResponse out = facade.createTrainee(traineeRegistrationRequest);
 
-        assertSame(sampleTrainee, out);
-        verify(traineeService).createTrainee(sampleTrainee);
+        assertSame(registrationResponse, out);
+        verify(traineeService).createTrainee(traineeRegistrationRequest);
     }
 
     @Test
     void updateTrainee_delegatesAndReturns() {
-        when(traineeService.updateTrainee("t.one", sampleTrainee)).thenReturn(sampleTrainee);
+        UpdateTraineeRequest request = new UpdateTraineeRequest(
+                "t.one", "T", "One", new Date(0), "Address", true);
+        when(traineeService.updateTrainee("t.one", request)).thenReturn(traineeProfileResponse);
 
-        Trainee out = facade.updateTrainee("t.one", sampleTrainee);
+        TraineeProfileResponse out = facade.updateTrainee("t.one", request);
 
-        assertSame(sampleTrainee, out);
-        verify(traineeService).updateTrainee("t.one", sampleTrainee);
+        assertSame(traineeProfileResponse, out);
+        verify(traineeService).updateTrainee("t.one", request);
     }
 
     @Test
@@ -98,11 +109,11 @@ class GymFacadeTest {
 
     @Test
     void getTraineeByUsername_delegatesAndReturns() {
-        when(traineeService.getByUsername("t.one")).thenReturn(sampleTrainee);
+        when(traineeService.getByUsername("t.one")).thenReturn(traineeProfileResponse);
 
-        Trainee out = facade.getTraineeByUsername("t.one");
+        TraineeProfileResponse out = facade.getTraineeByUsername("t.one");
 
-        assertSame(sampleTrainee, out);
+        assertSame(traineeProfileResponse, out);
         verify(traineeService).getByUsername("t.one");
     }
 
@@ -126,61 +137,70 @@ class GymFacadeTest {
 
     @Test
     void getTraineeTrainings_delegatesAndReturnsList() {
-        // Convert LocalDate to Date
         Date from = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000)); // 1 day ago
         Date to = new Date(); // current date
 
         TrainingFilterRequest filter = new TrainingFilterRequest(from, to, "r", TrainingType.Type.CARDIO);
 
         when(traineeService.getTraineeTrainings("t.one", filter))
-                .thenReturn(List.of(sampleTraining));
+                .thenReturn(List.of(trainingResponse));
 
-        List<Training> out = facade.getTraineeTrainings("t.one", filter);
+        List<TrainingResponse> out = facade.getTraineeTrainings("t.one", filter);
 
         assertEquals(1, out.size());
-        assertSame(sampleTraining, out.get(0));
+        assertSame(trainingResponse, out.get(0));
         verify(traineeService).getTraineeTrainings("t.one", filter);
     }
 
     @Test
     void getTrainersNotAssignedToTrainee_delegatesAndReturns() {
+        TrainerInfoResponse trainerInfo = new TrainerInfoResponse(
+                "r.two", "R", "Two", TrainingType.Type.CARDIO);
         when(traineeService.getTrainersNotAssignedToTrainee("t.one"))
-                .thenReturn(List.of(sampleTrainer));
+                .thenReturn(List.of(trainerInfo));
 
-        List<Trainer> out = facade.getTrainersNotAssignedToTrainee("t.one");
+        List<TrainerInfoResponse> out = facade.getTrainersNotAssignedToTrainee("t.one");
 
         assertEquals(1, out.size());
-        assertSame(sampleTrainer, out.get(0));
+        assertSame(trainerInfo, out.get(0));
         verify(traineeService).getTrainersNotAssignedToTrainee("t.one");
     }
 
     @Test
     void updateTraineeTrainers_delegates() {
-        doNothing().when(traineeService).updateTraineeTrainers("t.one", List.of(1L, 2L));
+        UpdateTraineeTrainersRequest request = new UpdateTraineeTrainersRequest(
+                List.of(new UpdateTraineeTrainersRequest.TrainerUsernameRequest("r.two")));
+        TrainerInfoResponse trainerInfo = new TrainerInfoResponse(
+                "r.two", "R", "Two", TrainingType.Type.CARDIO);
+        when(traineeService.updateTraineeTrainers("t.one", request))
+                .thenReturn(List.of(trainerInfo));
 
-        facade.updateTraineeTrainers("t.one", List.of(1L, 2L));
+        List<TrainerInfoResponse> out = facade.updateTraineeTrainers("t.one", request);
 
-        verify(traineeService).updateTraineeTrainers("t.one", List.of(1L, 2L));
+        assertEquals(1, out.size());
+        verify(traineeService).updateTraineeTrainers("t.one", request);
     }
 
     @Test
     void createTrainer_delegatesAndReturns() {
-        when(trainerService.createTrainer(sampleTrainer)).thenReturn(sampleTrainer);
+        when(trainerService.createTrainer(trainerRegistrationRequest)).thenReturn(registrationResponse);
 
-        Trainer out = facade.createTrainer(sampleTrainer);
+        RegistrationResponse out = facade.createTrainer(trainerRegistrationRequest);
 
-        assertSame(sampleTrainer, out);
-        verify(trainerService).createTrainer(sampleTrainer);
+        assertSame(registrationResponse, out);
+        verify(trainerService).createTrainer(trainerRegistrationRequest);
     }
 
     @Test
     void updateTrainer_delegatesAndReturns() {
-        when(trainerService.updateTrainer("r.two", sampleTrainer)).thenReturn(sampleTrainer);
+        UpdateTrainerRequest request = new UpdateTrainerRequest(
+                "r.two", "R", "Two", TrainingType.Type.CARDIO, true);
+        when(trainerService.updateTrainer("r.two", request)).thenReturn(trainerProfileResponse);
 
-        Trainer out = facade.updateTrainer("r.two", sampleTrainer);
+        TrainerProfileResponse out = facade.updateTrainer("r.two", request);
 
-        assertSame(sampleTrainer, out);
-        verify(trainerService).updateTrainer("r.two", sampleTrainer);
+        assertSame(trainerProfileResponse, out);
+        verify(trainerService).updateTrainer("r.two", request);
     }
 
     @Test
@@ -194,11 +214,11 @@ class GymFacadeTest {
 
     @Test
     void getTrainerByUsername_delegatesAndReturns() {
-        when(trainerService.getByUsername("r.two")).thenReturn(sampleTrainer);
+        when(trainerService.getByUsername("r.two")).thenReturn(trainerProfileResponse);
 
-        Trainer out = facade.getTrainerByUsername("r.two");
+        TrainerProfileResponse out = facade.getTrainerByUsername("r.two");
 
-        assertSame(sampleTrainer, out);
+        assertSame(trainerProfileResponse, out);
         verify(trainerService).getByUsername("r.two");
     }
 
@@ -219,9 +239,9 @@ class GymFacadeTest {
         TrainerTrainingFilterRequest filter = new TrainerTrainingFilterRequest(from, to, "t");
 
         when(trainerService.getTrainerTrainings("r.two", filter))
-                .thenReturn(List.of(sampleTraining));
+                .thenReturn(List.of(trainingResponse));
 
-        List<Training> out = facade.getTrainerTrainings("r.two", from, to, "t");
+        List<TrainingResponse> out = facade.getTrainerTrainings("r.two", filter);
 
         assertEquals(1, out.size());
         verify(trainerService).getTrainerTrainings("r.two", filter);
@@ -229,24 +249,21 @@ class GymFacadeTest {
 
     @Test
     void createTraining_delegatesAndReturns() {
-        when(trainingService.addTraining(sampleTraining)).thenReturn(sampleTraining);
+        doNothing().when(trainingService).addTraining(addTrainingRequest);
 
-        Training out = facade.createTraining(sampleTraining);
+        facade.createTraining(addTrainingRequest);
 
-        assertSame(sampleTraining, out);
-        verify(trainingService).addTraining(sampleTraining);
+        verify(trainingService).addTraining(addTrainingRequest);
     }
 
     @Test
     void listTrainingTypes_delegatesAndReturns() {
-        TrainingType.Type sampleType = TrainingType.Type.CARDIO;
+        when(trainingTypeService.listAll()).thenReturn(List.of(trainingTypeResponse));
 
-        when(trainingTypeService.listAll()).thenReturn(List.of(sampleType));
-
-        List<TrainingType.Type> out = facade.listTrainingTypes();
+        List<TrainingTypeResponse> out = facade.listTrainingTypes();
 
         assertEquals(1, out.size());
-        assertSame(sampleType, out.get(0));
+        assertSame(trainingTypeResponse, out.get(0));
         verify(trainingTypeService).listAll();
     }
 

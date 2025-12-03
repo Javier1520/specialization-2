@@ -1,7 +1,8 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.exception.NotFoundException;
-import com.epam.gym.exception.ValidationException;
+import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
 import com.epam.gym.model.Training;
@@ -18,13 +19,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,65 +33,57 @@ class TrainingServiceTest {
     @Mock TrainingRepository trainingRepository;
     @Mock TraineeRepository traineeRepository;
     @Mock TrainerRepository trainerRepository;
+    @Mock TrainingMapper trainingMapper;
     @Mock LogUtils logUtils;
 
     @InjectMocks TrainingServiceImpl trainingService;
 
-    private Training payload;
+    private AddTrainingRequest request;
 
     @BeforeEach
     void setUp() {
-        Trainee t = Trainee.builder().username("trainee1").build();
-        Trainer tr = Trainer.builder().username("trainer1").build();
-        payload = Training.builder()
-                .name("S1")
-                .date(new Date())
-                .duration(30)
-                .specialization(TrainingType.Type.HIIT)
-                .trainee(t)
-                .trainer(tr)
-                .build();
+        Date trainingDate = new Date();
+        request = new AddTrainingRequest("trainee1", "trainer1", "S1", trainingDate, 30);
     }
 
     @Test
     void addTraining_success_bindsEntitiesAndSaves() {
         // Arrange
         Trainee persistedT = Trainee.builder().username("trainee1").id(11L).build();
-        Trainer persistedTr = Trainer.builder().username("trainer1").id(22L).build();
+        Trainer persistedTr = Trainer.builder().username("trainer1").id(22L).specialization(TrainingType.Type.HIIT).build();
+        Training mappedTraining = Training.builder()
+                .name("S1")
+                .date(request.trainingDate())
+                .duration(30)
+                .build();
 
-        // Make the repository return the same payload instance (or one with proper entities)
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.of(persistedT));
         when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.of(persistedTr));
-        when(trainingRepository.save(payload)).thenAnswer(invocation -> {
+        when(trainingMapper.toEntity(request)).thenReturn(mappedTraining);
+        when(trainingRepository.save(any(Training.class))).thenAnswer(invocation -> {
             Training training = invocation.getArgument(0);
             return Training.builder()
                     .id(100L)
                     .name(training.getName())
-                    .trainee(training.getTrainee())  // Copy the entities
-                    .trainer(training.getTrainer())  // Copy the entities
+                    .trainee(training.getTrainee())
+                    .trainer(training.getTrainer())
                     .build();
         });
 
         // Act
-        Training out = trainingService.addTraining(payload);
+        trainingService.addTraining(request);
 
         // Assert
-        assertEquals(100L, out.getId());
-        // Check that the service properly bound the entities
-        assertSame(persistedT, payload.getTrainee());
-        assertSame(persistedTr, payload.getTrainer());
-        verify(trainingRepository).save(payload);
-    }
-
-    @Test
-    void addTraining_missingPayload_throws() {
-        assertThrows(ValidationException.class, () -> trainingService.addTraining(null));
+        verify(traineeRepository).findByUsername("trainee1");
+        verify(trainerRepository).findByUsername("trainer1");
+        verify(trainingMapper).toEntity(request);
+        verify(trainingRepository).save(any(Training.class));
     }
 
     @Test
     void addTraining_missingTrainee_throwsNotFound() {
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> trainingService.addTraining(payload));
+        assertThrows(NotFoundException.class, () -> trainingService.addTraining(request));
     }
 
     @Test
@@ -101,28 +92,6 @@ class TrainingServiceTest {
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.of(persistedT));
         when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> trainingService.addTraining(payload));
-    }
-
-    @Test
-    void addTraining_invalidDateTooFar_throwsValidation() {
-        // date > 5 years in future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.YEAR, 6);
-        payload.setDate(cal.getTime());
-
-        assertThrows(ValidationException.class, () -> trainingService.addTraining(payload));
-    }
-
-    @Test
-    void addTraining_missingName_throwsValidation() {
-        payload.setName("  ");
-        assertThrows(ValidationException.class, () -> trainingService.addTraining(payload));
-    }
-
-    @Test
-    void addTraining_missingSpecialization_throwsValidation() {
-        payload.setSpecialization(null);
-        assertThrows(ValidationException.class, () -> trainingService.addTraining(payload));
+        assertThrows(NotFoundException.class, () -> trainingService.addTraining(request));
     }
 }
