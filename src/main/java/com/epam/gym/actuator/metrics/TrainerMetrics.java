@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrainerMetrics {
 
-    public static final String GYM_TRAINERS_COUNT = "gym.trainers.count";
+    private static final String GYM_TRAINERS_COUNT = "gym.trainers.count";
 
     public TrainerMetrics(MeterRegistry registry, TrainerRepository trainerRepository) {
         Gauge.builder(GYM_TRAINERS_COUNT, trainerRepository, TrainerRepository::count)
