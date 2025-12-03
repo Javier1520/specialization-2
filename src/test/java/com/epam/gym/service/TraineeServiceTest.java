@@ -20,7 +20,6 @@ import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.impl.TraineeServiceImpl;
-import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,21 +33,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyIterable;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TraineeServiceTest {
