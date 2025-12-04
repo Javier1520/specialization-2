@@ -9,7 +9,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface TrainingTypeMapper {
-
     @Mapping(target = "trainingTypeId", source = "id")
     @Mapping(target = "trainingType", source = "name")
     TrainingTypeResponse toResponse(TrainingType trainingType);

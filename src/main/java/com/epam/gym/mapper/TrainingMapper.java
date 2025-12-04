@@ -12,7 +12,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface TrainingMapper {
-
     @Mapping(target = "trainingName", source = "name")
     @Mapping(target = "trainingDate", source = "date")
     @Mapping(target = "trainingType", source = "specialization")
@@ -25,8 +24,7 @@ public interface TrainingMapper {
 
     @Named("userToFullName")
     default String userToFullName(User user) {
-        return user == null ? null :
-                user.getFirstName() + " " + user.getLastName();
+        return user == null ? null : user.getFirstName() + " " + user.getLastName();
     }
 
     @Mapping(target = "id", ignore = true)
