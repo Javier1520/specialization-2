@@ -52,6 +52,7 @@ class TrainerServiceTest {
     @Mock TrainerMapper trainerMapper;
     @Mock TrainingMapper trainingMapper;
     @Mock LogUtils logUtils;
+    @Mock org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @InjectMocks TrainerServiceImpl trainerService;
 
@@ -82,6 +83,7 @@ class TrainerServiceTest {
         .when(usernamePasswordGenerator)
         .generateUsername(anyString(), anyString(), any());
         when(usernamePasswordGenerator.generatePassword()).thenReturn("pw");
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         lenient().when(trainerRepository.existsByUsername("tr.ai")).thenReturn(false);
         lenient().when(traineeRepository.existsByUsername("tr.ai")).thenReturn(false);
         when(trainerRepository.save(any())).thenReturn(saved);
@@ -138,6 +140,7 @@ class TrainerServiceTest {
     void changePassword_success_updatesAndSaves() {
         Trainer t = Trainer.builder().username("u").password("old4567890").build();
         when(trainerRepository.findByUsername("u")).thenReturn(Optional.of(t));
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         when(trainerRepository.save(any())).thenReturn(t);
 
         trainerService.changePassword("u", "newstrong_gt_10_chars");
@@ -211,7 +214,7 @@ class TrainerServiceTest {
         TrainingResponse trainingResponse = new TrainingResponse(
                 "Training1", new Date(), TrainingType.Type.CARDIO, 60, "Trainer1", "Trainee1");
 
-        when(trainingRepository.findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class),
+        when(trainingRepository.findByTrainerUsernameWithOptionalFilters(eq("t1"), any(Date.class), any(Date.class),
                 isNull()))
                 .thenReturn(List.of(tr));
         when(trainingMapper.toResponseList(List.of(tr))).thenReturn(List.of(trainingResponse));
@@ -220,7 +223,7 @@ class TrainerServiceTest {
                 null);
         List<TrainingResponse> out = trainerService.getTrainerTrainings("t1", filter);
         assertEquals(1, out.size());
-        verify(trainingRepository).findByTrainerUsernameAndCriteria(eq("t1"), any(Date.class), any(Date.class),
+        verify(trainingRepository).findByTrainerUsernameWithOptionalFilters(eq("t1"), any(Date.class), any(Date.class),
                 isNull());
         verify(trainingMapper).toResponseList(List.of(tr));
     }

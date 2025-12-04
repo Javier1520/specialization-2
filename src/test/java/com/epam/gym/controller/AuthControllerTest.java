@@ -1,6 +1,8 @@
 package com.epam.gym.controller;
 
 import com.epam.gym.dto.request.ChangePasswordRequest;
+import com.epam.gym.dto.request.LoginRequest;
+import com.epam.gym.dto.response.LoginResponse;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.service.AuthenticationService;
@@ -17,10 +19,7 @@ import org.springframework.http.ResponseEntity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -47,16 +46,19 @@ class AuthControllerTest {
         // Given
         String username = "testuser";
         String password = "password123";
-        doNothing().when(authenticationService).authenticate(username, password);
+        LoginRequest loginRequest = new LoginRequest(username, password);
+        LoginResponse loginResponse = new LoginResponse("jwt-token", "refresh-token");
+
+        when(authenticationService.authenticate(username, password)).thenReturn(loginResponse);
 
         // When
-        ResponseEntity<Void> response = authController.login(username, password);
+        ResponseEntity<LoginResponse> response = authController.login(loginRequest);
 
         // Then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(loginResponse, response.getBody());
         verify(authenticationService).authenticate(eq(username), eq(password));
-        verifyNoMoreInteractions(authenticationService);
     }
 
     @Test
@@ -64,16 +66,54 @@ class AuthControllerTest {
         // Given
         String username = "testuser";
         String password = "wrongpass";
+        LoginRequest loginRequest = new LoginRequest(username, password);
+
         doThrow(new ValidationException("Invalid credentials"))
                 .when(authenticationService).authenticate(username, password);
 
         // When & Then
         try {
-            authController.login(username, password);
+            authController.login(loginRequest);
         } catch (ValidationException e) {
             assertEquals("Invalid credentials", e.getMessage());
         }
         verify(authenticationService).authenticate(eq(username), eq(password));
+    }
+
+    @Test
+    void refresh_success_returnsOk() {
+        // Given
+        String refreshToken = "refresh-token";
+        com.epam.gym.dto.request.RefreshTokenRequest request = new com.epam.gym.dto.request.RefreshTokenRequest(refreshToken);
+        LoginResponse loginResponse = new LoginResponse("new-jwt-token", refreshToken);
+
+        when(authenticationService.refreshToken(refreshToken)).thenReturn(loginResponse);
+
+        // When
+        ResponseEntity<LoginResponse> response = authController.refresh(request);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(loginResponse, response.getBody());
+        verify(authenticationService).refreshToken(refreshToken);
+    }
+
+    @Test
+    void logout_success_returnsOk() {
+        // Given
+        String refreshToken = "refresh-token";
+        com.epam.gym.dto.request.RefreshTokenRequest request = new com.epam.gym.dto.request.RefreshTokenRequest(refreshToken);
+
+        doNothing().when(authenticationService).logout(refreshToken);
+
+        // When
+        ResponseEntity<Void> response = authController.logout(request);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(authenticationService).logout(refreshToken);
     }
 
     @Test

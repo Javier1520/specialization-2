@@ -38,7 +38,7 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Resource not found", response.getBody().get("error"));
+        assertEquals("Resource not found", response.getBody().get("errors"));
     }
 
     @Test
@@ -53,7 +53,7 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Invalid input", response.getBody().get("error"));
+        assertEquals("Invalid input", response.getBody().get("errors"));
     }
 
     @Test
@@ -84,7 +84,7 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("An unexpected error occurred", response.getBody().get("error"));
+        assertEquals("An unexpected error occurred", response.getBody().get("errors"));
     }
 
     @Test
@@ -99,7 +99,7 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("An unexpected error occurred", response.getBody().get("error"));
+        assertEquals("An unexpected error occurred", response.getBody().get("errors"));
     }
 
 

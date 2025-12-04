@@ -47,6 +47,7 @@ class TraineeServiceTest {
     @Mock TraineeMapper traineeMapper;
     @Mock TrainingMapper trainingMapper;
     @Mock LogUtils logUtils;
+    @Mock org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @InjectMocks TraineeServiceImpl traineeService;
 
@@ -78,6 +79,7 @@ class TraineeServiceTest {
         .generateUsername(anyString(), anyString(), any());
 
         when(usernamePasswordGenerator.generatePassword()).thenReturn("pass123456");
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         lenient().when(traineeRepository.existsByUsername("john.doe")).thenReturn(false);
         lenient().when(trainerRepository.existsByUsername("john.doe")).thenReturn(false);
         when(traineeRepository.save(any(Trainee.class))).thenReturn(saved);
@@ -118,6 +120,7 @@ class TraineeServiceTest {
     void changePassword_valid_updatesPasswordAndSaves() {
         Trainee t = Trainee.builder().username("u2").password("old4567890").build();
         when(traineeRepository.findByUsername("u2")).thenReturn(Optional.of(t));
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         when(traineeRepository.save(any())).thenReturn(t);
 
         traineeService.changePassword("u2", "newpass890");
@@ -222,7 +225,7 @@ class TraineeServiceTest {
         TrainingResponse trainingResponse = new TrainingResponse(
                 "Training1", new Date(), TrainingType.Type.CARDIO, 60, "Trainer1", "Trainee1");
 
-        when(trainingRepository.findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),
+        when(trainingRepository.findByTraineeUsernameWithOptionalFilters(eq("u"), any(Date.class), any(Date.class),
                 isNull(), isNull()))
                 .thenReturn(List.of(t));
         when(trainingMapper.toResponseList(List.of(t))).thenReturn(List.of(trainingResponse));
@@ -233,7 +236,7 @@ class TraineeServiceTest {
         TrainingFilterRequest filter = new TrainingFilterRequest(fromDate, toDate, null, null);
         List<TrainingResponse> result = traineeService.getTraineeTrainings("u", filter);
         assertEquals(1, result.size());
-        verify(trainingRepository).findByTraineeUsernameAndCriteria(eq("u"), any(Date.class), any(Date.class),
+        verify(trainingRepository).findByTraineeUsernameWithOptionalFilters(eq("u"), any(Date.class), any(Date.class),
                 isNull(), isNull());
         verify(trainingMapper).toResponseList(List.of(t));
     }
