@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
+
     boolean existsByUsername(String username);
 
     Optional<Trainer> findByUsername(String username);
