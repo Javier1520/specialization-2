@@ -23,15 +23,14 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     private final LogUtils logUtils;
 
-    private static final String ERROR = "error";
-    private static final String ERRORS = "errors";
+    private static final String ERRORS = "error";
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException ex) {
         logUtils.error(log, "Not found exception: {}", ex.getMessage());
         Map<String, String> error = new HashMap<>();
-        error.put(ERROR, ex.getMessage());
+        error.put(ERRORS, ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
@@ -40,8 +39,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
         logUtils.error(log, "Validation exception: {}", ex.getMessage());
         Map<String, String> error = new HashMap<>();
-        error.put(ERROR, ex.getMessage());
+        error.put(ERRORS, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(AccountLockedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<Map<String, String>> handleAccountLockedException(AccountLockedException ex) {
+        logUtils.error(log, "Account locked exception: {}", ex.getMessage());
+        Map<String, String> error = new HashMap<>();
+        error.put(ERRORS, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -78,7 +86,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
         logUtils.error(log, "Unexpected error: ", ex);
         Map<String, String> error = new HashMap<>();
-        error.put(ERROR, "An unexpected error occurred");
+        error.put(ERRORS, "An unexpected error occurred");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
