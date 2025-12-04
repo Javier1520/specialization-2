@@ -1,6 +1,8 @@
 package com.epam.gym.security;
 
 import com.epam.gym.exception.AccountLockedException;
+import com.epam.gym.util.LogUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,17 +13,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @Slf4j
 public class BruteForceProtectionService {
+    private final LogUtils logUtils;
 
     private static final int MAX_FAILED_ATTEMPTS = 3;
     private static final int LOCKOUT_DURATION_MINUTES = 5;
 
     private final Map<String, LoginAttempt> loginAttempts = new ConcurrentHashMap<>();
 
+    public BruteForceProtectionService(LogUtils logUtils) {
+        this.logUtils = logUtils;
+    }
+
     public void checkAccountLocked(String username) {
         LoginAttempt attempt = loginAttempts.get(username);
         if (attempt != null && attempt.isLocked()) {
             long remainingMinutes = attempt.getRemainingLockoutMinutes();
-            log.warn("Account locked for username: {}. Remaining lockout time: {} minutes", username, remainingMinutes);
+            logUtils.warn(log, "Account locked for username: {}. Remaining lockout time: {} minutes", username, remainingMinutes);
             throw new AccountLockedException("Account is locked due to too many failed login attempts. Please try again in " + remainingMinutes + " minutes.");
         }
     }
@@ -32,15 +39,15 @@ public class BruteForceProtectionService {
 
         if (attempt.getFailedAttempts() >= MAX_FAILED_ATTEMPTS) {
             attempt.lock();
-            log.warn("Account locked for username: {} after {} failed attempts", username, attempt.getFailedAttempts());
+            logUtils.warn(log, "Account locked for username: {} after {} failed attempts", username, attempt.getFailedAttempts());
         } else {
-            log.debug("Failed login attempt for username: {}. Attempts: {}", username, attempt.getFailedAttempts());
+            logUtils.debug(log, "Failed login attempt for username: {}. Attempts: {}", username, attempt.getFailedAttempts());
         }
     }
 
     public void resetFailedAttempts(String username) {
         loginAttempts.remove(username);
-        log.debug("Reset failed login attempts for username: {}", username);
+        logUtils.debug(log, "Reset failed login attempts for username: {}", username);
     }
 
     private static class LoginAttempt {
