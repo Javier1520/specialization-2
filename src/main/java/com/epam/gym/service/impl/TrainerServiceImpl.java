@@ -20,6 +20,7 @@ import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,22 +37,26 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainingRepository trainingRepository;
     private final TraineeRepository traineeRepository;
     private final UsernamePasswordGenerator usernamePasswordGenerator;
+    private final PasswordEncoder passwordEncoder;
     private final TrainerMapper trainerMapper;
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
 
+    private static final int MIN_PASSWORD_LENGTH = 10;
+
     public RegistrationResponse createTrainer(TrainerRegistrationRequest request) {
         logUtils.info(log, "Trainer registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
         Trainer trainer = trainerMapper.toEntity(request);
-        prepareTrainer(trainer);
+        String generatedPassword = getGeneratePassword();
+        prepareTrainer(trainer, generatedPassword);
         Trainer saved = trainerRepository.save(trainer);
         logUtils.info(log, "Created trainer username={} id={}", saved.getUsername(), saved.getId());
-        return new RegistrationResponse(saved.getUsername(), saved.getPassword());
+        return new RegistrationResponse(saved.getUsername(), generatedPassword);
     }
 
-    private void prepareTrainer(Trainer payload) {
+    private void prepareTrainer(Trainer payload, String plainPassword) {
         payload.setUsername(generateUsername(payload));
-        payload.setPassword(getGeneratePassword());
+        payload.setPassword(passwordEncoder.encode(plainPassword));
         payload.setIsActive(true);
     }
 
@@ -80,7 +85,7 @@ public class TrainerServiceImpl implements TrainerService {
     public void changePassword(String username, String newPassword) {
         validatePasswordLength(newPassword);
         Trainer t = findTrainerByUsername(username);
-        t.setPassword(newPassword);
+        t.setPassword(passwordEncoder.encode(newPassword));
         trainerRepository.save(t);
         logUtils.info(log, "Changed password for trainer {}", username);
     }
@@ -108,7 +113,7 @@ public class TrainerServiceImpl implements TrainerService {
         logUtils.info(log,
                 "Get trainer trainings request: username={}, periodFrom={}, periodTo={}, traineeName={}",
                 username, filter.periodFrom(), filter.periodTo(), filter.traineeName());
-        List<Training> trainings = trainingRepository.findByTrainerUsernameAndCriteria(
+        List<Training> trainings = trainingRepository.findByTrainerUsernameWithOptionalFilters(
                 username,
                 filter.periodFrom(),
                 filter.periodTo(),
@@ -129,7 +134,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     private void validatePasswordLength(String password) {
         Optional.ofNullable(password)
-                .filter(pwd -> pwd.length() >= 10)
+                .filter(pwd -> pwd.length() >= MIN_PASSWORD_LENGTH)
                 .orElseThrow(() -> new ValidationException("Password must be at least 10 chars"));
     }
 

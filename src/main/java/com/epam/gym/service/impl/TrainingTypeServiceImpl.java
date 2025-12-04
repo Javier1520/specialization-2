@@ -7,12 +7,9 @@ import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainingTypeRepository;
 import com.epam.gym.service.TrainingTypeService;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
-
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

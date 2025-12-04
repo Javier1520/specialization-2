@@ -11,22 +11,29 @@ import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
+//TODO delombok constructores y slf4j
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class TrainingServiceImpl implements TrainingService {
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(TrainingServiceImpl.class);
+
     private final TrainingRepository trainingRepository;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
+
+
+    public TrainingServiceImpl(TrainingRepository trainingRepository, TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingMapper trainingMapper, LogUtils logUtils) {
+        this.trainingRepository = trainingRepository;
+        this.traineeRepository = traineeRepository;
+        this.trainerRepository = trainerRepository;
+        this.trainingMapper = trainingMapper;
+        this.logUtils = logUtils;
+    }
 
     @Transactional
     public void addTraining(AddTrainingRequest request) {
@@ -37,14 +44,18 @@ public class TrainingServiceImpl implements TrainingService {
                 .orElseThrow(() -> new NotFoundException("Trainer not found: " + request.trainerUsername()));
 
         Training training = trainingMapper.toEntity(request);
-        training.setSpecialization(trainer.getSpecialization());
-        training.setTrainee(trainee);
-        training.setTrainer(trainer);
+        setAdditionalInfo(training, trainer, trainee);
 
         Training saved = trainingRepository.save(training);
         logUtils.info(log, "Created training id={} trainee={} trainer={}",
                 saved.getId(),
                 saved.getTrainee().getUsername(),
                 saved.getTrainer().getUsername());
+    }
+
+    private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {
+        training.setSpecialization(trainer.getSpecialization());
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
     }
 }

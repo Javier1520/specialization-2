@@ -4,10 +4,13 @@ import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
+import com.epam.gym.security.BruteForceProtectionService;
+import com.epam.gym.security.JwtService;
 import com.epam.gym.service.AuthenticationService;
 import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,18 +23,29 @@ import java.util.Optional;
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final BruteForceProtectionService bruteForceProtectionService;
     private final LogUtils logUtils;
 
     private static final int PASSWORD_LENGTH = 10;
 
     @Transactional(readOnly = true)
-    public void authenticate(String username, String password) {
+    public String authenticate(String username, String password) {
         validateCredentials(username, password);
+        bruteForceProtectionService.checkAccountLocked(username);
 
-        if (authenticateTrainee(username, password) ||authenticateTrainer(username, password)) {
-            return;
+        try {
+            if (authenticateTrainee(username, password) || authenticateTrainer(username, password)) {             // Reset failed attempts on successful login
+                bruteForceProtectionService.resetFailedAttempts(username);
+                return jwtService.generateToken(username);
+            }
+        } catch (ValidationException e) {
+            bruteForceProtectionService.recordFailedAttempt(username);
+            throw e;
         }
 
+        bruteForceProtectionService.recordFailedAttempt(username);
         throw new NotFoundException("User not found: " + username);
     }
 
@@ -64,40 +78,36 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private boolean authenticateTrainee(String username, String password) {
-    return traineeRepository.findByUsername(username)
-        .map(trainee -> {
-            verifyPassword(password, trainee.getPassword());
-            verifyUserActive(trainee.getIsActive(), "Trainee");
-            logUtils.info(log, "Authenticated trainee: {}", username);
-            return true;
-        })
-        .orElse(false);
-}
+        return traineeRepository.findByUsername(username)
+                .map(trainee -> {
+                    verifyPassword(password, trainee.getPassword());
+                    verifyUserActive(trainee.getIsActive(), "Trainee");
+                    logUtils.info(log, "Authenticated trainee: {}", username);
+                    return true;
+                })
+                .orElse(false);
+    }
 
     private boolean authenticateTrainer(String username, String password) {
-    return trainerRepository.findByUsername(username)
-        .map(trainer -> {
-            verifyPassword(password, trainer.getPassword());
-            verifyUserActive(trainer.getIsActive(), "Trainer");
-            logUtils.info(log, "Authenticated trainer: {}", username);
-            return true;
-        })
-        .orElse(false);
-}
+        return trainerRepository.findByUsername(username)
+                .map(trainer -> {
+                    verifyPassword(password, trainer.getPassword());
+                    verifyUserActive(trainer.getIsActive(), "Trainer");
+                    logUtils.info(log, "Authenticated trainer: {}", username);
+                    return true;
+                })
+                .orElse(false);
+    }
 
     private void verifyPassword(String provided, String stored) {
         verifyPassword(provided, stored, "Invalid username or password");
     }
 
     private void verifyPassword(String provided, String stored, String errorMessage) {
-        if (passwordsMatch(provided, stored)) {
+        if (passwordEncoder.matches(provided, stored)) {
             return;
         }
         throw new ValidationException(errorMessage);
-    }
-
-    private boolean passwordsMatch(String provided, String stored) {
-        return stored.equals(provided);
     }
 
     private void verifyUserActive(Boolean isActive, String userType) {
@@ -116,7 +126,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return traineeRepository.findByUsername(username)
                 .map(trainee -> {
                     verifyPassword(oldPassword, trainee.getPassword(), "Invalid old password");
-                    trainee.setPassword(newPassword);
+                    trainee.setPassword(passwordEncoder.encode(newPassword));
                     traineeRepository.save(trainee);
                     logUtils.info(log, "Changed password for trainee: {}", username);
                     return true;
@@ -128,7 +138,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return trainerRepository.findByUsername(username)
                 .map(trainer -> {
                     verifyPassword(oldPassword, trainer.getPassword(), "Invalid old password");
-                    trainer.setPassword(newPassword);
+                    trainer.setPassword(passwordEncoder.encode(newPassword));
                     trainerRepository.save(trainer);
                     logUtils.info(log, "Changed password for trainer: {}", username);
                     return true;

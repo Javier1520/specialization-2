@@ -23,6 +23,7 @@ import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
     private final UsernamePasswordGenerator usernamePasswordGenerator;
+    private final PasswordEncoder passwordEncoder;
     private final TraineeMapper traineeMapper;
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
@@ -48,15 +50,20 @@ public class TraineeServiceImpl implements TraineeService {
     public RegistrationResponse createTrainee(TraineeRegistrationRequest request) {
         logUtils.info(log, "Trainee registration request: firstName={}, lastName={}", request.firstName(), request.lastName());
         Trainee trainee = traineeMapper.toEntity(request);
-        prepareTrainee(trainee);
+        String generatedPassword = getGeneratePassword();
+        prepareTrainee(trainee, generatedPassword);
         Trainee saved = traineeRepository.save(trainee);
         logUtils.info(log, "Created trainee username={} id={}", saved.getUsername(), saved.getId());
-        return new RegistrationResponse(saved.getUsername(), saved.getPassword());
+        return new RegistrationResponse(saved.getUsername(), generatedPassword);
     }
 
-    private void prepareTrainee(Trainee payload) {
+    private String getGeneratePassword() {
+        return usernamePasswordGenerator.generatePassword();
+    }
+
+    private void prepareTrainee(Trainee payload, String plainPassword) {
         payload.setUsername(generateUsername(payload));
-        payload.setPassword(getGeneratePassword());
+        payload.setPassword(passwordEncoder.encode(plainPassword));
         payload.setIsActive(true);
     }
 
@@ -71,10 +78,6 @@ public class TraineeServiceImpl implements TraineeService {
         return traineeRepository.existsByUsername(candidate) || trainerRepository.existsByUsername(candidate);
     }
 
-    private String getGeneratePassword() {
-        return usernamePasswordGenerator.generatePassword();
-    }
-
     @Transactional(readOnly = true)
     public TraineeProfileResponse getByUsername(String username) {
         logUtils.info(log, "Get trainee profile request: username={}", username);
@@ -85,9 +88,15 @@ public class TraineeServiceImpl implements TraineeService {
     public void changePassword(String username, String newPassword) {
         validatePasswordLength(newPassword);
         Trainee trainee = findTraineeByUsername(username);
-        trainee.setPassword(newPassword);
+        trainee.setPassword(passwordEncoder.encode(newPassword));
         traineeRepository.save(trainee);
         logUtils.info(log, "Changed password for trainee {}", username);
+    }
+
+    //TODO top-down- Refactoring martin fowler 2 edicion
+    private Trainee findTraineeByUsernameWithTrainers(String username) {
+        return traineeRepository.findByUsernameWithTrainers(username)
+                .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
     }
 
     public TraineeProfileResponse updateTrainee(String username, UpdateTraineeRequest request) {
@@ -121,8 +130,8 @@ public class TraineeServiceImpl implements TraineeService {
         logUtils.info(log,
                 "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, " +
                         "trainingType={}", username, filter.periodFrom(), filter.periodTo(), filter.trainerName(),
-                        filter.trainingType());
-        List<Training> trainings = trainingRepository.findByTraineeUsernameAndCriteria(
+                filter.trainingType());
+        List<Training> trainings = trainingRepository.findByTraineeUsernameWithOptionalFilters(
                 username,
                 filter.periodFrom(),
                 filter.periodTo(),
@@ -165,11 +174,6 @@ public class TraineeServiceImpl implements TraineeService {
 
     private Trainee findTraineeByUsername(String username) {
         return traineeRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
-    }
-
-    private Trainee findTraineeByUsernameWithTrainers(String username) {
-        return traineeRepository.findByUsernameWithTrainers(username)
                 .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
     }
 

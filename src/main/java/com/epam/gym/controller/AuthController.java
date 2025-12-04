@@ -1,7 +1,9 @@
 package com.epam.gym.controller;
 
 import com.epam.gym.dto.request.ChangePasswordRequest;
-import com.epam.gym.openapi.annotation.operation.GetByIdOperation;
+import com.epam.gym.dto.request.LoginRequest;
+import com.epam.gym.dto.response.LoginResponse;
+import com.epam.gym.openapi.annotation.operation.CreateOperation;
 import com.epam.gym.openapi.annotation.operation.UpdateOperation;
 import com.epam.gym.service.AuthenticationService;
 import com.epam.gym.util.LogUtils;
@@ -10,11 +12,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Authentication", description = "Authentication Operations")
@@ -26,11 +27,19 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final LogUtils logUtils;
 
-    @GetByIdOperation(summary = "Login", description = "Authenticate User")
-    @GetMapping("/login")
-    public ResponseEntity<Void> login(@RequestParam String username, @RequestParam String password) {
-        logUtils.info(log, "Login attempt for username: {}", username);
-        authenticationService.authenticate(username, password);
+    @CreateOperation(summary = "Login", description = "Authenticate User and Get JWT Token")
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        logUtils.info(log, "Login attempt for username: {}", request.username());
+        String token = authenticationService.authenticate(request.username(), request.password());
+        return ResponseEntity.ok(new LoginResponse(token));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        logUtils.info(log, "Logout request");
+        // For stateless JWT, logout is handled client-side by removing the token
+        // If token blacklist is needed, it can be implemented here
         return ResponseEntity.ok().build();
     }
 
