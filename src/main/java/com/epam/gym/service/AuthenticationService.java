@@ -1,10 +1,11 @@
 package com.epam.gym.service;
 
+import com.epam.gym.dto.response.LoginResponse;
+
 public interface AuthenticationService {
 
-    String authenticate(String username, String password);
-
+    LoginResponse authenticate(String username, String password);
     void changePassword(String username, String oldPassword, String newPassword);
+    LoginResponse refreshToken(String refreshToken);
+    void logout(String refreshToken);
 }
-
-

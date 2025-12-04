@@ -4,9 +4,12 @@ import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
+import com.epam.gym.dto.response.LoginResponse;
+import com.epam.gym.model.RefreshToken;
 import com.epam.gym.security.BruteForceProtectionService;
 import com.epam.gym.security.JwtService;
 import com.epam.gym.service.AuthenticationService;
+import com.epam.gym.service.RefreshTokenService;
 import com.epam.gym.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,19 +29,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final BruteForceProtectionService bruteForceProtectionService;
+    private final RefreshTokenService refreshTokenService;
     private final LogUtils logUtils;
 
     private static final int PASSWORD_LENGTH = 10;
 
-    @Transactional(readOnly = true)
-    public String authenticate(String username, String password) {
+    @Override
+    public LoginResponse authenticate(String username, String password) {
         validateCredentials(username, password);
         bruteForceProtectionService.checkAccountLocked(username);
 
         try {
-            if (authenticateTrainee(username, password) || authenticateTrainer(username, password)) {             // Reset failed attempts on successful login
+            if (authenticateTrainee(username, password) || authenticateTrainer(username, password)) {
                 bruteForceProtectionService.resetFailedAttempts(username);
-                return jwtService.generateToken(username);
+                String jwt = jwtService.generateToken(username);
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(username);
+                return new LoginResponse(jwt, refreshToken.getToken());
             }
         } catch (ValidationException e) {
             bruteForceProtectionService.recordFailedAttempt(username);
@@ -47,6 +53,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         bruteForceProtectionService.recordFailedAttempt(username);
         throw new NotFoundException("User not found: " + username);
+    }
+
+    @Override
+    public LoginResponse refreshToken(String requestRefreshToken) {
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUsername)
+                .map(username -> {
+                    String token = jwtService.generateToken(username);
+                    return new LoginResponse(token, requestRefreshToken);
+                })
+                .orElseThrow(() -> new ValidationException("Refresh token is not in database!"));
+    }
+
+    @Override
+    public void logout(String refreshToken) {
+        refreshTokenService.deleteByToken(refreshToken);
     }
 
     public void changePassword(String username, String oldPassword, String newPassword) {

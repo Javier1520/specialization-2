@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     private final LogUtils logUtils;
 
-    private static final String ERRORS = "error";
+    private static final String ERRORS = "errors";
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

@@ -31,15 +31,21 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         logUtils.info(log, "Login attempt for username: {}", request.username());
-        String token = authenticationService.authenticate(request.username(), request.password());
-        return ResponseEntity.ok(new LoginResponse(token));
+        LoginResponse response = authenticationService.authenticate(request.username(), request.password());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
+        logUtils.info(log, "Refresh token request");
+        LoginResponse response = authenticationService.refreshToken(request.refreshToken());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(@Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
         logUtils.info(log, "Logout request");
-        // For stateless JWT, logout is handled client-side by removing the token
-        // If token blacklist is needed, it can be implemented here
+        authenticationService.logout(request.refreshToken());
         return ResponseEntity.ok().build();
     }
 
