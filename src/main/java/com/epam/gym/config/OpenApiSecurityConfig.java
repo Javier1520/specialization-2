@@ -26,7 +26,7 @@ public class OpenApiSecurityConfig {
         return new Info()
                 .title("Gym CRM")
                 .description("REST API for managing gym trainers, trainees and training sessions")
-                .version("6.0.0")
+                .version("2.5.0")
                 .contact(new Contact()
                         .name("Javier Guerrero")
                         .email("javier.guerrero@email.com"))
@@ -37,23 +37,17 @@ public class OpenApiSecurityConfig {
 
     private Components getComponents() {
         return new Components()
-                .addSecuritySchemes("Username",
+                .addSecuritySchemes("bearer-jwt",
                         new SecurityScheme()
-                                .type(SecurityScheme.Type.APIKEY)
-                                .in(SecurityScheme.In.HEADER)
-                                .name("username")
-                )
-                .addSecuritySchemes("Password",
-                        new SecurityScheme()
-                                .type(SecurityScheme.Type.APIKEY)
-                                .in(SecurityScheme.In.HEADER)
-                                .name("password")
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .description("JWT token authentication")
                 );
     }
 
     private SecurityRequirement getSecurityItem() {
         return new SecurityRequirement()
-                .addList("Username")
-                .addList("Password");
+                .addList("bearer-jwt");
     }
 }
