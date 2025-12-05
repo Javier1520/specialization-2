@@ -24,37 +24,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-    private final AuthenticationService authenticationService;
-    private final LogUtils logUtils;
+  private final AuthenticationService authenticationService;
+  private final LogUtils logUtils;
 
-    @CreateOperation(summary = "Login", description = "Authenticate User and Get JWT Token")
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        logUtils.info(log, "Login attempt for username: {}", request.username());
-        LoginResponse response = authenticationService.authenticate(request.username(), request.password());
-        return ResponseEntity.ok(response);
-    }
+  @CreateOperation(summary = "Login", description = "Authenticate User and Get JWT Token")
+  @PostMapping("/login")
+  public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    logUtils.info(log, "Login attempt for username: {}", request.username());
+    LoginResponse response =
+        authenticationService.authenticate(request.username(), request.password());
+    return ResponseEntity.ok(response);
+  }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<LoginResponse> refresh(@Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
-        logUtils.info(log, "Refresh token request");
-        LoginResponse response = authenticationService.refreshToken(request.refreshToken());
-        return ResponseEntity.ok(response);
-    }
+  @PostMapping("/refresh")
+  public ResponseEntity<LoginResponse> refresh(
+      @Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
+    logUtils.info(log, "Refresh token request");
+    LoginResponse response = authenticationService.refreshToken(request.refreshToken());
+    return ResponseEntity.ok(response);
+  }
 
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
-        logUtils.info(log, "Logout request");
-        authenticationService.logout(request.refreshToken());
-        return ResponseEntity.ok().build();
-    }
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(
+      @Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
+    logUtils.info(log, "Logout request");
+    authenticationService.logout(request.refreshToken());
+    return ResponseEntity.ok().build();
+  }
 
-    @UpdateOperation(summary = "Change Password", description = "Change User Password")
-    @PutMapping("/change-password")
-    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        logUtils.info(log, "Change password request for username: {}", request.username());
-        authenticationService.changePassword(request.username(), request.oldPassword(), request.newPassword());
-        return ResponseEntity.ok().build();
-    }
+  @UpdateOperation(summary = "Change Password", description = "Change User Password")
+  @PutMapping("/change-password")
+  public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+    logUtils.info(log, "Change password request for username: {}", request.username());
+    authenticationService.changePassword(
+        request.username(), request.oldPassword(), request.newPassword());
+    return ResponseEntity.ok().build();
+  }
 }
-

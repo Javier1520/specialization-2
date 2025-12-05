@@ -6,7 +6,6 @@ import com.epam.gym.dto.request.UpdateTrainerRequest;
 import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.dto.response.TrainingResponse;
-
 import java.util.List;
 
 public interface TrainerService {

@@ -13,41 +13,38 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiSecurityConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-            .info(getInfo())
-            .components(getComponents())
-            .addSecurityItem(getSecurityItem()
-            );
-    }
+  @Bean
+  public OpenAPI customOpenAPI() {
+    return new OpenAPI()
+        .info(getInfo())
+        .components(getComponents())
+        .addSecurityItem(getSecurityItem());
+  }
 
-    private Info getInfo() {
-        return new Info()
-                .title("Gym CRM")
-                .description("REST API for managing gym trainers, trainees and training sessions")
-                .version("2.5.0")
-                .contact(new Contact()
-                        .name("Javier Guerrero")
-                        .email("javier.guerrero@email.com"))
-                .license(new License()
-                        .name("Apache 2.0")
-                        .url("https://www.apache.org/licenses/LICENSE-2.0.html"));
-    }
+  private Info getInfo() {
+    return new Info()
+        .title("Gym CRM")
+        .description("REST API for managing gym trainers, trainees and training sessions")
+        .version("2.5.0")
+        .contact(new Contact().name("Javier Guerrero").email("javier.guerrero@email.com"))
+        .license(
+            new License()
+                .name("Apache 2.0")
+                .url("https://www.apache.org/licenses/LICENSE-2.0.html"));
+  }
 
-    private Components getComponents() {
-        return new Components()
-                .addSecuritySchemes("bearer-jwt",
-                        new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                .description("JWT token authentication")
-                );
-    }
+  private Components getComponents() {
+    return new Components()
+        .addSecuritySchemes(
+            "bearer-jwt",
+            new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT")
+                .description("JWT token authentication"));
+  }
 
-    private SecurityRequirement getSecurityItem() {
-        return new SecurityRequirement()
-                .addList("bearer-jwt");
-    }
+  private SecurityRequirement getSecurityItem() {
+    return new SecurityRequirement().addList("bearer-jwt");
+  }
 }

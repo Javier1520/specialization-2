@@ -18,21 +18,21 @@ import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainerService;
 import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class TrainerServiceImpl implements TrainerService {
+    private static final int MIN_PASSWORD_LENGTH = 10;
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
     private final TraineeRepository traineeRepository;
@@ -41,8 +41,6 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainerMapper trainerMapper;
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
-
-    private static final int MIN_PASSWORD_LENGTH = 10;
 
     public RegistrationResponse createTrainer(TrainerRegistrationRequest request) {
         logUtils.info(log, "Trainer registration request: firstName={}, lastName={}", request.firstName(), request.lastName());

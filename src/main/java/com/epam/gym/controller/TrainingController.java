@@ -1,9 +1,7 @@
 package com.epam.gym.controller;
 
 import com.epam.gym.dto.request.AddTrainingRequest;
-
 import com.epam.gym.openapi.annotation.operation.CreateOperation;
-
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,17 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 public class TrainingController {
-    private final TrainingService trainingService;
-    private final LogUtils logUtils;
+  private final TrainingService trainingService;
+  private final LogUtils logUtils;
 
-    @CreateOperation(summary = "Add Training", description = "Add a new Training in Gym CRM")
-    @PostMapping
-    public ResponseEntity<Void> addTraining(@Valid @RequestBody AddTrainingRequest request) {
-        logUtils.info(log, "Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
-                request.traineeUsername(), request.trainerUsername(), request.trainingName());
+  @CreateOperation(summary = "Add Training", description = "Add a new Training in Gym CRM")
+  @PostMapping
+  public ResponseEntity<Void> addTraining(@Valid @RequestBody AddTrainingRequest request) {
+    logUtils.info(
+        log,
+        "Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
+        request.traineeUsername(),
+        request.trainerUsername(),
+        request.trainingName());
 
-        trainingService.addTraining(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+    trainingService.addTraining(request);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
 }
-

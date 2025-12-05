@@ -21,15 +21,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TrainingTypeController {
-    private final TrainingTypeService trainingTypeService;
-    private final LogUtils logUtils;
+  private final TrainingTypeService trainingTypeService;
+  private final LogUtils logUtils;
 
-    @GetAllOperation(summary = "Get Training Types", description = "Get All Training Types")
-    @GetMapping
-    public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
-        logUtils.info(log, "Get training types request");
-        return ResponseEntity.ok(trainingTypeService.listAll());
-    }
+  @GetAllOperation(summary = "Get Training Types", description = "Get All Training Types")
+  @GetMapping
+  public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
+    logUtils.info(log, "Get training types request");
+    return ResponseEntity.ok(trainingTypeService.listAll());
+  }
 }
-
-

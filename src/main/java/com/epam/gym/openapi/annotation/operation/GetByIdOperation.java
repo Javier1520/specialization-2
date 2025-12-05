@@ -16,9 +16,9 @@ import java.lang.annotation.Target;
 @Operation
 @GetByIdResponses
 public @interface GetByIdOperation {
-    @AliasFor(annotation = Operation.class, attribute = "summary")
-    String summary() default "Get resource by ID";
+  @AliasFor(annotation = Operation.class, attribute = "summary")
+  String summary() default "Get resource by ID";
 
-    @AliasFor(annotation = Operation.class, attribute = "description")
-    String description() default "";
+  @AliasFor(annotation = Operation.class, attribute = "description")
+  String description() default "";
 }

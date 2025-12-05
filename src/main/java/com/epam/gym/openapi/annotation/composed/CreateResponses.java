@@ -16,5 +16,4 @@ import java.lang.annotation.Target;
 @ResponseCreated_201
 @ResponseBadRequest_400
 @ResponseInternalServerError_500
-public @interface CreateResponses {
-}
+public @interface CreateResponses {}

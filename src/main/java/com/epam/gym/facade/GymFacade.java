@@ -14,14 +14,13 @@ import com.epam.gym.dto.response.TrainerInfoResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.dto.response.TrainingTypeResponse;
-import lombok.RequiredArgsConstructor;
 import com.epam.gym.service.TraineeService;
 import com.epam.gym.service.TrainerService;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.service.TrainingTypeService;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

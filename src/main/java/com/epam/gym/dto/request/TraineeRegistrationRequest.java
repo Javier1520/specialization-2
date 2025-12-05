@@ -2,7 +2,6 @@ package com.epam.gym.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
-
 import java.util.Date;
 
 public record TraineeRegistrationRequest(

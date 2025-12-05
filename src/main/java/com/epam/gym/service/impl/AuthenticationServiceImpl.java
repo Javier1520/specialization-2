@@ -1,29 +1,29 @@
 package com.epam.gym.service.impl;
 
+import com.epam.gym.dto.response.LoginResponse;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
+import com.epam.gym.model.RefreshToken;
 import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
-import com.epam.gym.dto.response.LoginResponse;
-import com.epam.gym.model.RefreshToken;
 import com.epam.gym.security.BruteForceProtectionService;
 import com.epam.gym.security.JwtService;
 import com.epam.gym.service.AuthenticationService;
 import com.epam.gym.service.RefreshTokenService;
 import com.epam.gym.util.LogUtils;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
+    private static final int PASSWORD_LENGTH = 10;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final PasswordEncoder passwordEncoder;
@@ -31,8 +31,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final BruteForceProtectionService bruteForceProtectionService;
     private final RefreshTokenService refreshTokenService;
     private final LogUtils logUtils;
-
-    private static final int PASSWORD_LENGTH = 10;
 
     @Override
     public LoginResponse authenticate(String username, String password) {
