@@ -1,7 +1,6 @@
 package com.epam.gym.dto.response;
 
 import com.epam.gym.model.TrainingType;
-
 import java.util.List;
 
 public record TrainerProfileResponse(
@@ -10,7 +9,4 @@ public record TrainerProfileResponse(
     String lastName,
     TrainingType.Type specialization,
     Boolean isActive,
-    List<TraineeInfoResponse> trainees
-) {}
-
-
+    List<TraineeInfoResponse> trainees) {}

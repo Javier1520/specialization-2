@@ -2,42 +2,49 @@ package com.epam.gym.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-@Slf4j
-@RequiredArgsConstructor
 public class TransactionIdInterceptor implements HandlerInterceptor {
-    private final LogUtils logUtils;
+  private static final String TRANSACTION_ID_HEADER = "X-Transaction-Id";
+  private static final String TRANSACTION_ID_MDC_KEY = "transactionId";
+  private static final Logger log = LoggerFactory.getLogger(TransactionIdInterceptor.class);
 
-    private static final String TRANSACTION_ID_HEADER = "X-Transaction-Id";
-    private static final String TRANSACTION_ID_MDC_KEY = "transactionId";
+  private final LogUtils logUtils;
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
-        String transactionId = request.getHeader(TRANSACTION_ID_HEADER);
-        if (transactionId == null || transactionId.isBlank()) {
-            transactionId = TransactionIdGenerator.generate();
-        }
+  public TransactionIdInterceptor(LogUtils logUtils) {
+    this.logUtils = logUtils;
+  }
 
-        MDC.put(TRANSACTION_ID_MDC_KEY, transactionId);
-        response.setHeader(TRANSACTION_ID_HEADER, transactionId);
-
-        logUtils.info(log, "Request: {} {} - TransactionId: {}", request.getMethod(), request.getRequestURI(), transactionId);
-
-        return true;
+  @Override
+  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+      throws Exception {
+    String transactionId = request.getHeader(TRANSACTION_ID_HEADER);
+    if (transactionId == null || transactionId.isBlank()) {
+      transactionId = TransactionIdGenerator.generate();
     }
 
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
-                                Exception ex) throws Exception {
-        MDC.remove(TRANSACTION_ID_MDC_KEY);
-    }
+    MDC.put(TRANSACTION_ID_MDC_KEY, transactionId);
+    response.setHeader(TRANSACTION_ID_HEADER, transactionId);
+
+    logUtils.info(
+        log,
+        "Request: {} {} - TransactionId: {}",
+        request.getMethod(),
+        request.getRequestURI(),
+        transactionId);
+
+    return true;
+  }
+
+  @Override
+  public void afterCompletion(
+      HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+      throws Exception {
+    MDC.remove(TRANSACTION_ID_MDC_KEY);
+  }
 }
-
-

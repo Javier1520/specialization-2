@@ -2,7 +2,6 @@ package com.epam.gym.dto.response;
 
 import com.epam.gym.model.TrainingType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.Date;
 
 public record TrainingResponse(
@@ -11,7 +10,4 @@ public record TrainingResponse(
     TrainingType.Type trainingType,
     Integer trainingDuration,
     String trainerName,
-    String traineeName
-) {}
-
-
+    String traineeName) {}

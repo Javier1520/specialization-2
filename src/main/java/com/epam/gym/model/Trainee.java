@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,9 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "trainees")
@@ -28,16 +27,14 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Trainee extends User {
 
-    @Column(name = "date_of_birth")
-    private Date dateOfBirth;
+  @Column(name = "date_of_birth")
+  private Date dateOfBirth;
 
-    @Column
-    private String address;
+  @Column private String address;
 
-    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Training> trainings;
+  @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Training> trainings;
 
-    @ManyToMany(mappedBy = "trainees" )
-    private List<Trainer> trainers;
-
+  @ManyToMany(mappedBy = "trainees")
+  private List<Trainer> trainers;
 }
