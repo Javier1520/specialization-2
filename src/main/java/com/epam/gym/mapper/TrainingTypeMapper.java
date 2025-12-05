@@ -2,10 +2,9 @@ package com.epam.gym.mapper;
 
 import com.epam.gym.dto.response.TrainingTypeResponse;
 import com.epam.gym.model.TrainingType;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface TrainingTypeMapper {

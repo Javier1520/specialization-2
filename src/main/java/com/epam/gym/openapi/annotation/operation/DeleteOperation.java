@@ -15,9 +15,9 @@ import org.springframework.core.annotation.AliasFor;
 @Operation
 @DeleteResponses
 public @interface DeleteOperation {
-    @AliasFor(annotation = Operation.class, attribute = "summary")
-    String summary() default "Delete resource";
+  @AliasFor(annotation = Operation.class, attribute = "summary")
+  String summary() default "Delete resource";
 
-    @AliasFor(annotation = Operation.class, attribute = "description")
-    String description() default "";
+  @AliasFor(annotation = Operation.class, attribute = "description")
+  String description() default "";
 }

@@ -7,9 +7,8 @@ import com.epam.gym.dto.response.TrainerInfoResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
-import org.mapstruct.*;
-
 import java.util.List;
+import org.mapstruct.*;
 
 @Mapper(
     componentModel = "spring",

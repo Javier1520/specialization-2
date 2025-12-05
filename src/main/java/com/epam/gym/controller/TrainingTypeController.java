@@ -1,19 +1,17 @@
 package com.epam.gym.controller;
 
 import com.epam.gym.dto.response.TrainingTypeResponse;
-
 import com.epam.gym.openapi.annotation.operation.GetAllOperation;
 import com.epam.gym.service.TrainingTypeService;
 import com.epam.gym.util.LogUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "Training Types", description = "Operations in Training Types")
 @RestController

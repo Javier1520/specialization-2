@@ -1,10 +1,10 @@
 package com.epam.gym.controller;
 
-import com.epam.gym.dto.request.ActivateDeactivateRequest;
-import com.epam.gym.dto.request.TraineeRegistrationRequest;
-import com.epam.gym.dto.request.TrainingFilterRequest;
-import com.epam.gym.dto.request.UpdateTraineeRequest;
-import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+
+import com.epam.gym.dto.request.*;
 import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TraineeProfileResponse;
 import com.epam.gym.dto.response.TrainerInfoResponse;
@@ -12,6 +12,8 @@ import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.service.TraineeService;
 import com.epam.gym.util.LogUtils;
+import java.util.Date;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,15 +22,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Date;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TraineeControllerTest {

@@ -10,9 +10,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ApiResponse(
-        responseCode = "201",
-        description = "Resource created successfully"
-)
-public @interface ResponseCreated_201 {
-}
+@ApiResponse(responseCode = "201", description = "Resource created successfully")
+public @interface ResponseCreated_201 {}

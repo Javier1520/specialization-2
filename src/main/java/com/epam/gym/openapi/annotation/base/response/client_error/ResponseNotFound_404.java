@@ -10,9 +10,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ApiResponse(
-        responseCode = "404",
-        description = "Resource not found"
-)
-public @interface ResponseNotFound_404 {
-}
+@ApiResponse(responseCode = "404", description = "Resource not found")
+public @interface ResponseNotFound_404 {}

@@ -11,18 +11,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
 
-    boolean existsByUsername(String username);
+  boolean existsByUsername(String username);
 
-    Optional<Trainer> findByUsername(String username);
+  Optional<Trainer> findByUsername(String username);
 
-    @Query("SELECT t FROM Trainer t LEFT JOIN FETCH t.trainees WHERE t.username = :username")
-    Optional<Trainer> findByUsernameWithTrainees(@Param("username") String username);
+  @Query("SELECT t FROM Trainer t LEFT JOIN FETCH t.trainees WHERE t.username = :username")
+  Optional<Trainer> findByUsernameWithTrainees(@Param("username") String username);
 
-    @Query("""
+  @Query(
+      """
             SELECT t FROM Trainer t
             WHERE t.id NOT IN (
                 SELECT tr.id FROM Trainer tr JOIN tr.trainees te WHERE te.id = :traineeId
             )
             """)
-    List<Trainer> findNotAssignedToTrainee(@Param("traineeId") Long traineeId);
+  List<Trainer> findNotAssignedToTrainee(@Param("traineeId") Long traineeId);
 }

@@ -15,5 +15,4 @@ import java.lang.annotation.Target;
 @ResponseOk_200
 @ResponseNotFound_404
 @ResponseInternalServerError_500
-public @interface DeleteResponses {
-}
+public @interface DeleteResponses {}
