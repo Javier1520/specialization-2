@@ -3,11 +3,8 @@ package com.epam.gym.exception;
 import com.epam.gym.util.LogUtils;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,14 +13,21 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @ControllerAdvice
-@RequiredArgsConstructor
-@Slf4j
 public class GlobalExceptionHandler {
   private static final String ERRORS = "errors";
-  private final LogUtils logUtils;
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final LogUtils logUtils;
 
-  @ExceptionHandler(NotFoundException.class)
+    public GlobalExceptionHandler(LogUtils logUtils) {
+        this.logUtils = logUtils;
+    }
+
+    @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException ex) {
     logUtils.error(log, "Not found exception: {}", ex.getMessage());

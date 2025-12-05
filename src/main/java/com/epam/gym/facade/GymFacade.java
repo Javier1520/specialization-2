@@ -18,18 +18,28 @@ import com.epam.gym.service.TraineeService;
 import com.epam.gym.service.TrainerService;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.service.TrainingTypeService;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-@RequiredArgsConstructor
 public class GymFacade {
 
   private final TraineeService traineeService;
   private final TrainerService trainerService;
   private final TrainingService trainingService;
   private final TrainingTypeService trainingTypeService;
+
+  public GymFacade(
+      TraineeService traineeService,
+      TrainerService trainerService,
+      TrainingService trainingService,
+      TrainingTypeService trainingTypeService) {
+    this.traineeService = traineeService;
+    this.trainerService = trainerService;
+    this.trainingService = trainingService;
+    this.trainingTypeService = trainingTypeService;
+  }
 
   // --- Trainee operations ---
   public RegistrationResponse createTrainee(TraineeRegistrationRequest request) {

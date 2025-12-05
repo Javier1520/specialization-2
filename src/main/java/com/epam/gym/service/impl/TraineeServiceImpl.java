@@ -21,21 +21,21 @@ import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TraineeService;
 import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 @Service
-@RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class TraineeServiceImpl implements TraineeService {
   private static final int PASSWORD_LENGTH = 10;
+  private static final Logger log = LoggerFactory.getLogger(TraineeServiceImpl.class);
   private final TraineeRepository traineeRepository;
   private final TrainerRepository trainerRepository;
   private final TrainingRepository trainingRepository;
@@ -44,6 +44,25 @@ public class TraineeServiceImpl implements TraineeService {
   private final TraineeMapper traineeMapper;
   private final TrainingMapper trainingMapper;
   private final LogUtils logUtils;
+
+  public TraineeServiceImpl(
+      TraineeRepository traineeRepository,
+      TrainerRepository trainerRepository,
+      TrainingRepository trainingRepository,
+      UsernamePasswordGenerator usernamePasswordGenerator,
+      PasswordEncoder passwordEncoder,
+      TraineeMapper traineeMapper,
+      TrainingMapper trainingMapper,
+      LogUtils logUtils) {
+    this.traineeRepository = traineeRepository;
+    this.trainerRepository = trainerRepository;
+    this.trainingRepository = trainingRepository;
+    this.usernamePasswordGenerator = usernamePasswordGenerator;
+    this.passwordEncoder = passwordEncoder;
+    this.traineeMapper = traineeMapper;
+    this.trainingMapper = trainingMapper;
+    this.logUtils = logUtils;
+  }
 
   public RegistrationResponse createTrainee(TraineeRegistrationRequest request) {
     logUtils.info(
@@ -94,7 +113,6 @@ public class TraineeServiceImpl implements TraineeService {
     logUtils.info(log, "Changed password for trainee {}", username);
   }
 
-  // TODO top-down- Refactoring martin fowler 2 edicion
   private Trainee findTraineeByUsernameWithTrainers(String username) {
     return traineeRepository
         .findByUsernameWithTrainers(username)

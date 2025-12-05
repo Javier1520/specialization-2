@@ -12,13 +12,13 @@ import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// TODO delombok constructores y slf4j
 @Service
 public class TrainingServiceImpl implements TrainingService {
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(TrainingServiceImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
   private final TrainingRepository trainingRepository;
   private final TraineeRepository traineeRepository;

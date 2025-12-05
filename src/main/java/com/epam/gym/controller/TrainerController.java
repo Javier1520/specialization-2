@@ -15,9 +15,8 @@ import com.epam.gym.service.TrainerService;
 import com.epam.gym.util.LogUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +29,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Tag(name = "Trainers", description = "Operations in Trainers")
 @RestController
 @RequestMapping("/api/v1/trainers")
-@RequiredArgsConstructor
-@Slf4j
 public class TrainerController {
+  private static final Logger log = LoggerFactory.getLogger(TrainerController.class);
   private final TrainerService trainerService;
   private final LogUtils logUtils;
+
+  public TrainerController(TrainerService trainerService, LogUtils logUtils) {
+    this.trainerService = trainerService;
+    this.logUtils = logUtils;
+  }
 
   @CreateOperation(summary = "Create Trainer", description = "Create a new Trainer in Gym CRM")
   @PostMapping("/register")

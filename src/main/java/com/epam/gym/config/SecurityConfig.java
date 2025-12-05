@@ -1,8 +1,5 @@
 package com.epam.gym.config;
 
-import java.util.Arrays;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,14 +20,22 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final UserDetailsService userDetailsService;
+
+  public SecurityConfig(
+      JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+    this.jwtAuthFilter = jwtAuthFilter;
+    this.userDetailsService = userDetailsService;
+  }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

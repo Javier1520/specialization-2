@@ -11,19 +11,20 @@ import com.epam.gym.security.JwtService;
 import com.epam.gym.service.AuthenticationService;
 import com.epam.gym.service.RefreshTokenService;
 import com.epam.gym.util.LogUtils;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
-@RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
   private static final int PASSWORD_LENGTH = 10;
+  private static final Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
+
   private final TraineeRepository traineeRepository;
   private final TrainerRepository trainerRepository;
   private final PasswordEncoder passwordEncoder;
@@ -31,6 +32,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final BruteForceProtectionService bruteForceProtectionService;
   private final RefreshTokenService refreshTokenService;
   private final LogUtils logUtils;
+
+  public AuthenticationServiceImpl(
+      TraineeRepository traineeRepository,
+      TrainerRepository trainerRepository,
+      PasswordEncoder passwordEncoder,
+      JwtService jwtService,
+      BruteForceProtectionService bruteForceProtectionService,
+      RefreshTokenService refreshTokenService,
+      LogUtils logUtils) {
+    this.traineeRepository = traineeRepository;
+    this.trainerRepository = trainerRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.jwtService = jwtService;
+    this.bruteForceProtectionService = bruteForceProtectionService;
+    this.refreshTokenService = refreshTokenService;
+    this.logUtils = logUtils;
+  }
 
   @Override
   public LoginResponse authenticate(String username, String password) {
@@ -52,6 +70,59 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     bruteForceProtectionService.recordFailedAttempt(username);
     throw new NotFoundException("User not found: " + username);
   }
+
+  private void validateCredentials(String username, String password) {
+    Optional.ofNullable(username)
+        .filter(this::isNotBlank)
+        .orElseThrow(() -> new ValidationException("Username is required"));
+
+    Optional.ofNullable(password)
+        .filter(this::isNotBlank)
+        .orElseThrow(() -> new ValidationException("Password is required"));
+  }
+
+  private boolean authenticateTrainee(String username, String password) {
+    return traineeRepository
+        .findByUsername(username)
+        .map(
+            trainee -> {
+              verifyPassword(password, trainee.getPassword());
+              verifyUserActive(trainee.getIsActive(), "Trainee");
+              logUtils.info(log, "Authenticated trainee: {}", username);
+              return true;
+            })
+        .orElse(false);
+  }
+
+    private boolean authenticateTrainer(String username, String password) {
+        return trainerRepository
+                .findByUsername(username)
+                .map(
+                        trainer -> {
+                            verifyPassword(password, trainer.getPassword());
+                            verifyUserActive(trainer.getIsActive(), "Trainer");
+                            logUtils.info(log, "Authenticated trainer: {}", username);
+                            return true;
+                        })
+                .orElse(false);
+    }
+
+    private void verifyUserActive(Boolean isActive, String userType) {
+        Optional.ofNullable(isActive)
+                .filter(Boolean.TRUE::equals)
+                .orElseThrow(() -> new ValidationException(userType + " account is inactive"));
+    }
+
+    private void verifyPassword(String provided, String stored) {
+        verifyPassword(provided, stored, "Invalid username or password");
+    }
+
+    private void verifyPassword(String provided, String stored, String errorMessage) {
+        if (passwordEncoder.matches(provided, stored)) {
+            return;
+        }
+        throw new ValidationException(errorMessage);
+    }
 
   @Override
   public LoginResponse refreshToken(String requestRefreshToken) {
@@ -86,61 +157,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     throw new NotFoundException("User not found: " + username);
   }
 
-  private void validateCredentials(String username, String password) {
-    Optional.ofNullable(username)
-        .filter(this::isNotBlank)
-        .orElseThrow(() -> new ValidationException("Username is required"));
-
-    Optional.ofNullable(password)
-        .filter(this::isNotBlank)
-        .orElseThrow(() -> new ValidationException("Password is required"));
-  }
-
   private boolean isNotBlank(String value) {
-    return value != null && !value.isBlank();
-  }
-
-  private boolean authenticateTrainee(String username, String password) {
-    return traineeRepository
-        .findByUsername(username)
-        .map(
-            trainee -> {
-              verifyPassword(password, trainee.getPassword());
-              verifyUserActive(trainee.getIsActive(), "Trainee");
-              logUtils.info(log, "Authenticated trainee: {}", username);
-              return true;
-            })
-        .orElse(false);
-  }
-
-  private boolean authenticateTrainer(String username, String password) {
-    return trainerRepository
-        .findByUsername(username)
-        .map(
-            trainer -> {
-              verifyPassword(password, trainer.getPassword());
-              verifyUserActive(trainer.getIsActive(), "Trainer");
-              logUtils.info(log, "Authenticated trainer: {}", username);
-              return true;
-            })
-        .orElse(false);
-  }
-
-  private void verifyPassword(String provided, String stored) {
-    verifyPassword(provided, stored, "Invalid username or password");
-  }
-
-  private void verifyPassword(String provided, String stored, String errorMessage) {
-    if (passwordEncoder.matches(provided, stored)) {
-      return;
-    }
-    throw new ValidationException(errorMessage);
-  }
-
-  private void verifyUserActive(Boolean isActive, String userType) {
-    Optional.ofNullable(isActive)
-        .filter(Boolean.TRUE::equals)
-        .orElseThrow(() -> new ValidationException(userType + " account is inactive"));
+    return !value.isBlank();
   }
 
   private void validateNewPassword(String newPassword) {

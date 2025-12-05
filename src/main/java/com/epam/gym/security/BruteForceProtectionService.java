@@ -2,17 +2,20 @@ package com.epam.gym.security;
 
 import com.epam.gym.exception.AccountLockedException;
 import com.epam.gym.util.LogUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 public class BruteForceProtectionService {
   private static final int MAX_FAILED_ATTEMPTS = 3;
   private static final int LOCKOUT_DURATION_MINUTES = 5;
+  private static final Logger log = LoggerFactory.getLogger(BruteForceProtectionService.class);
+
   private final LogUtils logUtils;
   private final Map<String, LoginAttempt> loginAttempts = new ConcurrentHashMap<>();
 

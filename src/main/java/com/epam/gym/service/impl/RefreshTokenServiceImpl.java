@@ -6,18 +6,21 @@ import com.epam.gym.repository.RefreshTokenRepository;
 import com.epam.gym.service.RefreshTokenService;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
   private final RefreshTokenRepository refreshTokenRepository;
+
   @Value("${jwt.refresh.expiration:86400000}") // Default 24 hours
   private Long refreshTokenDurationMs;
+
+  public RefreshTokenServiceImpl(RefreshTokenRepository refreshTokenRepository) {
+    this.refreshTokenRepository = refreshTokenRepository;
+  }
 
   @Override
   public RefreshToken createRefreshToken(String username) {

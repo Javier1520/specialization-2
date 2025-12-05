@@ -18,21 +18,22 @@ import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainerService;
 import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 @Service
-@RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class TrainerServiceImpl implements TrainerService {
   private static final int MIN_PASSWORD_LENGTH = 10;
+  private static final Logger log = LoggerFactory.getLogger(TrainerServiceImpl.class);
+
   private final TrainerRepository trainerRepository;
   private final TrainingRepository trainingRepository;
   private final TraineeRepository traineeRepository;
@@ -41,6 +42,25 @@ public class TrainerServiceImpl implements TrainerService {
   private final TrainerMapper trainerMapper;
   private final TrainingMapper trainingMapper;
   private final LogUtils logUtils;
+
+  public TrainerServiceImpl(
+      TrainerRepository trainerRepository,
+      TrainingRepository trainingRepository,
+      TraineeRepository traineeRepository,
+      UsernamePasswordGenerator usernamePasswordGenerator,
+      PasswordEncoder passwordEncoder,
+      TrainerMapper trainerMapper,
+      TrainingMapper trainingMapper,
+      LogUtils logUtils) {
+    this.trainerRepository = trainerRepository;
+    this.trainingRepository = trainingRepository;
+    this.traineeRepository = traineeRepository;
+    this.usernamePasswordGenerator = usernamePasswordGenerator;
+    this.passwordEncoder = passwordEncoder;
+    this.trainerMapper = trainerMapper;
+    this.trainingMapper = trainingMapper;
+    this.logUtils = logUtils;
+  }
 
   public RegistrationResponse createTrainer(TrainerRegistrationRequest request) {
     logUtils.info(
