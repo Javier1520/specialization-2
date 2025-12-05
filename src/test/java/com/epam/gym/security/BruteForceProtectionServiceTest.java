@@ -1,6 +1,9 @@
 package com.epam.gym.security;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.epam.gym.exception.AccountLockedException;
 import com.epam.gym.util.LogUtils;

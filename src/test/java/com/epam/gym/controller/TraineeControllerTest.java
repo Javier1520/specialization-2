@@ -2,9 +2,15 @@ package com.epam.gym.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import com.epam.gym.dto.request.*;
+import com.epam.gym.dto.request.ActivateDeactivateRequest;
+import com.epam.gym.dto.request.TraineeRegistrationRequest;
+import com.epam.gym.dto.request.TrainingFilterRequest;
+import com.epam.gym.dto.request.UpdateTraineeRequest;
+import com.epam.gym.dto.request.UpdateTraineeTrainersRequest;
 import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TraineeProfileResponse;
 import com.epam.gym.dto.response.TrainerInfoResponse;
