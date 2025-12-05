@@ -7,13 +7,12 @@ import com.epam.gym.dto.response.TrainerInfoResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.model.Trainee;
 import com.epam.gym.model.Trainer;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-
-import java.util.List;
 
 @Mapper(
     componentModel = "spring",
