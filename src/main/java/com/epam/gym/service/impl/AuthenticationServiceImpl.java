@@ -93,35 +93,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         .orElse(false);
   }
 
-    private boolean authenticateTrainer(String username, String password) {
-        return trainerRepository
-                .findByUsername(username)
-                .map(
-                        trainer -> {
-                            verifyPassword(password, trainer.getPassword());
-                            verifyUserActive(trainer.getIsActive(), "Trainer");
-                            logUtils.info(log, "Authenticated trainer: {}", username);
-                            return true;
-                        })
-                .orElse(false);
-    }
+  private boolean authenticateTrainer(String username, String password) {
+    return trainerRepository
+        .findByUsername(username)
+        .map(
+            trainer -> {
+              verifyPassword(password, trainer.getPassword());
+              verifyUserActive(trainer.getIsActive(), "Trainer");
+              logUtils.info(log, "Authenticated trainer: {}", username);
+              return true;
+            })
+        .orElse(false);
+  }
 
-    private void verifyUserActive(Boolean isActive, String userType) {
-        Optional.ofNullable(isActive)
-                .filter(Boolean.TRUE::equals)
-                .orElseThrow(() -> new ValidationException(userType + " account is inactive"));
-    }
+  private void verifyUserActive(Boolean isActive, String userType) {
+    Optional.ofNullable(isActive)
+        .filter(Boolean.TRUE::equals)
+        .orElseThrow(() -> new ValidationException(userType + " account is inactive"));
+  }
 
-    private void verifyPassword(String provided, String stored) {
-        verifyPassword(provided, stored, "Invalid username or password");
-    }
+  private void verifyPassword(String provided, String stored) {
+    verifyPassword(provided, stored, "Invalid username or password");
+  }
 
-    private void verifyPassword(String provided, String stored, String errorMessage) {
-        if (passwordEncoder.matches(provided, stored)) {
-            return;
-        }
-        throw new ValidationException(errorMessage);
+  private void verifyPassword(String provided, String stored, String errorMessage) {
+    if (passwordEncoder.matches(provided, stored)) {
+      return;
     }
+    throw new ValidationException(errorMessage);
+  }
 
   @Override
   public LoginResponse refreshToken(String requestRefreshToken) {

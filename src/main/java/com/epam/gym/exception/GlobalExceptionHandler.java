@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class GlobalExceptionHandler {
   private static final String ERRORS = "errors";
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    private final LogUtils logUtils;
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+  private final LogUtils logUtils;
 
-    public GlobalExceptionHandler(LogUtils logUtils) {
-        this.logUtils = logUtils;
-    }
+  public GlobalExceptionHandler(LogUtils logUtils) {
+    this.logUtils = logUtils;
+  }
 
-    @ExceptionHandler(NotFoundException.class)
+  @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException ex) {
     logUtils.error(log, "Not found exception: {}", ex.getMessage());

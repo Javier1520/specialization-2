@@ -21,20 +21,22 @@ import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TraineeService;
 import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 @Service
 @Transactional
 public class TraineeServiceImpl implements TraineeService {
   private static final int PASSWORD_LENGTH = 10;
   private static final Logger log = LoggerFactory.getLogger(TraineeServiceImpl.class);
+
   private final TraineeRepository traineeRepository;
   private final TrainerRepository trainerRepository;
   private final TrainingRepository trainingRepository;

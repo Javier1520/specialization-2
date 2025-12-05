@@ -140,12 +140,6 @@ class JwtServiceTest {
 
     // When
     String token1 = jwtService.generateToken(username);
-    // Small delay to ensure different issuedAt time
-    try {
-      Thread.sleep(10);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
     String token2 = jwtService.generateToken(username);
 
     // Then
