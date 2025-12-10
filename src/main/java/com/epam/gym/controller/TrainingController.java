@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/trainings")
 public class TrainingController {
     private static final Logger log = LoggerFactory.getLogger(TrainingController.class);
+
     private final TrainingService trainingService;
     private final LogUtils logUtils;
 
