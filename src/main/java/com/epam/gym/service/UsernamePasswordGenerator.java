@@ -1,12 +1,12 @@
 package com.epam.gym.service;
 
-import java.util.function.Predicate;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.function.Predicate;
+
 @Service
 public class UsernamePasswordGenerator {
-
     private static final int CHARACTER_AMOUNT = 10;
 
     public String generateUsername(

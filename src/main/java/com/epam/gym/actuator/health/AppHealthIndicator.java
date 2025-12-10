@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AppHealthIndicator implements HealthIndicator {
-
     private static final String APP = "app";
 
     @Override

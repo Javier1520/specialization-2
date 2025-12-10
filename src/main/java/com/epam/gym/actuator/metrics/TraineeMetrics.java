@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TraineeMetrics {
-
     private static final String GYM_TRAINEES_COUNT = "gym.trainees.count";
 
     public TraineeMetrics(MeterRegistry registry, TraineeRepository traineeRepository) {

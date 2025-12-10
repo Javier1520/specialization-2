@@ -6,12 +6,12 @@ import com.epam.gym.mapper.TrainingTypeMapper;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.repository.TrainingTypeRepository;
 import com.epam.gym.service.TrainingTypeService;
-import java.util.List;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TrainingTypeServiceImpl implements TrainingTypeService {
-
     private final TrainingTypeRepository repo;
     private final TrainingTypeMapper mapper;
 
