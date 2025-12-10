@@ -24,92 +24,93 @@ import org.springframework.stereotype.Component;
 @Component
 public class GymFacade {
 
-  private final TraineeService traineeService;
-  private final TrainerService trainerService;
-  private final TrainingService trainingService;
-  private final TrainingTypeService trainingTypeService;
+    private final TraineeService traineeService;
+    private final TrainerService trainerService;
+    private final TrainingService trainingService;
+    private final TrainingTypeService trainingTypeService;
 
-  public GymFacade(
-      TraineeService traineeService,
-      TrainerService trainerService,
-      TrainingService trainingService,
-      TrainingTypeService trainingTypeService) {
-    this.traineeService = traineeService;
-    this.trainerService = trainerService;
-    this.trainingService = trainingService;
-    this.trainingTypeService = trainingTypeService;
-  }
+    public GymFacade(
+            TraineeService traineeService,
+            TrainerService trainerService,
+            TrainingService trainingService,
+            TrainingTypeService trainingTypeService) {
+        this.traineeService = traineeService;
+        this.trainerService = trainerService;
+        this.trainingService = trainingService;
+        this.trainingTypeService = trainingTypeService;
+    }
 
-  // --- Trainee operations ---
-  public RegistrationResponse createTrainee(TraineeRegistrationRequest request) {
-    return traineeService.createTrainee(request);
-  }
+    // --- Trainee operations ---
+    public RegistrationResponse createTrainee(TraineeRegistrationRequest request) {
+        return traineeService.createTrainee(request);
+    }
 
-  public TraineeProfileResponse updateTrainee(String username, UpdateTraineeRequest request) {
-    return traineeService.updateTrainee(username, request);
-  }
+    public TraineeProfileResponse updateTrainee(String username, UpdateTraineeRequest request) {
+        return traineeService.updateTrainee(username, request);
+    }
 
-  public void changeTraineePassword(String username, String newPassword) {
-    traineeService.changePassword(username, newPassword);
-  }
+    public void changeTraineePassword(String username, String newPassword) {
+        traineeService.changePassword(username, newPassword);
+    }
 
-  public TraineeProfileResponse getTraineeByUsername(String username) {
-    return traineeService.getByUsername(username);
-  }
+    public TraineeProfileResponse getTraineeByUsername(String username) {
+        return traineeService.getByUsername(username);
+    }
 
-  public void setTraineeActive(String username, boolean active) {
-    traineeService.setActive(username, active);
-  }
+    public void setTraineeActive(String username, boolean active) {
+        traineeService.setActive(username, active);
+    }
 
-  public void deleteTraineeByUsername(String username) {
-    traineeService.deleteByUsername(username);
-  }
+    public void deleteTraineeByUsername(String username) {
+        traineeService.deleteByUsername(username);
+    }
 
-  public List<TrainingResponse> getTraineeTrainings(String username, TrainingFilterRequest filter) {
-    return traineeService.getTraineeTrainings(username, filter);
-  }
+    public List<TrainingResponse> getTraineeTrainings(
+            String username, TrainingFilterRequest filter) {
+        return traineeService.getTraineeTrainings(username, filter);
+    }
 
-  public List<TrainerInfoResponse> getTrainersNotAssignedToTrainee(String traineeUsername) {
-    return traineeService.getTrainersNotAssignedToTrainee(traineeUsername);
-  }
+    public List<TrainerInfoResponse> getTrainersNotAssignedToTrainee(String traineeUsername) {
+        return traineeService.getTrainersNotAssignedToTrainee(traineeUsername);
+    }
 
-  public List<TrainerInfoResponse> updateTraineeTrainers(
-      String traineeUsername, UpdateTraineeTrainersRequest request) {
-    return traineeService.updateTraineeTrainers(traineeUsername, request);
-  }
+    public List<TrainerInfoResponse> updateTraineeTrainers(
+            String traineeUsername, UpdateTraineeTrainersRequest request) {
+        return traineeService.updateTraineeTrainers(traineeUsername, request);
+    }
 
-  // --- Trainer operations ---
-  public RegistrationResponse createTrainer(TrainerRegistrationRequest request) {
-    return trainerService.createTrainer(request);
-  }
+    // --- Trainer operations ---
+    public RegistrationResponse createTrainer(TrainerRegistrationRequest request) {
+        return trainerService.createTrainer(request);
+    }
 
-  public TrainerProfileResponse updateTrainer(String username, UpdateTrainerRequest request) {
-    return trainerService.updateTrainer(username, request);
-  }
+    public TrainerProfileResponse updateTrainer(String username, UpdateTrainerRequest request) {
+        return trainerService.updateTrainer(username, request);
+    }
 
-  public void changeTrainerPassword(String username, String newPassword) {
-    trainerService.changePassword(username, newPassword);
-  }
+    public void changeTrainerPassword(String username, String newPassword) {
+        trainerService.changePassword(username, newPassword);
+    }
 
-  public TrainerProfileResponse getTrainerByUsername(String username) {
-    return trainerService.getByUsername(username);
-  }
+    public TrainerProfileResponse getTrainerByUsername(String username) {
+        return trainerService.getByUsername(username);
+    }
 
-  public void setTrainerActive(String username, boolean active) {
-    trainerService.setActive(username, active);
-  }
+    public void setTrainerActive(String username, boolean active) {
+        trainerService.setActive(username, active);
+    }
 
-  public List<TrainingResponse> getTrainerTrainings(
-      String username, TrainerTrainingFilterRequest filter) {
-    return trainerService.getTrainerTrainings(username, filter);
-  }
+    public List<TrainingResponse> getTrainerTrainings(
+            String username, TrainerTrainingFilterRequest filter) {
+        return trainerService.getTrainerTrainings(username, filter);
+    }
 
-  // --- Training operations ---
-  public void createTraining(AddTrainingRequest request) {
-    trainingService.addTraining(request);
-  }
+    // --- Training operations ---
+    public void createTraining(AddTrainingRequest request) {
+        trainingService.addTraining(request);
+    }
 
-  public List<TrainingTypeResponse> listTrainingTypes() {
-    return trainingTypeService.listAll();
-  }
+    public List<TrainingTypeResponse> listTrainingTypes() {
+        return trainingTypeService.listAll();
+    }
 }

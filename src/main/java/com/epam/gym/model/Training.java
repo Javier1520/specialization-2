@@ -31,29 +31,29 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Training {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @EqualsAndHashCode.Include
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    private Long id;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Column(name = "training_date", nullable = false)
-  private Date date;
+    @Column(name = "training_date", nullable = false)
+    private Date date;
 
-  @Column(name = "duration", nullable = false)
-  private Integer duration;
+    @Column(name = "duration", nullable = false)
+    private Integer duration;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "training_type", nullable = false)
-  private TrainingType.Type specialization;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "training_type", nullable = false)
+    private TrainingType.Type specialization;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "trainee_id", nullable = false)
-  private Trainee trainee;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "trainee_id", nullable = false)
+    private Trainee trainee;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "trainer_id")
-  private Trainer trainer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainer_id")
+    private Trainer trainer;
 }

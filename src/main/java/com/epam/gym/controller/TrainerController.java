@@ -34,77 +34,78 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trainers")
 public class TrainerController {
-  private static final Logger log = LoggerFactory.getLogger(TrainerController.class);
-  private final TrainerService trainerService;
-  private final LogUtils logUtils;
+    private static final Logger log = LoggerFactory.getLogger(TrainerController.class);
+    private final TrainerService trainerService;
+    private final LogUtils logUtils;
 
-  public TrainerController(TrainerService trainerService, LogUtils logUtils) {
-    this.trainerService = trainerService;
-    this.logUtils = logUtils;
-  }
+    public TrainerController(TrainerService trainerService, LogUtils logUtils) {
+        this.trainerService = trainerService;
+        this.logUtils = logUtils;
+    }
 
-  @CreateOperation(summary = "Create Trainer", description = "Create a new Trainer in Gym CRM")
-  @PostMapping("/register")
-  public ResponseEntity<RegistrationResponse> register(
-      @Valid @RequestBody TrainerRegistrationRequest request) {
-    logUtils.info(
-        log,
-        "Trainer registration request: firstName={}, lastName={}",
-        request.firstName(),
-        request.lastName());
-    RegistrationResponse response = trainerService.createTrainer(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-  }
+    @CreateOperation(summary = "Create Trainer", description = "Create a new Trainer in Gym CRM")
+    @PostMapping("/register")
+    public ResponseEntity<RegistrationResponse> register(
+            @Valid @RequestBody TrainerRegistrationRequest request) {
+        logUtils.info(
+                log,
+                "Trainer registration request: firstName={}, lastName={}",
+                request.firstName(),
+                request.lastName());
+        RegistrationResponse response = trainerService.createTrainer(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
-  @GetByIdOperation(
-      summary = "Get Trainer Profile",
-      description = "Get Trainer Profile by Username")
-  @GetMapping("/{username}")
-  public ResponseEntity<TrainerProfileResponse> getProfile(@PathVariable String username) {
-    logUtils.info(log, "Get trainer profile request: username={}", username);
-    return ResponseEntity.ok(trainerService.getByUsername(username));
-  }
+    @GetByIdOperation(
+            summary = "Get Trainer Profile",
+            description = "Get Trainer Profile by Username")
+    @GetMapping("/{username}")
+    public ResponseEntity<TrainerProfileResponse> getProfile(@PathVariable String username) {
+        logUtils.info(log, "Get trainer profile request: username={}", username);
+        return ResponseEntity.ok(trainerService.getByUsername(username));
+    }
 
-  @UpdateOperation(
-      summary = "Update Trainer Profile",
-      description = "Update Trainer Profile by Username")
-  @PutMapping("/{username}")
-  public ResponseEntity<TrainerProfileResponse> updateProfile(
-      @PathVariable String username, @Valid @RequestBody UpdateTrainerRequest request) {
-    logUtils.info(log, "Update trainer profile request: username={}", username);
-    return ResponseEntity.ok(trainerService.updateTrainer(username, request));
-  }
+    @UpdateOperation(
+            summary = "Update Trainer Profile",
+            description = "Update Trainer Profile by Username")
+    @PutMapping("/{username}")
+    public ResponseEntity<TrainerProfileResponse> updateProfile(
+            @PathVariable String username, @Valid @RequestBody UpdateTrainerRequest request) {
+        logUtils.info(log, "Update trainer profile request: username={}", username);
+        return ResponseEntity.ok(trainerService.updateTrainer(username, request));
+    }
 
-  @GetAllOperation(
-      summary = "Get Trainer Trainings",
-      description = "Get Trainer Trainings by Username and Filter")
-  @GetMapping("/{username}/trainings")
-  public ResponseEntity<List<TrainingResponse>> getTrainings(
-      @PathVariable String username, @Valid @ModelAttribute TrainerTrainingFilterRequest filter) {
+    @GetAllOperation(
+            summary = "Get Trainer Trainings",
+            description = "Get Trainer Trainings by Username and Filter")
+    @GetMapping("/{username}/trainings")
+    public ResponseEntity<List<TrainingResponse>> getTrainings(
+            @PathVariable String username,
+            @Valid @ModelAttribute TrainerTrainingFilterRequest filter) {
 
-    logUtils.info(
-        log,
-        "Get trainer trainings request: username={}, periodFrom={}, periodTo={}, traineeName={}",
-        username,
-        filter.periodFrom(),
-        filter.periodTo(),
-        filter.traineeName());
+        logUtils.info(
+                log,
+                "Get trainer trainings request: username={}, periodFrom={}, periodTo={}, traineeName={}",
+                username,
+                filter.periodFrom(),
+                filter.periodTo(),
+                filter.traineeName());
 
-    return ResponseEntity.ok(trainerService.getTrainerTrainings(username, filter));
-  }
+        return ResponseEntity.ok(trainerService.getTrainerTrainings(username, filter));
+    }
 
-  @UpdateOperation(
-      summary = "Activate/Deactivate Trainer",
-      description = "Activate or Deactivate Trainer Profile")
-  @PatchMapping("/{username}/activate")
-  public ResponseEntity<Void> activateDeactivate(
-      @PathVariable String username, @Valid @RequestBody ActivateDeactivateRequest request) {
-    logUtils.info(
-        log,
-        "Activate/Deactivate trainer request: username={}, isActive={}",
-        username,
-        request.isActive());
-    trainerService.setActive(username, request.isActive());
-    return ResponseEntity.ok().build();
-  }
+    @UpdateOperation(
+            summary = "Activate/Deactivate Trainer",
+            description = "Activate or Deactivate Trainer Profile")
+    @PatchMapping("/{username}/activate")
+    public ResponseEntity<Void> activateDeactivate(
+            @PathVariable String username, @Valid @RequestBody ActivateDeactivateRequest request) {
+        logUtils.info(
+                log,
+                "Activate/Deactivate trainer request: username={}, isActive={}",
+                username,
+                request.isActive());
+        trainerService.setActive(username, request.isActive());
+        return ResponseEntity.ok().build();
+    }
 }

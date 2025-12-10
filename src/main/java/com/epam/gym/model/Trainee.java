@@ -27,14 +27,14 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Trainee extends User {
 
-  @Column(name = "date_of_birth")
-  private Date dateOfBirth;
+    @Column(name = "date_of_birth")
+    private Date dateOfBirth;
 
-  @Column private String address;
+    @Column private String address;
 
-  @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Training> trainings;
+    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Training> trainings;
 
-  @ManyToMany(mappedBy = "trainees")
-  private List<Trainer> trainers;
+    @ManyToMany(mappedBy = "trainees")
+    private List<Trainer> trainers;
 }

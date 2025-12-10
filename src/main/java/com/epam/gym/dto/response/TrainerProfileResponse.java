@@ -4,9 +4,9 @@ import com.epam.gym.model.TrainingType;
 import java.util.List;
 
 public record TrainerProfileResponse(
-    String username,
-    String firstName,
-    String lastName,
-    TrainingType.Type specialization,
-    Boolean isActive,
-    List<TraineeInfoResponse> trainees) {}
+        String username,
+        String firstName,
+        String lastName,
+        TrainingType.Type specialization,
+        Boolean isActive,
+        List<TraineeInfoResponse> trainees) {}

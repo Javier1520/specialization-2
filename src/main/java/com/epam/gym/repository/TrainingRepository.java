@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TrainingRepository extends JpaRepository<Training, Long> {
 
-  @Query(
-      """
+    @Query(
+            """
                 SELECT tr FROM Training tr
                 JOIN FETCH tr.trainee te
                 LEFT JOIN FETCH tr.trainer trn
@@ -24,15 +24,15 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
                   AND (:trainingType IS NULL OR tr.specialization = :trainingType)
                 ORDER BY tr.date DESC
             """)
-  List<Training> findByTraineeUsernameWithOptionalFilters(
-      @Param("username") String username,
-      @Param("fromDate") Date fromDate,
-      @Param("toDate") Date toDate,
-      @Param("trainerName") String trainerName,
-      @Param("trainingType") TrainingType.Type trainingType);
+    List<Training> findByTraineeUsernameWithOptionalFilters(
+            @Param("username") String username,
+            @Param("fromDate") Date fromDate,
+            @Param("toDate") Date toDate,
+            @Param("trainerName") String trainerName,
+            @Param("trainingType") TrainingType.Type trainingType);
 
-  @Query(
-      """
+    @Query(
+            """
                 SELECT tr FROM Training tr
                 JOIN FETCH tr.trainer t
                 LEFT JOIN FETCH tr.trainee te
@@ -42,9 +42,9 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
                   AND (:traineeName IS NULL OR te.username LIKE %:traineeName%)
                 ORDER BY tr.date DESC
             """)
-  List<Training> findByTrainerUsernameWithOptionalFilters(
-      @Param("username") String username,
-      @Param("fromDate") Date fromDate,
-      @Param("toDate") Date toDate,
-      @Param("traineeName") String traineeName);
+    List<Training> findByTrainerUsernameWithOptionalFilters(
+            @Param("username") String username,
+            @Param("fromDate") Date fromDate,
+            @Param("toDate") Date toDate,
+            @Param("traineeName") String traineeName);
 }

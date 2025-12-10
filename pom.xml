@@ -145,7 +145,6 @@
       </plugin>
 
         <plugin>
-
             <!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
@@ -156,6 +155,7 @@
                     <!-- Use Google Java Format -->
                     <googleJavaFormat>
                         <version>1.33.0</version>
+                        <style>AOSP</style>
                     </googleJavaFormat>
 
                 </java>

@@ -24,63 +24,63 @@ import org.springframework.http.ResponseEntity;
 @ExtendWith(MockitoExtension.class)
 class TrainingControllerTest {
 
-  @Mock private TrainingService trainingService;
+    @Mock private TrainingService trainingService;
 
-  @Mock private LogUtils logUtils;
+    @Mock private LogUtils logUtils;
 
-  @InjectMocks private TrainingController trainingController;
+    @InjectMocks private TrainingController trainingController;
 
-  private AddTrainingRequest request;
+    private AddTrainingRequest request;
 
-  @BeforeEach
-  void setUp() {
-    Date trainingDate = new Date();
-    request = new AddTrainingRequest("trainee1", "trainer1", "Morning Run", trainingDate, 60);
-  }
-
-  @Test
-  void addTraining_success_returnsCreated() {
-    // Given
-    doNothing().when(trainingService).addTraining(any(AddTrainingRequest.class));
-
-    // When
-    ResponseEntity<Void> response = trainingController.addTraining(request);
-
-    // Then
-    assertNotNull(response);
-    assertEquals(HttpStatus.CREATED, response.getStatusCode());
-    verify(trainingService).addTraining(any(AddTrainingRequest.class));
-  }
-
-  @Test
-  void addTraining_traineeNotFound_throwsException() {
-    // Given
-    doThrow(new NotFoundException("Trainee not found: trainee1"))
-        .when(trainingService)
-        .addTraining(any(AddTrainingRequest.class));
-
-    // When & Then
-    try {
-      trainingController.addTraining(request);
-    } catch (NotFoundException e) {
-      assertEquals("Trainee not found: trainee1", e.getMessage());
+    @BeforeEach
+    void setUp() {
+        Date trainingDate = new Date();
+        request = new AddTrainingRequest("trainee1", "trainer1", "Morning Run", trainingDate, 60);
     }
-    verify(trainingService).addTraining(any(AddTrainingRequest.class));
-  }
 
-  @Test
-  void addTraining_trainerNotFound_throwsException() {
-    // Given
-    doThrow(new NotFoundException("Trainer not found: trainer1"))
-        .when(trainingService)
-        .addTraining(any(AddTrainingRequest.class));
+    @Test
+    void addTraining_success_returnsCreated() {
+        // Given
+        doNothing().when(trainingService).addTraining(any(AddTrainingRequest.class));
 
-    // When & Then
-    try {
-      trainingController.addTraining(request);
-    } catch (NotFoundException e) {
-      assertEquals("Trainer not found: trainer1", e.getMessage());
+        // When
+        ResponseEntity<Void> response = trainingController.addTraining(request);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        verify(trainingService).addTraining(any(AddTrainingRequest.class));
     }
-    verify(trainingService).addTraining(any(AddTrainingRequest.class));
-  }
+
+    @Test
+    void addTraining_traineeNotFound_throwsException() {
+        // Given
+        doThrow(new NotFoundException("Trainee not found: trainee1"))
+                .when(trainingService)
+                .addTraining(any(AddTrainingRequest.class));
+
+        // When & Then
+        try {
+            trainingController.addTraining(request);
+        } catch (NotFoundException e) {
+            assertEquals("Trainee not found: trainee1", e.getMessage());
+        }
+        verify(trainingService).addTraining(any(AddTrainingRequest.class));
+    }
+
+    @Test
+    void addTraining_trainerNotFound_throwsException() {
+        // Given
+        doThrow(new NotFoundException("Trainer not found: trainer1"))
+                .when(trainingService)
+                .addTraining(any(AddTrainingRequest.class));
+
+        // When & Then
+        try {
+            trainingController.addTraining(request);
+        } catch (NotFoundException e) {
+            assertEquals("Trainer not found: trainer1", e.getMessage());
+        }
+        verify(trainingService).addTraining(any(AddTrainingRequest.class));
+    }
 }

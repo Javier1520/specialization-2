@@ -20,74 +20,74 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class TraineeRepositoryTest {
 
-  @Test
-  void existsByUsername_shouldReturnTrueWhenExists() {
-    // Arrange
-    TraineeRepository repo = mock(TraineeRepository.class);
-    String username = "john.doe";
-    when(repo.existsByUsername(username)).thenReturn(true);
+    @Test
+    void existsByUsername_shouldReturnTrueWhenExists() {
+        // Arrange
+        TraineeRepository repo = mock(TraineeRepository.class);
+        String username = "john.doe";
+        when(repo.existsByUsername(username)).thenReturn(true);
 
-    // Act
-    boolean exists = repo.existsByUsername(username);
+        // Act
+        boolean exists = repo.existsByUsername(username);
 
-    // Assert
-    assertTrue(exists, "expected existsByUsername to return true when user exists");
-    verify(repo, times(1)).existsByUsername(username);
-  }
+        // Assert
+        assertTrue(exists, "expected existsByUsername to return true when user exists");
+        verify(repo, times(1)).existsByUsername(username);
+    }
 
-  @Test
-  void findByUsername_shouldReturnTrainee() {
-    // Arrange
-    TraineeRepository repo = mock(TraineeRepository.class);
-    String username = "jane.smith";
-    Trainee expected =
-        Trainee.builder()
-            .id(10L)
-            .firstName("Jane")
-            .lastName("Smith")
-            .username(username)
-            .password("pw")
-            .isActive(true)
-            .dateOfBirth(new Date())
-            .address("123 Street")
-            .build();
+    @Test
+    void findByUsername_shouldReturnTrainee() {
+        // Arrange
+        TraineeRepository repo = mock(TraineeRepository.class);
+        String username = "jane.smith";
+        Trainee expected =
+                Trainee.builder()
+                        .id(10L)
+                        .firstName("Jane")
+                        .lastName("Smith")
+                        .username(username)
+                        .password("pw")
+                        .isActive(true)
+                        .dateOfBirth(new Date())
+                        .address("123 Street")
+                        .build();
 
-    when(repo.findByUsername(username)).thenReturn(Optional.of(expected));
+        when(repo.findByUsername(username)).thenReturn(Optional.of(expected));
 
-    // Act
-    Trainee actual =
-        repo.findByUsername(username)
-            .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
+        // Act
+        Trainee actual =
+                repo.findByUsername(username)
+                        .orElseThrow(() -> new NotFoundException("Trainee not found: " + username));
 
-    // Assert
-    assertNotNull(actual);
-    assertEquals(expected.getId(), actual.getId());
-    assertEquals(expected.getUsername(), actual.getUsername());
-    verify(repo).findByUsername(username);
-  }
+        // Assert
+        assertNotNull(actual);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getUsername(), actual.getUsername());
+        verify(repo).findByUsername(username);
+    }
 
-  @Test
-  void deleteByUsername_shouldBeInvoked() {
-    // Arrange
-    TraineeRepository repo = mock(TraineeRepository.class);
-    String username = "to.delete";
+    @Test
+    void deleteByUsername_shouldBeInvoked() {
+        // Arrange
+        TraineeRepository repo = mock(TraineeRepository.class);
+        String username = "to.delete";
 
-    // Act
-    repo.deleteByUsername(username);
+        // Act
+        repo.deleteByUsername(username);
 
-    // Assert
-    verify(repo, times(1)).deleteByUsername(username);
-  }
+        // Assert
+        verify(repo, times(1)).deleteByUsername(username);
+    }
 
-  @Test
-  void existsByUsername_shouldReturnFalseWhenNotExists() {
-    // Arrange
-    TraineeRepository repo = mock(TraineeRepository.class);
-    String username = "non.existent";
-    when(repo.existsByUsername(username)).thenReturn(false);
+    @Test
+    void existsByUsername_shouldReturnFalseWhenNotExists() {
+        // Arrange
+        TraineeRepository repo = mock(TraineeRepository.class);
+        String username = "non.existent";
+        when(repo.existsByUsername(username)).thenReturn(false);
 
-    // Act & Assert
-    assertFalse(repo.existsByUsername(username));
-    verify(repo).existsByUsername(username);
-  }
+        // Act & Assert
+        assertFalse(repo.existsByUsername(username));
+        verify(repo).existsByUsername(username);
+    }
 }

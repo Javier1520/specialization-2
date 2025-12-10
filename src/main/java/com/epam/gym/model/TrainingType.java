@@ -30,31 +30,31 @@ import lombok.ToString;
 @Builder
 public class TrainingType {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @ToString.Include
-  @EqualsAndHashCode.Include
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ToString.Include
+    @EqualsAndHashCode.Include
+    private Long id;
 
-  @Column(name = "name", nullable = false, unique = true, length = 50)
-  @ToString.Include
-  private String name;
+    @Column(name = "name", nullable = false, unique = true, length = 50)
+    @ToString.Include
+    private String name;
 
-  @OneToMany(mappedBy = "specialization", fetch = FetchType.LAZY)
-  private List<Trainer> trainers;
+    @OneToMany(mappedBy = "specialization", fetch = FetchType.LAZY)
+    private List<Trainer> trainers;
 
-  @OneToMany(mappedBy = "specialization", fetch = FetchType.LAZY)
-  private List<Training> trainings;
+    @OneToMany(mappedBy = "specialization", fetch = FetchType.LAZY)
+    private List<Training> trainings;
 
-  /**
-   * Enum representing the constant training type values. Use this in business logic for type-safe
-   * comparisons.
-   */
-  public enum Type {
-    CARDIO,
-    STRENGTH,
-    YOGA,
-    HIIT,
-    PILATES
-  }
+    /**
+     * Enum representing the constant training type values. Use this in business logic for type-safe
+     * comparisons.
+     */
+    public enum Type {
+        CARDIO,
+        STRENGTH,
+        YOGA,
+        HIIT,
+        PILATES
+    }
 }
