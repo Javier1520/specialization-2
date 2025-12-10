@@ -95,8 +95,8 @@ public class TraineeController {
             summary = "Get Trainee Trainings",
             description = "Get Trainee Trainings by Username and Filter")
     @GetMapping("/{username}/trainings")
-    public ResponseEntity<List<TrainingResponse>> getTrainings(
-            @PathVariable String username, @ModelAttribute TrainingFilterRequest filter) {
+    public ResponseEntity<List<TrainingResponse>> getTrainings(@PathVariable String username,
+                                                               @ModelAttribute TrainingFilterRequest filter) {
         logUtils.info(
                 log,
                 "Get trainee trainings request: username={}, periodFrom={}, periodTo={}, trainerName={}, "
@@ -114,8 +114,7 @@ public class TraineeController {
             summary = "Get Not Assigned Trainers",
             description = "Get Trainers Not Assigned to Trainee")
     @GetMapping("/{username}/trainers/not-assigned")
-    public ResponseEntity<List<TrainerInfoResponse>> getNotAssignedTrainers(
-            @PathVariable String username) {
+    public ResponseEntity<List<TrainerInfoResponse>> getNotAssignedTrainers(@PathVariable String username) {
         logUtils.info(log, "Get not assigned trainers request: traineeUsername={}", username);
         return ResponseEntity.ok(traineeService.getTrainersNotAssignedToTrainee(username));
     }
