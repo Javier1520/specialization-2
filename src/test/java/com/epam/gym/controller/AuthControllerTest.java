@@ -1,16 +1,8 @@
 package com.epam.gym.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import com.epam.gym.dto.request.ChangePasswordRequest;
 import com.epam.gym.dto.request.LoginRequest;
+import com.epam.gym.dto.request.RefreshTokenRequest;
 import com.epam.gym.dto.response.LoginResponse;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
@@ -25,14 +17,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-    @Mock private AuthenticationService authenticationService;
+    @Mock
+    private AuthenticationService authenticationService;
 
-    @Mock private LogUtils logUtils;
+    @Mock
+    private LogUtils logUtils;
 
-    @InjectMocks private AuthController authController;
+    @InjectMocks
+    private AuthController authController;
 
     private ChangePasswordRequest changePasswordRequest;
 
@@ -85,8 +89,7 @@ class AuthControllerTest {
     void refresh_success_returnsOk() {
         // Given
         String refreshToken = "refresh-token";
-        com.epam.gym.dto.request.RefreshTokenRequest request =
-                new com.epam.gym.dto.request.RefreshTokenRequest(refreshToken);
+        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
         LoginResponse loginResponse = new LoginResponse("new-jwt-token", refreshToken);
 
         when(authenticationService.refreshToken(refreshToken)).thenReturn(loginResponse);
@@ -105,8 +108,7 @@ class AuthControllerTest {
     void logout_success_returnsOk() {
         // Given
         String refreshToken = "refresh-token";
-        com.epam.gym.dto.request.RefreshTokenRequest request =
-                new com.epam.gym.dto.request.RefreshTokenRequest(refreshToken);
+        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
 
         doNothing().when(authenticationService).logout(refreshToken);
 

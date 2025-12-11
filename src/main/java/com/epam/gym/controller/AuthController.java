@@ -2,6 +2,7 @@ package com.epam.gym.controller;
 
 import com.epam.gym.dto.request.ChangePasswordRequest;
 import com.epam.gym.dto.request.LoginRequest;
+import com.epam.gym.dto.request.RefreshTokenRequest;
 import com.epam.gym.dto.response.LoginResponse;
 import com.epam.gym.openapi.annotation.operation.CreateOperation;
 import com.epam.gym.openapi.annotation.operation.UpdateOperation;
@@ -43,7 +44,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refresh(
-            @Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
+            @Valid @RequestBody RefreshTokenRequest request) {
         logUtils.info(log, "Refresh token request");
         LoginResponse response = authenticationService.refreshToken(request.refreshToken());
         return ResponseEntity.ok(response);
@@ -51,7 +52,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @Valid @RequestBody com.epam.gym.dto.request.RefreshTokenRequest request) {
+            @Valid @RequestBody RefreshTokenRequest request) {
         logUtils.info(log, "Logout request");
         authenticationService.logout(request.refreshToken());
         return ResponseEntity.ok().build();
