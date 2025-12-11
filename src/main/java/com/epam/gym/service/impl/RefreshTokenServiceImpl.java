@@ -5,6 +5,7 @@ import com.epam.gym.model.RefreshToken;
 import com.epam.gym.repository.RefreshTokenRepository;
 import com.epam.gym.service.RefreshTokenService;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,18 +34,26 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public java.util.Optional<RefreshToken> findByToken(String token) {
+    public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
 
     @Override
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-            refreshTokenRepository.delete(token);
+        if (isTokenExpired(token)) {
+            deleteExpiredToken(token);
             throw new ValidationException(
                     "Refresh token was expired. Please make a new signin request");
         }
         return token;
+    }
+
+    private boolean isTokenExpired(RefreshToken token) {
+        return token.getExpiryDate().compareTo(Instant.now()) < 0;
+    }
+
+    private void deleteExpiredToken(RefreshToken token) {
+        refreshTokenRepository.delete(token);
     }
 
     @Override
