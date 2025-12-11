@@ -57,12 +57,10 @@ public class GlobalExceptionHandler {
         Map<String, Object> errors = new HashMap<>();
         ex.getBindingResult()
                 .getAllErrors()
-                .forEach(
-                        (error) -> {
-                            String fieldName = ((FieldError) error).getField();
-                            String errorMessage = error.getDefaultMessage();
-                            errors.put(fieldName, errorMessage);
-                        });
+                .stream()
+                .filter(FieldError.class::isInstance)
+                .map(FieldError.class::cast)
+                .forEach(fieldError -> mapErrors(fieldError, errors));
         Map<String, Object> response = new HashMap<>();
         response.put(ERRORS, errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -95,5 +93,11 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put(ERRORS, ex);
         return ResponseEntity.status(httpStatus).body(error);
+    }
+
+    private void mapErrors(FieldError fieldError, Map<String, Object> errors) {
+        String fieldName = fieldError.getField();
+        String errorMessage = fieldError.getDefaultMessage();
+        errors.put(fieldName, errorMessage);
     }
 }
