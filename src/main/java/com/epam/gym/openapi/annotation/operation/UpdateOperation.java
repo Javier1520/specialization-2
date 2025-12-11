@@ -15,9 +15,9 @@ import org.springframework.core.annotation.AliasFor;
 @Operation
 @UpdateResponses
 public @interface UpdateOperation {
-  @AliasFor(annotation = Operation.class, attribute = "summary")
-  String summary() default "Update resource";
+    @AliasFor(annotation = Operation.class, attribute = "summary")
+    String summary() default "Update resource";
 
-  @AliasFor(annotation = Operation.class, attribute = "description")
-  String description() default "";
+    @AliasFor(annotation = Operation.class, attribute = "description")
+    String description() default "";
 }

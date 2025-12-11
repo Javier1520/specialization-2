@@ -4,11 +4,11 @@ import com.epam.gym.model.RefreshToken;
 import java.util.Optional;
 
 public interface RefreshTokenService {
-  RefreshToken createRefreshToken(String username);
+    RefreshToken createRefreshToken(String username);
 
-  Optional<RefreshToken> findByToken(String token);
+    Optional<RefreshToken> findByToken(String token);
 
-  RefreshToken verifyExpiration(RefreshToken token);
+    RefreshToken verifyExpiration(RefreshToken token);
 
-  void deleteByToken(String token);
+    void deleteByToken(String token);
 }

@@ -10,12 +10,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TraineeRepository extends JpaRepository<Trainee, Long> {
 
-  boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-  Optional<Trainee> findByUsername(String username);
+    Optional<Trainee> findByUsername(String username);
 
-  @Query("SELECT t FROM Trainee t LEFT JOIN FETCH t.trainers WHERE t.username = :username")
-  Optional<Trainee> findByUsernameWithTrainers(@Param("username") String username);
+    @Query("SELECT t FROM Trainee t LEFT JOIN FETCH t.trainers WHERE t.username = :username")
+    Optional<Trainee> findByUsernameWithTrainers(@Param("username") String username);
 
-  void deleteByUsername(String username);
+    void deleteByUsername(String username);
 }

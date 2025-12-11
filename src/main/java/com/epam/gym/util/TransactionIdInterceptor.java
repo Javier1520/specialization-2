@@ -10,41 +10,42 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class TransactionIdInterceptor implements HandlerInterceptor {
-  private static final String TRANSACTION_ID_HEADER = "X-Transaction-Id";
-  private static final String TRANSACTION_ID_MDC_KEY = "transactionId";
-  private static final Logger log = LoggerFactory.getLogger(TransactionIdInterceptor.class);
+    private static final String TRANSACTION_ID_HEADER = "X-Transaction-Id";
+    private static final String TRANSACTION_ID_MDC_KEY = "transactionId";
+    private static final Logger log = LoggerFactory.getLogger(TransactionIdInterceptor.class);
 
-  private final LogUtils logUtils;
+    private final LogUtils logUtils;
 
-  public TransactionIdInterceptor(LogUtils logUtils) {
-    this.logUtils = logUtils;
-  }
-
-  @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-      throws Exception {
-    String transactionId = request.getHeader(TRANSACTION_ID_HEADER);
-    if (transactionId == null || transactionId.isBlank()) {
-      transactionId = TransactionIdGenerator.generate();
+    public TransactionIdInterceptor(LogUtils logUtils) {
+        this.logUtils = logUtils;
     }
 
-    MDC.put(TRANSACTION_ID_MDC_KEY, transactionId);
-    response.setHeader(TRANSACTION_ID_HEADER, transactionId);
+    @Override
+    public boolean preHandle(
+            HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+        String transactionId = request.getHeader(TRANSACTION_ID_HEADER);
+        if (transactionId == null || transactionId.isBlank()) {
+            transactionId = TransactionIdGenerator.generate();
+        }
 
-    logUtils.info(
-        log,
-        "Request: {} {} - TransactionId: {}",
-        request.getMethod(),
-        request.getRequestURI(),
-        transactionId);
+        MDC.put(TRANSACTION_ID_MDC_KEY, transactionId);
+        response.setHeader(TRANSACTION_ID_HEADER, transactionId);
 
-    return true;
-  }
+        logUtils.info(
+                log,
+                "Request: {} {} - TransactionId: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                transactionId);
 
-  @Override
-  public void afterCompletion(
-      HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-      throws Exception {
-    MDC.remove(TRANSACTION_ID_MDC_KEY);
-  }
+        return true;
+    }
+
+    @Override
+    public void afterCompletion(
+            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+        MDC.remove(TRANSACTION_ID_MDC_KEY);
+    }
 }

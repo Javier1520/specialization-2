@@ -14,42 +14,44 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-  private final TraineeRepository traineeRepository;
-  private final TrainerRepository trainerRepository;
+    private final TraineeRepository traineeRepository;
+    private final TrainerRepository trainerRepository;
 
-  public UserDetailsServiceImpl(
-      TraineeRepository traineeRepository, TrainerRepository trainerRepository) {
-    this.traineeRepository = traineeRepository;
-    this.trainerRepository = trainerRepository;
-  }
+    public UserDetailsServiceImpl(
+            TraineeRepository traineeRepository, TrainerRepository trainerRepository) {
+        this.traineeRepository = traineeRepository;
+        this.trainerRepository = trainerRepository;
+    }
 
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    // Try to find as Trainee first
-    return traineeRepository
-        .findByUsername(username)
-        .map(this::createUserDetails)
-        .orElseGet(
-            () ->
-                trainerRepository
-                    .findByUsername(username)
-                    .map(this::createUserDetails)
-                    .orElseThrow(
-                        () -> new UsernameNotFoundException("User not found: " + username)));
-  }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Try to find as Trainee first
+        return traineeRepository
+                .findByUsername(username)
+                .map(this::createUserDetails)
+                .orElseGet(
+                        () ->
+                                trainerRepository
+                                        .findByUsername(username)
+                                        .map(this::createUserDetails)
+                                        .orElseThrow(
+                                                () ->
+                                                        new UsernameNotFoundException(
+                                                                "User not found: " + username)));
+    }
 
-  private UserDetails createUserDetails(com.epam.gym.model.User user) {
-    List<GrantedAuthority> authorities =
-        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    private UserDetails createUserDetails(com.epam.gym.model.User user) {
+        List<GrantedAuthority> authorities =
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-    return User.builder()
-        .username(user.getUsername())
-        .password(user.getPassword())
-        .authorities(authorities)
-        .accountExpired(false)
-        .accountLocked(false)
-        .credentialsExpired(false)
-        .disabled(!user.getIsActive())
-        .build();
-  }
+        return User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities(authorities)
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(!user.getIsActive())
+                .build();
+    }
 }

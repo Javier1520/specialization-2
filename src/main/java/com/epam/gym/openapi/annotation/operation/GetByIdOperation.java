@@ -15,9 +15,9 @@ import org.springframework.core.annotation.AliasFor;
 @Operation
 @GetByIdResponses
 public @interface GetByIdOperation {
-  @AliasFor(annotation = Operation.class, attribute = "summary")
-  String summary() default "Get resource by ID";
+    @AliasFor(annotation = Operation.class, attribute = "summary")
+    String summary() default "Get resource by ID";
 
-  @AliasFor(annotation = Operation.class, attribute = "description")
-  String description() default "";
+    @AliasFor(annotation = Operation.class, attribute = "description")
+    String description() default "";
 }

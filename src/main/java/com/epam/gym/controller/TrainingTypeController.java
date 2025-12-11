@@ -17,19 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/training-types")
 public class TrainingTypeController {
-  private static final Logger log = LoggerFactory.getLogger(TrainingTypeController.class);
-  private final TrainingTypeService trainingTypeService;
-  private final LogUtils logUtils;
+    private static final Logger log = LoggerFactory.getLogger(TrainingTypeController.class);
 
-  public TrainingTypeController(TrainingTypeService trainingTypeService, LogUtils logUtils) {
-    this.trainingTypeService = trainingTypeService;
-    this.logUtils = logUtils;
-  }
+    private final TrainingTypeService trainingTypeService;
+    private final LogUtils logUtils;
 
-  @GetAllOperation(summary = "Get Training Types", description = "Get All Training Types")
-  @GetMapping
-  public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
-    logUtils.info(log, "Get training types request");
-    return ResponseEntity.ok(trainingTypeService.listAll());
-  }
+    public TrainingTypeController(TrainingTypeService trainingTypeService, LogUtils logUtils) {
+        this.trainingTypeService = trainingTypeService;
+        this.logUtils = logUtils;
+    }
+
+    @GetAllOperation(summary = "Get Training Types", description = "Get All Training Types")
+    @GetMapping
+    public ResponseEntity<List<TrainingTypeResponse>> getTrainingTypes() {
+        logUtils.info(log, "Get training types request");
+        return ResponseEntity.ok(trainingTypeService.listAll());
+    }
 }

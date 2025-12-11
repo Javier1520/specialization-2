@@ -10,15 +10,16 @@ import java.util.List;
 
 public interface TrainerService {
 
-  RegistrationResponse createTrainer(TrainerRegistrationRequest request);
+    RegistrationResponse createTrainer(TrainerRegistrationRequest request);
 
-  TrainerProfileResponse getByUsername(String username);
+    TrainerProfileResponse getByUsername(String username);
 
-  TrainerProfileResponse updateTrainer(String username, UpdateTrainerRequest request);
+    TrainerProfileResponse updateTrainer(String username, UpdateTrainerRequest request);
 
-  void changePassword(String username, String newPassword);
+    void changePassword(String username, String newPassword);
 
-  void setActive(String username, boolean active);
+    void setActive(String username, boolean active);
 
-  List<TrainingResponse> getTrainerTrainings(String username, TrainerTrainingFilterRequest filter);
+    List<TrainingResponse> getTrainerTrainings(
+            String username, TrainerTrainingFilterRequest filter);
 }

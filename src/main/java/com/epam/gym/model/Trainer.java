@@ -30,17 +30,17 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Trainer extends User {
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "training_type", nullable = false)
-  private TrainingType.Type specialization;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "training_type", nullable = false)
+    private TrainingType.Type specialization;
 
-  @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Training> trainings;
+    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Training> trainings;
 
-  @ManyToMany
-  @JoinTable(
-      name = "trainer_trainee",
-      joinColumns = @JoinColumn(name = "trainer_id"),
-      inverseJoinColumns = @JoinColumn(name = "trainee_id"))
-  private List<Trainee> trainees;
+    @ManyToMany
+    @JoinTable(
+            name = "trainer_trainee",
+            joinColumns = @JoinColumn(name = "trainer_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainee_id"))
+    private List<Trainee> trainees;
 }

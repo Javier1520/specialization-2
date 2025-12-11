@@ -4,6 +4,7 @@ import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
 public record TrainerTrainingFilterRequest(
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodFrom,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
-    String traineeName) {}
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodFrom,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodTo,
+        String traineeName) {
+}

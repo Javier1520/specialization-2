@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long> {
 
-  Optional<TrainingType> findByName(String name);
+    Optional<TrainingType> findByName(String name);
 }

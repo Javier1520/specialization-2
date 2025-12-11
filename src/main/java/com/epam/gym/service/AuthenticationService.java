@@ -4,11 +4,11 @@ import com.epam.gym.dto.response.LoginResponse;
 
 public interface AuthenticationService {
 
-  LoginResponse authenticate(String username, String password);
+    LoginResponse authenticate(String username, String password);
 
-  void changePassword(String username, String oldPassword, String newPassword);
+    void changePassword(String username, String oldPassword, String newPassword);
 
-  LoginResponse refreshToken(String refreshToken);
+    LoginResponse refreshToken(String refreshToken);
 
-  void logout(String refreshToken);
+    void logout(String refreshToken);
 }

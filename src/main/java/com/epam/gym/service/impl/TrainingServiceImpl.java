@@ -18,56 +18,60 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
-  private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
-  private final TrainingRepository trainingRepository;
-  private final TraineeRepository traineeRepository;
-  private final TrainerRepository trainerRepository;
-  private final TrainingMapper trainingMapper;
-  private final LogUtils logUtils;
+    private final TrainingRepository trainingRepository;
+    private final TraineeRepository traineeRepository;
+    private final TrainerRepository trainerRepository;
+    private final TrainingMapper trainingMapper;
+    private final LogUtils logUtils;
 
-  public TrainingServiceImpl(
-      TrainingRepository trainingRepository,
-      TraineeRepository traineeRepository,
-      TrainerRepository trainerRepository,
-      TrainingMapper trainingMapper,
-      LogUtils logUtils) {
-    this.trainingRepository = trainingRepository;
-    this.traineeRepository = traineeRepository;
-    this.trainerRepository = trainerRepository;
-    this.trainingMapper = trainingMapper;
-    this.logUtils = logUtils;
-  }
+    public TrainingServiceImpl(
+            TrainingRepository trainingRepository,
+            TraineeRepository traineeRepository,
+            TrainerRepository trainerRepository,
+            TrainingMapper trainingMapper,
+            LogUtils logUtils) {
+        this.trainingRepository = trainingRepository;
+        this.traineeRepository = traineeRepository;
+        this.trainerRepository = trainerRepository;
+        this.trainingMapper = trainingMapper;
+        this.logUtils = logUtils;
+    }
 
-  @Transactional
-  public void addTraining(AddTrainingRequest request) {
-    logUtils.info(log, "Add training request: {}", request);
-    Trainee trainee =
-        traineeRepository
-            .findByUsername(request.traineeUsername())
-            .orElseThrow(
-                () -> new NotFoundException("Trainee not found: " + request.traineeUsername()));
-    Trainer trainer =
-        trainerRepository
-            .findByUsername(request.trainerUsername())
-            .orElseThrow(
-                () -> new NotFoundException("Trainer not found: " + request.trainerUsername()));
+    @Transactional
+    public void addTraining(AddTrainingRequest request) {
+        logUtils.info(log, "Add training request: {}", request);
+        Trainee trainee =
+                traineeRepository
+                        .findByUsername(request.traineeUsername())
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "Trainee not found: " + request.traineeUsername()));
+        Trainer trainer =
+                trainerRepository
+                        .findByUsername(request.trainerUsername())
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "Trainer not found: " + request.trainerUsername()));
 
-    Training training = trainingMapper.toEntity(request);
-    setAdditionalInfo(training, trainer, trainee);
+        Training training = trainingMapper.toEntity(request);
+        setAdditionalInfo(training, trainer, trainee);
 
-    Training saved = trainingRepository.save(training);
-    logUtils.info(
-        log,
-        "Created training id={} trainee={} trainer={}",
-        saved.getId(),
-        saved.getTrainee().getUsername(),
-        saved.getTrainer().getUsername());
-  }
+        Training saved = trainingRepository.save(training);
+        logUtils.info(
+                log,
+                "Created training id={} trainee={} trainer={}",
+                saved.getId(),
+                saved.getTrainee().getUsername(),
+                saved.getTrainer().getUsername());
+    }
 
-  private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {
-    training.setSpecialization(trainer.getSpecialization());
-    training.setTrainee(trainee);
-    training.setTrainer(trainer);
-  }
+    private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {
+        training.setSpecialization(trainer.getSpecialization());
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+    }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface TrainingTypeService {
 
-  List<TrainingTypeResponse> listAll();
+    List<TrainingTypeResponse> listAll();
 
-  TrainingTypeResponse getById(Long id);
+    TrainingTypeResponse getById(Long id);
 }
