@@ -3,6 +3,9 @@ package com.epam.gym.exception;
 import com.epam.gym.util.LogUtils;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,10 +15,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -32,18 +31,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException ex) {
         logUtils.error(log, "Not found exception: {}", ex.getMessage());
-        Map<String, String> error = new HashMap<>();
-        error.put(ERRORS, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
         logUtils.error(log, "Validation exception: {}", ex.getMessage());
-        Map<String, String> error = new HashMap<>();
-        error.put(ERRORS, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccountLockedException.class)
@@ -51,9 +46,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAccountLockedException(
             AccountLockedException ex) {
         logUtils.error(log, "Account locked exception: {}", ex.getMessage());
-        Map<String, String> error = new HashMap<>();
-        error.put(ERRORS, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        return buildErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -95,8 +88,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
         logUtils.error(log, "Unexpected error: ", ex);
+        return buildErrorResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<Map<String, String>> buildErrorResponse(String ex, HttpStatus httpStatus) {
         Map<String, String> error = new HashMap<>();
-        error.put(ERRORS, "An unexpected error occurred");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        error.put(ERRORS, ex);
+        return ResponseEntity.status(httpStatus).body(error);
     }
 }

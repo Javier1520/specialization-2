@@ -1,9 +1,8 @@
 package com.epam.gym.service;
 
+import java.util.function.Predicate;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
-
-import java.util.function.Predicate;
 
 @Service
 public class UsernamePasswordGenerator {

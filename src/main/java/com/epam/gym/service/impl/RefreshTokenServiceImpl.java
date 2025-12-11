@@ -4,12 +4,11 @@ import com.epam.gym.exception.ValidationException;
 import com.epam.gym.model.RefreshToken;
 import com.epam.gym.repository.RefreshTokenRepository;
 import com.epam.gym.service.RefreshTokenService;
+import java.time.Instant;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {

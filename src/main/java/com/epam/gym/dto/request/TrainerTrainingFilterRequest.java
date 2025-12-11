@@ -1,7 +1,7 @@
 package com.epam.gym.dto.request;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
 
 public record TrainerTrainingFilterRequest(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date periodFrom,
