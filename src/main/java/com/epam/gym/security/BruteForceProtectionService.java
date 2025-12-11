@@ -2,6 +2,7 @@ package com.epam.gym.security;
 
 import com.epam.gym.exception.AccountLockedException;
 import com.epam.gym.util.LogUtils;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +25,7 @@ public class BruteForceProtectionService {
 
     public void checkAccountLocked(String username) {
         LoginAttempt attempt = loginAttempts.get(username);
-        if (attempt != null && attempt.isLocked()) {
+        if (isAccountLocked(attempt)) {
             long remainingMinutes = attempt.getRemainingLockoutMinutes();
             logUtils.warn(
                     log,
@@ -38,24 +39,33 @@ public class BruteForceProtectionService {
         }
     }
 
+    private boolean isAccountLocked(LoginAttempt attempt) {
+        return attempt != null && attempt.isLocked();
+    }
+
     public void recordFailedAttempt(String username) {
         LoginAttempt attempt = loginAttempts.computeIfAbsent(username, k -> new LoginAttempt());
         attempt.incrementFailedAttempts();
 
-        if (attempt.getFailedAttempts() >= MAX_FAILED_ATTEMPTS) {
+        if (hasExceededMaxFailedAttempts(attempt)) {
             attempt.lock();
             logUtils.warn(
                     log,
                     "Account locked for username: {} after {} failed attempts",
                     username,
                     attempt.getFailedAttempts());
-        } else {
-            logUtils.debug(
-                    log,
-                    "Failed login attempt for username: {}. Attempts: {}",
-                    username,
-                    attempt.getFailedAttempts());
+            return;
         }
+
+        logUtils.debug(
+                log,
+                "Failed login attempt for username: {}. Attempts: {}",
+                username,
+                attempt.getFailedAttempts());
+    }
+
+    private boolean hasExceededMaxFailedAttempts(LoginAttempt attempt) {
+        return attempt.getFailedAttempts() >= MAX_FAILED_ATTEMPTS;
     }
 
     public void resetFailedAttempts(String username) {
@@ -80,31 +90,40 @@ public class BruteForceProtectionService {
         }
 
         public boolean isLocked() {
-            if (lockoutTime == null) {
+            if (lockoutTime == null) return false;
+
+            if (isLockoutPeriodExpired()) {
+                reset();
                 return false;
             }
-
-            LocalDateTime unlockTime = lockoutTime.plusMinutes(LOCKOUT_DURATION_MINUTES);
-            if (LocalDateTime.now().isBefore(unlockTime)) {
-                return true;
-            }
-
-            // Lockout period expired, reset
-            this.failedAttempts = 0;
-            this.lockoutTime = null;
-            return false;
+            return true;
         }
 
+        private boolean isLockoutPeriodExpired() {
+            return LocalDateTime.now().isAfter(getUnlockTime());
+        }
+
+        private LocalDateTime getUnlockTime() {
+            return lockoutTime.plusMinutes(LOCKOUT_DURATION_MINUTES);
+        }
+
+        private void reset() {
+            this.failedAttempts = 0;
+            this.lockoutTime = null;
+        }
+
+
         public long getRemainingLockoutMinutes() {
-            if (lockoutTime == null) {
-                return 0;
-            }
-            LocalDateTime unlockTime = lockoutTime.plusMinutes(LOCKOUT_DURATION_MINUTES);
-            LocalDateTime now = LocalDateTime.now();
-            if (now.isBefore(unlockTime)) {
-                return java.time.Duration.between(now, unlockTime).toMinutes() + 1;
-            }
+            if (lockoutTime == null) return 0;
+            LocalDateTime unlockTime = getUnlockTime();
+            if (isLockoutPeriodActive())
+                return Duration.between(LocalDateTime.now(), unlockTime).toMinutes() + 1;
+
             return 0;
+        }
+
+        private boolean isLockoutPeriodActive() {
+            return LocalDateTime.now().isBefore(getUnlockTime());
         }
     }
 }
