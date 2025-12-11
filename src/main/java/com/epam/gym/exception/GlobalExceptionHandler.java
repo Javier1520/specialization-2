@@ -54,16 +54,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex) {
         logUtils.error(log, "Validation error: {}", ex.getMessage());
-        Map<String, Object> errors = new HashMap<>();
-        ex.getBindingResult()
-                .getAllErrors()
-                .stream()
-                .filter(FieldError.class::isInstance)
-                .map(FieldError.class::cast)
-                .forEach(fieldError -> mapErrors(fieldError, errors));
-        Map<String, Object> response = new HashMap<>();
-        response.put(ERRORS, errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return buildMethodArgumentNotValidErrorResponse(ex);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -71,15 +62,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleConstraintViolation(
             ConstraintViolationException ex) {
         logUtils.error(log, "Constraint violation: {}", ex.getMessage());
-        Map<String, Object> errors =
-                ex.getConstraintViolations().stream()
-                        .collect(
-                                Collectors.toMap(
-                                        violation -> violation.getPropertyPath().toString(),
-                                        ConstraintViolation::getMessage));
-        Map<String, Object> response = new HashMap<>();
-        response.put(ERRORS, errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return buildConstraintViolationErrorResponse(ex);
     }
 
     @ExceptionHandler(Exception.class)
@@ -99,5 +82,32 @@ public class GlobalExceptionHandler {
         String fieldName = fieldError.getField();
         String errorMessage = fieldError.getDefaultMessage();
         errors.put(fieldName, errorMessage);
+    }
+
+    private ResponseEntity<Map<String, Object>> buildConstraintViolationErrorResponse(
+            ConstraintViolationException ex) {
+        Map<String, Object> errors =
+                ex.getConstraintViolations().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        violation -> violation.getPropertyPath().toString(),
+                                        ConstraintViolation::getMessage));
+        Map<String, Object> response = new HashMap<>();
+        response.put(ERRORS, errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    private ResponseEntity<Map<String, Object>> buildMethodArgumentNotValidErrorResponse(
+            MethodArgumentNotValidException ex) {
+        Map<String, Object> errors = new HashMap<>();
+        ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .filter(FieldError.class::isInstance)
+                .map(FieldError.class::cast)
+                .forEach(fieldError -> mapErrors(fieldError, errors));
+        Map<String, Object> response = new HashMap<>();
+        response.put(ERRORS, errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }
