@@ -6,4 +6,5 @@ public record TrainerInfoResponse(
         String trainerUsername,
         String trainerFirstName,
         String trainerLastName,
-        TrainingType.Type trainerSpecialization) {}
+        TrainingType.Type trainerSpecialization) {
+}

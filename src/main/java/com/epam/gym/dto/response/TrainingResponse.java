@@ -10,4 +10,5 @@ public record TrainingResponse(
         TrainingType.Type trainingType,
         Integer trainingDuration,
         String trainerName,
-        String traineeName) {}
+        String traineeName) {
+}

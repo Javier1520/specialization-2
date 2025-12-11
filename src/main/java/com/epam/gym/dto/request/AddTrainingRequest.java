@@ -11,5 +11,6 @@ public record AddTrainingRequest(
         @NotBlank(message = "Training name is required") String trainingName,
         @NotNull(message = "Training date is required") Date trainingDate,
         @NotNull(message = "Training duration is required")
-                @Positive(message = "Training duration must be positive")
-                Integer trainingDuration) {}
+        @Positive(message = "Training duration must be positive")
+        Integer trainingDuration) {
+}

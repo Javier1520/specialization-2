@@ -9,4 +9,5 @@ public record TrainerProfileResponse(
         String lastName,
         TrainingType.Type specialization,
         Boolean isActive,
-        List<TraineeInfoResponse> trainees) {}
+        List<TraineeInfoResponse> trainees) {
+}

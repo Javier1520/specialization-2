@@ -10,4 +10,5 @@ public record TraineeProfileResponse(
         Date dateOfBirth,
         String address,
         Boolean isActive,
-        List<TrainerInfoResponse> trainers) {}
+        List<TrainerInfoResponse> trainers) {
+}
