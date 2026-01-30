@@ -2,22 +2,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.6</version>
-    <relativePath/>
+    <groupId>com.epam.gym</groupId>
+    <artifactId>gym-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>com.epam.gym</groupId>
   <artifactId>gym-crm</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>gym-crm</name>
-    <properties>
-    <java.version>21</java.version>
-    <mapstruct.version>1.6.3</mapstruct.version>
-    <jjwt.version>0.12.5</jjwt.version>
-  </properties>
+
   <dependencies>
     <!-- Spring Boot Starters -->
     <dependency>
@@ -63,7 +57,6 @@
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
-      <version>${mapstruct.version}</version>
     </dependency>
 
     <!-- Lombok -->
@@ -77,6 +70,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+      <version>3.14.0</version>
     </dependency>
 
     <!-- JWT -->
@@ -97,6 +91,18 @@
       <version>${jjwt.version}</version>
       <scope>runtime</scope>
     </dependency>
+
+            <!-- Eureka Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- OpenFeign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
 
     <!-- Test dependencies -->
     <dependency>
@@ -143,30 +149,6 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
-
-        <plugin>
-            <!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
-                <version>3.1.0</version>
-
-            <configuration>
-                <java>
-                    <!-- Use Google Java Format -->
-                    <googleJavaFormat>
-                        <version>1.33.0</version>
-                        <style>AOSP</style>
-                    </googleJavaFormat>
-
-                </java>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>spotless-apply</id>
-                    <phase>none</phase>
-                </execution>
-            </executions>
-        </plugin>
     </plugins>
   </build>
 </project>
