@@ -75,7 +75,7 @@ public class TrainingServiceImpl implements TrainingService {
                 saved.getTrainee().getUsername(),
                 saved.getTrainer().getUsername());
 
-        workloadClient.updateWorkload(WorkloadRequest.builder()
+        WorkloadRequest trainingWorkloadRequest = WorkloadRequest.builder()
                 .username(trainer.getUsername())
                 .firstName(trainer.getFirstName())
                 .lastName(trainer.getLastName())
@@ -83,8 +83,10 @@ public class TrainingServiceImpl implements TrainingService {
                 .trainingDate(saved.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .trainingDuration(saved.getDuration())
                 .actionType(ActionType.ADD)
-                .build()
-        );
+                .build();
+
+        logUtils.info(log, "Calling workload service to update workload for trainer {}", trainingWorkloadRequest);
+        workloadClient.updateWorkload(trainingWorkloadRequest);
     }
 
     private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {
