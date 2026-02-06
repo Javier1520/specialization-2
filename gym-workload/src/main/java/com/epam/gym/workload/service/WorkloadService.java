@@ -22,19 +22,19 @@ public class WorkloadService {
 
     @Transactional
     public void updateWorkload(WorkloadRequest request) {
-        log.info("Updating workload for trainer: {}", request.getUsername());
+        log.info("Updating workload for trainer: {}", request.username());
 
-        TrainerEntity trainer = repository.findByUsername(request.getUsername())
+        TrainerEntity trainer = repository.findByUsername(request.username())
                 .orElseGet(() -> createTrainer(request));
 
-        trainer.setFirstName(request.getFirstName());
-        trainer.setLastName(request.getLastName());
+        trainer.setFirstName(request.firstName());
+        trainer.setLastName(request.lastName());
         trainer.setActive(request.isActive()); // Update status if changed
 
-        LocalDate date = request.getTrainingDate();
+        LocalDate date = request.trainingDate();
         int yearNum = date.getYear();
         int monthNum = date.getMonthValue();
-        int duration = request.getTrainingDuration();
+        int duration = request.trainingDuration();
 
         YearEntity yearEntity = trainer.getYears().stream()
                 .filter(y -> y.getYearNumber() == yearNum)
@@ -62,16 +62,16 @@ public class WorkloadService {
                     return newMonth;
                 });
 
-        if (request.getActionType() == ActionType.ADD) {
+        if (request.actionType() == ActionType.ADD) {
             monthEntity.setTrainingDuration(monthEntity.getTrainingDuration() + duration);
-        } else if (request.getActionType() == ActionType.DELETE) {
+        } else if (request.actionType() == ActionType.DELETE) {
             long newDuration = monthEntity.getTrainingDuration() - duration;
             if (newDuration < 0) newDuration = 0; // Prevent negative duration
             monthEntity.setTrainingDuration(newDuration);
         }
 
         repository.save(trainer);
-        log.info("Workload updated successfully for trainer: {}", request.getUsername());
+        log.info("Workload updated successfully for trainer: {}", request.username());
     }
 
     public TrainerEntity getWorkload(String username) {
@@ -81,9 +81,9 @@ public class WorkloadService {
 
     private TrainerEntity createTrainer(WorkloadRequest request) {
         return TrainerEntity.builder()
-                .username(request.getUsername())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+                .username(request.username())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
                 .isActive(request.isActive())
                 .years(new java.util.ArrayList<>())
                 .build();

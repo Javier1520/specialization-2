@@ -1,6 +1,9 @@
 package com.epam.gym.service.impl;
 
+import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.request.AddTrainingRequest;
+import com.epam.gym.dto.workload.ActionType;
+import com.epam.gym.dto.workload.WorkloadRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainee;
@@ -11,6 +14,7 @@ import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
+import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,18 +29,21 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainerRepository trainerRepository;
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
+    private final WorkloadClient workloadClient;
 
     public TrainingServiceImpl(
             TrainingRepository trainingRepository,
             TraineeRepository traineeRepository,
             TrainerRepository trainerRepository,
             TrainingMapper trainingMapper,
-            LogUtils logUtils) {
+            LogUtils logUtils,
+            WorkloadClient workloadClient) {
         this.trainingRepository = trainingRepository;
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingMapper = trainingMapper;
         this.logUtils = logUtils;
+        this.workloadClient = workloadClient;
     }
 
     @Transactional
@@ -67,6 +74,17 @@ public class TrainingServiceImpl implements TrainingService {
                 saved.getId(),
                 saved.getTrainee().getUsername(),
                 saved.getTrainer().getUsername());
+
+        workloadClient.updateWorkload(WorkloadRequest.builder()
+                .username(trainer.getUsername())
+                .firstName(trainer.getFirstName())
+                .lastName(trainer.getLastName())
+                .isActive(trainer.getIsActive())
+                .trainingDate(saved.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .trainingDuration(saved.getDuration())
+                .actionType(ActionType.ADD)
+                .build()
+        );
     }
 
     private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {

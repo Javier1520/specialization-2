@@ -1,21 +1,20 @@
 package com.epam.gym.workload.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
-import lombok.Builder;
-import lombok.Data;
 
-@Data
-@Builder
-public class WorkloadRequest {
-    private String username;
-    private String firstName;
-    private String lastName;
-    private boolean isActive;
+public record WorkloadRequest(
+    String username,
+    String firstName,
+    String lastName,
+
+    @JsonProperty("active")
+    boolean isActive,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate trainingDate;
+    LocalDate trainingDate,
 
-    private int trainingDuration;
-    private ActionType actionType;
-}
+    int trainingDuration,
+    ActionType actionType
+) {}
