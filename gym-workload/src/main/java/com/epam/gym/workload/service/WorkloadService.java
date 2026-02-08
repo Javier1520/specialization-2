@@ -22,6 +22,11 @@ public class WorkloadService {
 
     @Transactional
     public void updateWorkload(WorkloadRequest request) {
+        try{
+            Thread.sleep(3500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         log.info("Updating workload for trainer: {}", request.username());
 
         TrainerEntity trainer = repository.findByUsername(request.username())

@@ -3,6 +3,7 @@ package com.epam.gym.workload.controller;
 import com.epam.gym.workload.dto.WorkloadRequest;
 import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.service.WorkloadService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ public class WorkloadController {
     private final WorkloadService workloadService;
 
     @PostMapping
-    public ResponseEntity<Void> updateWorkload(@RequestBody WorkloadRequest request) {
+    public ResponseEntity<Void> updateWorkload(@Valid @RequestBody WorkloadRequest request) {
         workloadService.updateWorkload(request);
         return ResponseEntity.ok().build();
     }

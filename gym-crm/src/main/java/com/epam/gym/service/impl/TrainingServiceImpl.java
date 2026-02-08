@@ -14,7 +14,11 @@ import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import java.time.ZoneId;
+import java.util.concurrent.TimeoutException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -47,6 +51,8 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Transactional
+    //@TimeLimiter(name = "workloadService")
+    @CircuitBreaker(name = "workloadService", fallbackMethod = "updateWorkloadFallback")
     public void addTraining(AddTrainingRequest request) {
         logUtils.info(log, "Add training request: {}", request);
         Trainee trainee =
@@ -80,14 +86,25 @@ public class TrainingServiceImpl implements TrainingService {
                 .firstName(trainer.getFirstName())
                 .lastName(trainer.getLastName())
                 .isActive(trainer.getIsActive())
-                .trainingDate(saved.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .trainingDuration(saved.getDuration())
+                .trainingDate(training.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .trainingDuration(training.getDuration())
                 .actionType(ActionType.ADD)
                 .build();
 
         logUtils.info(log, "Calling workload service to update workload for trainer {}", trainingWorkloadRequest);
         workloadClient.updateWorkload(trainingWorkloadRequest);
     }
+
+    public void updateWorkloadFallback(AddTrainingRequest request, Throwable ex) {
+    logUtils.error(
+        log,
+        "Workload service unavailable. Training saved but workload update failed. " +
+        "Trainee={}, Trainer={}, Error={}",
+        request.traineeUsername(),
+        request.trainerUsername(),
+        ex.getMessage()
+    );
+}
 
     private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {
         training.setSpecialization(trainer.getSpecialization());
