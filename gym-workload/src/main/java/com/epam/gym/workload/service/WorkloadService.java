@@ -1,10 +1,13 @@
 package com.epam.gym.workload.service;
 
 import com.epam.gym.workload.dto.ActionType;
+import com.epam.gym.workload.dto.TrainerWorkloadDto;
+import com.epam.gym.workload.dto.TrainingHoursDto;
 import com.epam.gym.workload.dto.WorkloadRequest;
 import com.epam.gym.workload.entity.MonthEntity;
 import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.entity.YearEntity;
+import com.epam.gym.workload.mapper.WorkloadMapper;
 import com.epam.gym.workload.repository.TrainerWorkloadRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class WorkloadService {
 
     private final TrainerWorkloadRepository repository;
+    private final WorkloadMapper mapper;
 
     @Transactional
     public void updateWorkload(WorkloadRequest request) {
@@ -79,9 +83,26 @@ public class WorkloadService {
         log.info("Workload updated successfully for trainer: {}", request.username());
     }
 
-    public TrainerEntity getWorkload(String username) {
-        return repository.findByUsername(username)
+    public TrainerWorkloadDto getWorkload(String username) {
+        TrainerEntity trainer = repository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
+        return mapper.toDto(trainer);
+    }
+
+    public TrainingHoursDto getTrainingHours(String username, Integer year, Integer month) {
+        TrainerEntity trainer = repository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
+
+        long hours = trainer.getYears().stream()
+                .filter(y -> y.getYearNumber() == year)
+                .findFirst()
+                .flatMap(yearEntity -> yearEntity.getMonths().stream()
+                        .filter(m -> m.getMonthNumber() == month)
+                        .findFirst()
+                        .map(MonthEntity::getTrainingDuration))
+                .orElse(0L);
+
+        return new TrainingHoursDto(username, year, month, hours);
     }
 
     private TrainerEntity createTrainer(WorkloadRequest request) {

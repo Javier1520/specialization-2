@@ -14,11 +14,11 @@ public record WorkloadRequest(
     String lastName,
 
     @JsonProperty("active")
-    boolean isActive,
+    Boolean isActive,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate trainingDate,
 
-    int trainingDuration,
+    Integer trainingDuration,
     ActionType actionType
 ) {}

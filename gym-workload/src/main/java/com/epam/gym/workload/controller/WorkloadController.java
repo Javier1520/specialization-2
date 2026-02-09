@@ -1,12 +1,15 @@
 package com.epam.gym.workload.controller;
 
+import com.epam.gym.workload.dto.TrainerWorkloadDto;
+import com.epam.gym.workload.dto.TrainingHoursDto;
 import com.epam.gym.workload.dto.WorkloadRequest;
-import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.service.WorkloadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +29,16 @@ public class WorkloadController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
-    public ResponseEntity<TrainerEntity> getWorkload(@RequestParam String username) {
+    @GetMapping("/{username}")
+    public ResponseEntity<TrainerWorkloadDto> getWorkload(@PathVariable("username") String username) {
         return ResponseEntity.ok(workloadService.getWorkload(username));
+    }
+
+    @GetMapping("/hours")
+    public ResponseEntity<TrainingHoursDto> getTrainingHours(
+            @RequestParam("username") String username,
+            @RequestParam("year") Integer year,
+            @RequestParam("month") Integer month) {
+        return ResponseEntity.ok(workloadService.getTrainingHours(username, year, month));
     }
 }
