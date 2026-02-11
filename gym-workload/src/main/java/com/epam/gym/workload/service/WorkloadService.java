@@ -31,7 +31,14 @@ public class WorkloadService {
 
     @PostConstruct
     void initHandlers() {
-        handlers.forEach(handler -> handlerMap.put(handler.getSupportedAction(), handler));
+        log.debug("Initializing handlers: {}", handlers);
+        handlers.forEach(handler -> {
+            if (handler == null || handler.getSupportedAction() == null) {
+                log.error("Handler is null or returned null for getSupportedAction: {}", handler);
+                throw new IllegalStateException("Handler is null or returned null for getSupportedAction");
+            }
+            handlerMap.put(handler.getSupportedAction(), handler);
+        });
     }
 
     @Transactional
