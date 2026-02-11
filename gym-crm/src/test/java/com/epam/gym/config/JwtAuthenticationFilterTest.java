@@ -124,6 +124,7 @@ class JwtAuthenticationFilterTest {
                                 .getAuthentication()
                                 .getPrincipal())
                         .getUsername());
+        assertEquals(token, SecurityContextHolder.getContext().getAuthentication().getCredentials());
         verify(filterChain).doFilter(request, response);
     }
 

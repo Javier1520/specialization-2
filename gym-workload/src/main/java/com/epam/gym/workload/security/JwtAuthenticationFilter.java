@@ -1,7 +1,5 @@
-package com.epam.gym.config;
+package com.epam.gym.workload.security;
 
-import com.epam.gym.security.JwtService;
-import com.epam.gym.util.LogUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -9,17 +7,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Collections;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.ErrorResponse;
@@ -30,20 +25,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final int TOKEN_BEGIN_INDEX = BEARER_PREFIX.length();
-    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-    private final LogUtils logUtils;
     private final ObjectMapper objectMapper;
 
-    public JwtAuthenticationFilter(JwtService jwtService,
-                                   UserDetailsService userDetailsService,
-                                   LogUtils logUtils,
-                                   ObjectMapper objectMapper) {
+    public JwtAuthenticationFilter(JwtService jwtService, ObjectMapper objectMapper) {
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-        this.logUtils = logUtils;
         this.objectMapper = objectMapper;
     }
 
@@ -60,14 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (JwtException ex) {
                 handleJwtException(response, request.getRequestURI(), ex);
                 return;
-            } catch (UsernameNotFoundException ex) {
-                handleAuthenticationException(response, request.getRequestURI(),
-                        "User not found: " + ex.getMessage());
-                return;
             } catch (Exception ex) {
-                logUtils.error(log, "Unexpected authentication error for URI {}: {}",
-                        request.getRequestURI(), ex.getMessage());
-                        handleAuthenticationException(response, request.getRequestURI(),
+                 handleAuthenticationException(response, request.getRequestURI(),
                         "Authentication failed");
                 return;
             }
@@ -105,17 +86,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new JwtException("Token validation failed");
         }
 
-        authenticateUser(request, username, token);
-        logUtils.debug(log, "Successfully authenticated user: {}", username);
+        authenticateUser(request, username);
     }
 
-    private void authenticateUser(HttpServletRequest request, String username, String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    private void authenticateUser(HttpServletRequest request, String username) {
+        // Since gym-workload might not have a full UserDetailsService,
+        // we can trust the token and create an authenticated token with default/extracted authorities.
+        // For simplicity, we assign a default role or extract roles from claims if available.
+        // Assuming implicit trust for valid tokens from gym-crm.
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                token,
-                userDetails.getAuthorities()
+                username,
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
         );
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -124,8 +107,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void handleJwtException(HttpServletResponse response, String path, JwtException ex)
             throws IOException {
-        logUtils.warn(log, "JWT validation failed for URI {}: {}", path, ex.getMessage());
-
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");

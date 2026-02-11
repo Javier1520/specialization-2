@@ -34,6 +34,7 @@ class TrainingServiceTest {
     @Mock TrainerRepository trainerRepository;
     @Mock TrainingMapper trainingMapper;
     @Mock LogUtils logUtils;
+    @Mock com.epam.gym.client.WorkloadClient workloadClient;
 
     @InjectMocks TrainingServiceImpl trainingService;
 
