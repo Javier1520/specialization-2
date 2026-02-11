@@ -4,6 +4,7 @@ import com.epam.gym.model.Training;
 import com.epam.gym.model.TrainingType;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,4 +48,22 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate,
             @Param("traineeName") String traineeName);
+
+    List<Training> findByTraineeUsername(String username);
+
+    @Query(
+            """
+                SELECT tr FROM Training tr
+                JOIN tr.trainee te
+                JOIN tr.trainer trn
+                WHERE te.username = :traineeUsername
+                  AND trn.username = :trainerUsername
+                  AND tr.name = :trainingName
+                  AND tr.date = :trainingDate
+            """)
+    Optional<Training> findByTraineeAndTrainerAndNameAndDate(
+            @Param("traineeUsername") String traineeUsername,
+            @Param("trainerUsername") String trainerUsername,
+            @Param("trainingName") String trainingName,
+            @Param("trainingDate") Date trainingDate);
 }

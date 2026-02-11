@@ -19,6 +19,12 @@ import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TraineeService;
+import com.epam.gym.dto.workload.ActionType;
+import com.epam.gym.dto.workload.WorkloadRequest;
+import com.epam.gym.service.workload.WorkloadService;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import com.epam.gym.service.UsernamePasswordGenerator;
 import com.epam.gym.util.LogUtils;
 import java.util.List;
@@ -44,6 +50,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final TraineeMapper traineeMapper;
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
+    private final WorkloadService workloadService;
 
     public TraineeServiceImpl(
             TraineeRepository traineeRepository,
@@ -53,7 +60,8 @@ public class TraineeServiceImpl implements TraineeService {
             PasswordEncoder passwordEncoder,
             TraineeMapper traineeMapper,
             TrainingMapper trainingMapper,
-            LogUtils logUtils) {
+            LogUtils logUtils,
+            WorkloadService workloadService) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingRepository = trainingRepository;
@@ -62,6 +70,7 @@ public class TraineeServiceImpl implements TraineeService {
         this.traineeMapper = traineeMapper;
         this.trainingMapper = trainingMapper;
         this.logUtils = logUtils;
+        this.workloadService = workloadService;
     }
 
     public RegistrationResponse createTrainee(TraineeRegistrationRequest request) {
@@ -144,6 +153,7 @@ public class TraineeServiceImpl implements TraineeService {
     public void deleteByUsername(String username) {
         logUtils.info(log, "Delete trainee profile request: username={}", username);
         Trainee t = findTraineeByUsername(username);
+        cancelFutureTrainingsForTrainee(username);
         removeTraineeFromTrainers(t);
         traineeRepository.deleteByUsername(username);
         logUtils.info(log, "Deleted trainee {}", username);
@@ -241,6 +251,38 @@ public class TraineeServiceImpl implements TraineeService {
                             trainers.forEach(trainer -> trainer.getTrainees().remove(trainee));
                             trainerRepository.saveAll(trainers);
                         });
+    }
+
+    private void cancelFutureTrainingsForTrainee(String username) {
+        List<Training> trainings = trainingRepository.findByTraineeUsername(username);
+        Instant now = Instant.now();
+
+        trainings.stream()
+                .filter(training -> {
+                    Instant endTime = training.getDate().toInstant()
+                            .plus(training.getDuration(), ChronoUnit.MINUTES);
+                    return endTime.isAfter(now);
+                })
+                .forEach(training -> {
+                    Trainer trainer = training.getTrainer();
+                    if (trainer == null) {
+                        return;
+                    }
+
+                    WorkloadRequest workloadRequest = WorkloadRequest.builder()
+                            .username(trainer.getUsername())
+                            .firstName(trainer.getFirstName())
+                            .lastName(trainer.getLastName())
+                            .isActive(trainer.getIsActive())
+                            .trainingDate(training.getDate().toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate())
+                            .trainingDuration(training.getDuration())
+                            .actionType(ActionType.DELETE)
+                            .build();
+
+                    workloadService.updateWorkload(workloadRequest);
+                });
     }
 
     private void validateTrainerIds(List<Long> trainerIds, List<Trainer> trainers) {

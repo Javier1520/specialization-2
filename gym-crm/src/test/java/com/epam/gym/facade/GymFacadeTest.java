@@ -1,6 +1,7 @@
 package com.epam.gym.facade;
 
 import com.epam.gym.dto.request.AddTrainingRequest;
+import com.epam.gym.dto.workload.ActionType;
 import com.epam.gym.dto.request.TraineeRegistrationRequest;
 import com.epam.gym.dto.request.TrainerRegistrationRequest;
 import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
@@ -63,7 +64,8 @@ class GymFacadeTest {
                 new TraineeRegistrationRequest("T", "One", new Date(0), "Address");
         trainerRegistrationRequest =
                 new TrainerRegistrationRequest("R", "Two", TrainingType.Type.CARDIO);
-        addTrainingRequest = new AddTrainingRequest("t.one", "r.two", "Sesh", new Date(), 60);
+        addTrainingRequest =
+                new AddTrainingRequest("t.one", "r.two", "Sesh", new Date(), 60, ActionType.ADD);
         registrationResponse = new RegistrationResponse("t.one", "password123");
         traineeProfileResponse =
                 new TraineeProfileResponse(
@@ -254,11 +256,11 @@ class GymFacadeTest {
 
     @Test
     void createTraining_delegatesAndReturns() {
-        doNothing().when(trainingService).addTraining(addTrainingRequest);
+        doNothing().when(trainingService).updateTraining(addTrainingRequest);
 
         facade.createTraining(addTrainingRequest);
 
-        verify(trainingService).addTraining(addTrainingRequest);
+        verify(trainingService).updateTraining(addTrainingRequest);
     }
 
     @Test

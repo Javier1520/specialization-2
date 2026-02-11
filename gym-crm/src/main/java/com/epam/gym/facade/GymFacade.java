@@ -106,7 +106,7 @@ public class GymFacade {
 
     // --- Training operations ---
     public void createTraining(AddTrainingRequest request) {
-        trainingService.addTraining(request);
+        trainingService.updateTraining(request);
     }
 
     public List<TrainingTypeResponse> listTrainingTypes() {

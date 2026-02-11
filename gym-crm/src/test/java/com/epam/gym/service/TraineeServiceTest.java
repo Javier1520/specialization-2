@@ -21,6 +21,9 @@ import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.impl.TraineeServiceImpl;
 import com.epam.gym.util.LogUtils;
+import com.epam.gym.dto.workload.ActionType;
+import com.epam.gym.dto.workload.WorkloadRequest;
+import com.epam.gym.service.workload.WorkloadService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +61,7 @@ class TraineeServiceTest {
     @Mock TraineeMapper traineeMapper;
     @Mock TrainingMapper trainingMapper;
     @Mock LogUtils logUtils;
+    @Mock WorkloadService workloadService;
     @Mock org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @InjectMocks TraineeServiceImpl traineeService;
@@ -215,7 +219,7 @@ class TraineeServiceTest {
     }
 
     @Test
-    void deleteByUsername_removesAssociationsAndDeletes() {
+    void deleteByUsername_removesAssociationsAndDeletesAndCancelsFutureTrainings() {
         Trainee t = Trainee.builder().username("u").id(10L).trainers(new ArrayList<>()).build();
         // create two trainers that reference the trainee
         Trainer trainer1 =
@@ -231,6 +235,31 @@ class TraineeServiceTest {
         when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
         when(trainerRepository.saveAll(anyIterable())).thenReturn(List.of(trainer1, trainer2));
 
+        // future training with trainer
+        Date futureDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
+        Training futureTraining =
+                Training.builder()
+                        .id(1L)
+                        .date(futureDate)
+                        .duration(60)
+                        .trainer(trainer1)
+                        .trainee(t)
+                        .build();
+
+        // past training should be ignored
+        Date pastDate = new Date(System.currentTimeMillis() - 2 * 60 * 60 * 1000);
+        Training pastTraining =
+                Training.builder()
+                        .id(2L)
+                        .date(pastDate)
+                        .duration(30)
+                        .trainer(trainer1)
+                        .trainee(t)
+                        .build();
+
+        when(trainingRepository.findByTraineeUsername("u"))
+                .thenReturn(List.of(futureTraining, pastTraining));
+
         traineeService.deleteByUsername("u");
 
         // verify trainers had trainee removed
@@ -238,6 +267,12 @@ class TraineeServiceTest {
         assertFalse(trainer2.getTrainees().contains(t));
         verify(trainerRepository).saveAll(argThat(list -> ((List<?>) list).size() == 2));
         verify(traineeRepository).deleteByUsername("u");
+        verify(workloadService)
+                .updateWorkload(
+                        argThat(
+                                (WorkloadRequest req) ->
+                                        req.actionType() == ActionType.DELETE
+                                                && req.trainingDuration().equals(60)));
     }
 
     @Test

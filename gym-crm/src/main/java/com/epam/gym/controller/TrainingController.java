@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,17 +38,18 @@ public class TrainingController {
         this.workloadClient = workloadClient;
     }
 
-    @CreateOperation(summary = "Add Training", description = "Add a new Training in Gym CRM")
+    @CreateOperation(summary = "Update Training", description = "Apply an action for a Training in Gym CRM")
     @PostMapping
-    public ResponseEntity<Void> addTraining(@Valid @RequestBody AddTrainingRequest request) {
+    public ResponseEntity<Void> updateTraining(@Valid @RequestBody AddTrainingRequest request) {
         logUtils.info(
                 log,
-                "Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
+                "Update training request: traineeUsername={}, trainerUsername={}, trainingName={}, actionType={}",
                 request.traineeUsername(),
                 request.trainerUsername(),
-                request.trainingName());
+                request.trainingName(),
+                request.actionType());
 
-        trainingService.addTraining(request);
+        trainingService.updateTraining(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

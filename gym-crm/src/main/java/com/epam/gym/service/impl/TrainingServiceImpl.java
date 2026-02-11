@@ -1,6 +1,5 @@
 package com.epam.gym.service.impl;
 
-import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.dto.workload.ActionType;
 import com.epam.gym.dto.workload.WorkloadRequest;
@@ -13,11 +12,10 @@ import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.TrainingService;
+import com.epam.gym.service.workload.WorkloadService;
 import com.epam.gym.util.LogUtils;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import java.time.ZoneId;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,7 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainerRepository trainerRepository;
     private final TrainingMapper trainingMapper;
     private final LogUtils logUtils;
-    private final WorkloadClient workloadClient;
+    private final WorkloadService workloadService;
 
     public TrainingServiceImpl(
             TrainingRepository trainingRepository,
@@ -41,20 +39,44 @@ public class TrainingServiceImpl implements TrainingService {
             TrainerRepository trainerRepository,
             TrainingMapper trainingMapper,
             LogUtils logUtils,
-            WorkloadClient workloadClient) {
+            WorkloadService workloadService) {
         this.trainingRepository = trainingRepository;
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingMapper = trainingMapper;
         this.logUtils = logUtils;
-        this.workloadClient = workloadClient;
+        this.workloadService = workloadService;
     }
 
     @Transactional
     //@TimeLimiter(name = "workloadService")
     @CircuitBreaker(name = "workloadService", fallbackMethod = "updateWorkloadFallback")
-    public void addTraining(AddTrainingRequest request) {
-        logUtils.info(log, "Add training request: {}", request);
+    public void updateTraining(AddTrainingRequest request) {
+        logUtils.info(log, "Update training request: {}", request);
+
+        ActionType actionType = request.actionType();
+
+        if (actionType == ActionType.ADD) {
+            handleAddTraining(request);
+        } else if (actionType == ActionType.DELETE) {
+            handleDeleteTraining(request);
+        } else {
+            throw new IllegalArgumentException("Unsupported action type: " + actionType);
+        }
+    }
+
+    public void updateWorkloadFallback(AddTrainingRequest request, Throwable ex) {
+    logUtils.error(
+        log,
+        "Workload service unavailable. Training saved but workload update failed. " +
+        "Trainee={}, Trainer={}, Error={}",
+        request.traineeUsername(),
+        request.trainerUsername(),
+        ex.getMessage()
+    );
+}
+
+    private void handleAddTraining(AddTrainingRequest request) {
         Trainee trainee =
                 traineeRepository
                         .findByUsername(request.traineeUsername())
@@ -86,26 +108,61 @@ public class TrainingServiceImpl implements TrainingService {
                 .firstName(trainer.getFirstName())
                 .lastName(trainer.getLastName())
                 .isActive(trainer.getIsActive())
-                .trainingDate(training.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .trainingDuration(training.getDuration())
+                .trainingDate(saved.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .trainingDuration(saved.getDuration())
                 .actionType(ActionType.ADD)
                 .build();
 
         logUtils.info(log, "Calling workload service to update workload for trainer {}", trainingWorkloadRequest);
-        workloadClient.updateWorkload(trainingWorkloadRequest);
+        workloadService.updateWorkload(trainingWorkloadRequest);
     }
 
-    public void updateWorkloadFallback(AddTrainingRequest request, Throwable ex) {
-    logUtils.error(
-        log,
-        "Workload service unavailable. Training saved but workload update failed. " +
-        "Trainee={}, Trainer={}, Error={}",
-        request.traineeUsername(),
-        request.trainerUsername(),
-        ex.getMessage()
-    );
-}
+    private void handleDeleteTraining(AddTrainingRequest request) {
+        Training training =
+                trainingRepository
+                        .findByTraineeAndTrainerAndNameAndDate(
+                                request.traineeUsername(),
+                                request.trainerUsername(),
+                                request.trainingName(),
+                                request.trainingDate())
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "Training not found for trainee="
+                                                        + request.traineeUsername()
+                                                        + ", trainer="
+                                                        + request.trainerUsername()
+                                                        + ", name="
+                                                        + request.trainingName()
+                                                        + ", date="
+                                                        + request.trainingDate()));
 
+        Trainer trainer = training.getTrainer();
+        if (trainer == null) {
+            logUtils.info(log, "Training id={} has no assigned trainer, skipping workload update", training.getId());
+            trainingRepository.delete(training);
+            return;
+        }
+
+        trainingRepository.delete(training);
+        logUtils.info(log, "Deleted training id={} trainee={} trainer={}",
+                training.getId(),
+                training.getTrainee().getUsername(),
+                trainer.getUsername());
+
+        WorkloadRequest trainingWorkloadRequest = WorkloadRequest.builder()
+                .username(trainer.getUsername())
+                .firstName(trainer.getFirstName())
+                .lastName(trainer.getLastName())
+                .isActive(trainer.getIsActive())
+                .trainingDate(training.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .trainingDuration(training.getDuration())
+                .actionType(ActionType.DELETE)
+                .build();
+
+        logUtils.info(log, "Calling workload service to update workload for trainer {}", trainingWorkloadRequest);
+        workloadService.updateWorkload(trainingWorkloadRequest);
+    }
     private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {
         training.setSpecialization(trainer.getSpecialization());
         training.setTrainee(trainee);

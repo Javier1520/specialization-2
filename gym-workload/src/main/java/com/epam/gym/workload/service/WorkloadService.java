@@ -1,6 +1,5 @@
 package com.epam.gym.workload.service;
 
-import com.epam.gym.workload.dto.ActionType;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.TrainingHoursDto;
 import com.epam.gym.workload.dto.WorkloadRequest;
@@ -11,7 +10,10 @@ import com.epam.gym.workload.mapper.WorkloadMapper;
 import com.epam.gym.workload.repository.TrainerWorkloadRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,14 @@ public class WorkloadService {
 
     private final TrainerWorkloadRepository repository;
     private final WorkloadMapper mapper;
+    private final List<WorkloadActionHandler> handlers;
+    private final Map<com.epam.gym.workload.dto.ActionType, WorkloadActionHandler> handlerMap =
+            new EnumMap<>(com.epam.gym.workload.dto.ActionType.class);
+
+    @PostConstruct
+    void initHandlers() {
+        handlers.forEach(handler -> handlerMap.put(handler.getSupportedAction(), handler));
+    }
 
     @Transactional
     public void updateWorkload(WorkloadRequest request) {
@@ -71,13 +81,11 @@ public class WorkloadService {
                     return newMonth;
                 });
 
-        if (request.actionType() == ActionType.ADD) {
-            monthEntity.setTrainingDuration(monthEntity.getTrainingDuration() + duration);
-        } else if (request.actionType() == ActionType.DELETE) {
-            long newDuration = monthEntity.getTrainingDuration() - duration;
-            if (newDuration < 0) newDuration = 0; // Prevent negative duration
-            monthEntity.setTrainingDuration(newDuration);
+        WorkloadActionHandler handler = handlerMap.get(request.actionType());
+        if (handler == null) {
+            throw new IllegalArgumentException("Unsupported action type: " + request.actionType());
         }
+        handler.handle(monthEntity, duration);
 
         repository.save(trainer);
         log.info("Workload updated successfully for trainer: {}", request.username());
