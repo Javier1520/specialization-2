@@ -40,4 +40,14 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(response.getBody().get("error").contains("test exception"));
     }
+
+    @Test
+    void handleNullPointerException_returnsBadRequestWithoutInternalDetails() {
+        NullPointerException ex = new NullPointerException("some internal null");
+
+        ResponseEntity<Map<String, String>> response = handler.handleNullPointerException(ex);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Requested resource not found", response.getBody().get("error"));
+    }
 }

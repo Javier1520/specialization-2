@@ -25,8 +25,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleGlobalException(Exception ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", "An unexpected error occurred: " + ex.getMessage());
-        // In production, don't expose internal messages. Log them instead.
-        // For development/verification as requested, avoiding 500 status code.
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Map<String, String>> handleNullPointerException(NullPointerException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Requested resource not found");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }
