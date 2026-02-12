@@ -1,5 +1,6 @@
 package com.epam.gym.workload.exception;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -7,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,11 +18,12 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleValidationExceptions_returnsBadRequestWithErrors() {
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "object");
+        BeanPropertyBindingResult bindingResult =
+                new BeanPropertyBindingResult(new Object(), "object");
         bindingResult.addError(new FieldError("object", "field1", "message1"));
 
-        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(
-                (MethodParameter) null, bindingResult);
+        MethodArgumentNotValidException ex =
+                new MethodArgumentNotValidException((MethodParameter) null, bindingResult);
 
         ResponseEntity<Map<String, String>> response = handler.handleValidationExceptions(ex);
 

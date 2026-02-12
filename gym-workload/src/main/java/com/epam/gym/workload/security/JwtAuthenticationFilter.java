@@ -13,8 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.ErrorResponse;
@@ -35,9 +35,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         if (hasBearerToken(request) && isNotAlreadyAuthenticated()) {
@@ -48,8 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 handleJwtException(response, request.getRequestURI(), ex);
                 return;
             } catch (Exception ex) {
-                 handleAuthenticationException(response, request.getRequestURI(),
-                        "Authentication failed");
+                handleAuthenticationException(
+                        response, request.getRequestURI(), "Authentication failed");
                 return;
             }
         }
@@ -91,15 +92,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticateUser(HttpServletRequest request, String username) {
         // Since gym-workload might not have a full UserDetailsService,
-        // we can trust the token and create an authenticated token with default/extracted authorities.
+        // we can trust the token and create an authenticated token with default/extracted
+        // authorities.
         // For simplicity, we assign a default role or extract roles from claims if available.
         // Assuming implicit trust for valid tokens from gym-crm.
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                username,
-                null,
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-        );
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -111,28 +113,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ErrorResponse errorResponse = ErrorResponse.builder(ex, HttpStatus.UNAUTHORIZED,
-                        "JWT token is invalid or expired: " + ex.getMessage())
-                .title("Unauthorized")
-                .property("path", path)
-                .build();
+        ErrorResponse errorResponse =
+                ErrorResponse.builder(
+                                ex,
+                                HttpStatus.UNAUTHORIZED,
+                                "JWT token is invalid or expired: " + ex.getMessage())
+                        .title("Unauthorized")
+                        .property("path", path)
+                        .build();
 
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }
 
-    private void handleAuthenticationException(HttpServletResponse response, String path, String message)
-            throws IOException {
+    private void handleAuthenticationException(
+            HttpServletResponse response, String path, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ErrorResponse errorResponse = ErrorResponse.builder(
-                        new RuntimeException(message),
-                        HttpStatus.UNAUTHORIZED,
-                        message)
-                .title("Authentication Failed")
-                .property("path", path)
-                .build();
+        ErrorResponse errorResponse =
+                ErrorResponse.builder(
+                                new RuntimeException(message), HttpStatus.UNAUTHORIZED, message)
+                        .title("Authentication Failed")
+                        .property("path", path)
+                        .build();
 
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }

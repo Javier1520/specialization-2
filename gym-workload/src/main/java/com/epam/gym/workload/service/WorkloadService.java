@@ -8,12 +8,12 @@ import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.entity.YearEntity;
 import com.epam.gym.workload.mapper.WorkloadMapper;
 import com.epam.gym.workload.repository.TrainerWorkloadRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,13 +32,17 @@ public class WorkloadService {
     @PostConstruct
     void initHandlers() {
         log.debug("Initializing handlers: {}", handlers);
-        handlers.forEach(handler -> {
-            if (handler == null || handler.getSupportedAction() == null) {
-                log.error("Handler is null or returned null for getSupportedAction: {}", handler);
-                throw new IllegalStateException("Handler is null or returned null for getSupportedAction");
-            }
-            handlerMap.put(handler.getSupportedAction(), handler);
-        });
+        handlers.forEach(
+                handler -> {
+                    if (handler == null || handler.getSupportedAction() == null) {
+                        log.error(
+                                "Handler is null or returned null for getSupportedAction: {}",
+                                handler);
+                        throw new IllegalStateException(
+                                "Handler is null or returned null for getSupportedAction");
+                    }
+                    handlerMap.put(handler.getSupportedAction(), handler);
+                });
     }
 
     @Transactional
@@ -50,8 +54,10 @@ public class WorkloadService {
         // }
         log.info("Updating workload for trainer: {}", request.username());
 
-        TrainerEntity trainer = repository.findByUsername(request.username())
-                .orElseGet(() -> createTrainer(request));
+        TrainerEntity trainer =
+                repository
+                        .findByUsername(request.username())
+                        .orElseGet(() -> createTrainer(request));
 
         trainer.setFirstName(request.firstName());
         trainer.setLastName(request.lastName());
@@ -62,31 +68,37 @@ public class WorkloadService {
         int monthNum = date.getMonthValue();
         int duration = request.trainingDuration();
 
-        YearEntity yearEntity = trainer.getYears().stream()
-                .filter(y -> y.getYearNumber() == yearNum)
-                .findFirst()
-                .orElseGet(() -> {
-                    YearEntity newYear = YearEntity.builder()
-                            .yearNumber(yearNum)
-                            .trainer(trainer)
-                            .months(new java.util.ArrayList<>())
-                            .build();
-                    trainer.getYears().add(newYear);
-                    return newYear;
-                });
+        YearEntity yearEntity =
+                trainer.getYears().stream()
+                        .filter(y -> y.getYearNumber() == yearNum)
+                        .findFirst()
+                        .orElseGet(
+                                () -> {
+                                    YearEntity newYear =
+                                            YearEntity.builder()
+                                                    .yearNumber(yearNum)
+                                                    .trainer(trainer)
+                                                    .months(new java.util.ArrayList<>())
+                                                    .build();
+                                    trainer.getYears().add(newYear);
+                                    return newYear;
+                                });
 
-        MonthEntity monthEntity = yearEntity.getMonths().stream()
-                .filter(m -> m.getMonthNumber() == monthNum)
-                .findFirst()
-                .orElseGet(() -> {
-                    MonthEntity newMonth = MonthEntity.builder()
-                            .monthNumber(monthNum)
-                            .year(yearEntity)
-                            .trainingDuration(0)
-                            .build();
-                    yearEntity.getMonths().add(newMonth);
-                    return newMonth;
-                });
+        MonthEntity monthEntity =
+                yearEntity.getMonths().stream()
+                        .filter(m -> m.getMonthNumber() == monthNum)
+                        .findFirst()
+                        .orElseGet(
+                                () -> {
+                                    MonthEntity newMonth =
+                                            MonthEntity.builder()
+                                                    .monthNumber(monthNum)
+                                                    .year(yearEntity)
+                                                    .trainingDuration(0)
+                                                    .build();
+                                    yearEntity.getMonths().add(newMonth);
+                                    return newMonth;
+                                });
 
         WorkloadActionHandler handler = handlerMap.get(request.actionType());
         if (handler == null) {
@@ -99,23 +111,30 @@ public class WorkloadService {
     }
 
     public TrainerWorkloadDto getWorkload(String username) {
-        TrainerEntity trainer = repository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
+        TrainerEntity trainer =
+                repository
+                        .findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
         return mapper.toDto(trainer);
     }
 
     public TrainingHoursDto getTrainingHours(String username, Integer year, Integer month) {
-        TrainerEntity trainer = repository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
+        TrainerEntity trainer =
+                repository
+                        .findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
 
-        long hours = trainer.getYears().stream()
-                .filter(y -> y.getYearNumber() == year)
-                .findFirst()
-                .flatMap(yearEntity -> yearEntity.getMonths().stream()
-                        .filter(m -> m.getMonthNumber() == month)
+        long hours =
+                trainer.getYears().stream()
+                        .filter(y -> y.getYearNumber() == year)
                         .findFirst()
-                        .map(MonthEntity::getTrainingDuration))
-                .orElse(0L);
+                        .flatMap(
+                                yearEntity ->
+                                        yearEntity.getMonths().stream()
+                                                .filter(m -> m.getMonthNumber() == month)
+                                                .findFirst()
+                                                .map(MonthEntity::getTrainingDuration))
+                        .orElse(0L);
 
         return new TrainingHoursDto(username, year, month, hours);
     }

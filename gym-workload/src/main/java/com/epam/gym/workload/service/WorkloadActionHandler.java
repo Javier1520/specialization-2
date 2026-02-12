@@ -9,4 +9,3 @@ public interface WorkloadActionHandler {
 
     void handle(MonthEntity monthEntity, int duration);
 }
-

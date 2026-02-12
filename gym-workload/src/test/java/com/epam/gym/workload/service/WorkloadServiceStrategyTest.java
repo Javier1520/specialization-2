@@ -45,21 +45,12 @@ class WorkloadServiceStrategyTest {
     @Test
     void updateWorkload_usesAddHandler() {
         TrainerEntity trainer =
-                TrainerEntity.builder()
-                        .username("t1")
-                        .years(new ArrayList<>())
-                        .build();
+                TrainerEntity.builder().username("t1").years(new ArrayList<>()).build();
         when(repository.findByUsername("t1")).thenReturn(java.util.Optional.of(trainer));
 
         WorkloadRequest request =
                 new WorkloadRequest(
-                        "t1",
-                        "F",
-                        "L",
-                        true,
-                        LocalDate.of(2025, 1, 10),
-                        60,
-                        ActionType.ADD);
+                        "t1", "F", "L", true, LocalDate.of(2025, 1, 10), 60, ActionType.ADD);
 
         workloadService.updateWorkload(request);
 
@@ -71,21 +62,12 @@ class WorkloadServiceStrategyTest {
     @Test
     void updateWorkload_usesDeleteHandler() {
         TrainerEntity trainer =
-                TrainerEntity.builder()
-                        .username("t1")
-                        .years(new ArrayList<>())
-                        .build();
+                TrainerEntity.builder().username("t1").years(new ArrayList<>()).build();
         when(repository.findByUsername("t1")).thenReturn(java.util.Optional.of(trainer));
 
         WorkloadRequest request =
                 new WorkloadRequest(
-                        "t1",
-                        "F",
-                        "L",
-                        true,
-                        LocalDate.of(2025, 1, 10),
-                        60,
-                        ActionType.DELETE);
+                        "t1", "F", "L", true, LocalDate.of(2025, 1, 10), 60, ActionType.DELETE);
 
         workloadService.updateWorkload(request);
 
@@ -97,23 +79,20 @@ class WorkloadServiceStrategyTest {
     @Test
     void updateWorkload_unsupportedAction_throws() {
         WorkloadRequest badRequest =
-                new WorkloadRequest(
-                        "t1",
-                        "F",
-                        "L",
-                        true,
-                        LocalDate.of(2025, 1, 10),
-                        60,
-                        null);
+                new WorkloadRequest("t1", "F", "L", true, LocalDate.of(2025, 1, 10), 60, null);
 
-        assertThrows(IllegalArgumentException.class, () -> workloadService.updateWorkload(badRequest));
+        assertThrows(
+                IllegalArgumentException.class, () -> workloadService.updateWorkload(badRequest));
     }
 
     @Test
     void getWorkload_callsRepositoryAndMapper() {
         TrainerEntity trainer = new TrainerEntity();
         when(repository.findByUsername("t1")).thenReturn(java.util.Optional.of(trainer));
-        when(mapper.toDto(trainer)).thenReturn(new com.epam.gym.workload.dto.TrainerWorkloadDto("t1", "F", "L", true, List.of()));
+        when(mapper.toDto(trainer))
+                .thenReturn(
+                        new com.epam.gym.workload.dto.TrainerWorkloadDto(
+                                "t1", "F", "L", true, List.of()));
 
         workloadService.getWorkload("t1");
 
@@ -165,10 +144,7 @@ class WorkloadServiceStrategyTest {
         workloadService.updateWorkload(request);
 
         org.mockito.Mockito.verify(repository).save(any(TrainerEntity.class));
-        org.mockito.Mockito.verify(addHandler).handle(any(MonthEntity.class), org.mockito.Mockito.eq(60));
+        org.mockito.Mockito.verify(addHandler)
+                .handle(any(MonthEntity.class), org.mockito.Mockito.eq(60));
     }
-
-
-
 }
-

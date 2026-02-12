@@ -6,12 +6,14 @@ import com.epam.gym.workload.dto.YearSummaryDto;
 import com.epam.gym.workload.entity.MonthEntity;
 import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.entity.YearEntity;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WorkloadMapperTest {
 
@@ -19,21 +21,16 @@ class WorkloadMapperTest {
 
     @Test
     void toDto_trainerEntity_mapsCorrectly() {
-        MonthEntity month = MonthEntity.builder()
-                .monthNumber(1)
-                .trainingDuration(120)
-                .build();
-        YearEntity year = YearEntity.builder()
-                .yearNumber(2025)
-                .months(List.of(month))
-                .build();
-        TrainerEntity trainer = TrainerEntity.builder()
-                .username("trainer1")
-                .firstName("John")
-                .lastName("Doe")
-                .isActive(true)
-                .years(List.of(year))
-                .build();
+        MonthEntity month = MonthEntity.builder().monthNumber(1).trainingDuration(120).build();
+        YearEntity year = YearEntity.builder().yearNumber(2025).months(List.of(month)).build();
+        TrainerEntity trainer =
+                TrainerEntity.builder()
+                        .username("trainer1")
+                        .firstName("John")
+                        .lastName("Doe")
+                        .isActive(true)
+                        .years(List.of(year))
+                        .build();
 
         TrainerWorkloadDto dto = mapper.toDto(trainer);
 
@@ -48,14 +45,8 @@ class WorkloadMapperTest {
 
     @Test
     void toDto_yearEntity_mapsCorrectly() {
-        MonthEntity month = MonthEntity.builder()
-                .monthNumber(1)
-                .trainingDuration(120)
-                .build();
-        YearEntity year = YearEntity.builder()
-                .yearNumber(2025)
-                .months(List.of(month))
-                .build();
+        MonthEntity month = MonthEntity.builder().monthNumber(1).trainingDuration(120).build();
+        YearEntity year = YearEntity.builder().yearNumber(2025).months(List.of(month)).build();
 
         YearSummaryDto dto = mapper.toDto(year);
 
@@ -66,10 +57,7 @@ class WorkloadMapperTest {
 
     @Test
     void toDto_monthEntity_mapsCorrectly() {
-        MonthEntity month = MonthEntity.builder()
-                .monthNumber(1)
-                .trainingDuration(120)
-                .build();
+        MonthEntity month = MonthEntity.builder().monthNumber(1).trainingDuration(120).build();
 
         MonthSummaryDto dto = mapper.toDto(month);
 

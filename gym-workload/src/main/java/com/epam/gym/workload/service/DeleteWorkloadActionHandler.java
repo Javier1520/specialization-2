@@ -21,4 +21,3 @@ public class DeleteWorkloadActionHandler implements WorkloadActionHandler {
         monthEntity.setTrainingDuration(newDuration);
     }
 }
-

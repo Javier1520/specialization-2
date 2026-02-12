@@ -17,4 +17,3 @@ public class AddWorkloadActionHandler implements WorkloadActionHandler {
         monthEntity.setTrainingDuration(monthEntity.getTrainingDuration() + duration);
     }
 }
-
