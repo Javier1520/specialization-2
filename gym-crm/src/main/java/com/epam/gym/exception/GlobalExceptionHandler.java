@@ -1,6 +1,7 @@
 package com.epam.gym.exception;
 
 import com.epam.gym.util.LogUtils;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
@@ -63,6 +64,13 @@ public class GlobalExceptionHandler {
             ConstraintViolationException ex) {
         logUtils.error(log, "Constraint violation: {}", ex.getMessage());
         return buildConstraintViolationErrorResponse(ex);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handleNullPointerException(NullPointerException ex) {
+        logUtils.error(log, "Null pointer exception: {}", ex.getMessage());
+        return buildErrorResponse("Requested resource not found", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)

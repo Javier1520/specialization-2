@@ -90,9 +90,10 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleGenericException_nullPointerException_returnsInternalServerError() {
-        // Given
-        Exception exception = new NullPointerException("Null pointer");
+    void handleGenericException_withUnhandledException_returnsInternalServerError() {
+        // Given - use an exception that has NO dedicated handler
+        Exception exception = new IllegalStateException("Unexpected state");
+
 
         // When
         ResponseEntity<Map<String, String>> response =
@@ -103,6 +104,22 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("An unexpected error occurred", response.getBody().get("errors"));
+    }
+
+    @Test
+    void handleNullPointerException_returnsNotFoundStatus() {
+        // Given
+        NullPointerException exception = new NullPointerException("Null pointer");
+
+        // When
+        ResponseEntity<Map<String, String>> response =
+                globalExceptionHandler.handleNullPointerException(exception);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Requested resource not found", response.getBody().get("errors"));
     }
 
     private ConstraintViolation<?> createMockConstraintViolation() {
