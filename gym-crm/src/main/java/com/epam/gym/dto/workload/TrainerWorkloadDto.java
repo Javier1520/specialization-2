@@ -7,5 +7,4 @@ public record TrainerWorkloadDto(
         String firstName,
         String lastName,
         Boolean status,
-        List<YearSummaryDto> years
-) {}
+        List<YearSummaryDto> years) {}

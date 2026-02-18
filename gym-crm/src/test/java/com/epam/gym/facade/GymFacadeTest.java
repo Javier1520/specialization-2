@@ -1,7 +1,6 @@
 package com.epam.gym.facade;
 
 import com.epam.gym.dto.request.AddTrainingRequest;
-import com.epam.gym.dto.workload.ActionType;
 import com.epam.gym.dto.request.TraineeRegistrationRequest;
 import com.epam.gym.dto.request.TrainerRegistrationRequest;
 import com.epam.gym.dto.request.TrainerTrainingFilterRequest;
@@ -15,6 +14,7 @@ import com.epam.gym.dto.response.TrainerInfoResponse;
 import com.epam.gym.dto.response.TrainerProfileResponse;
 import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.dto.response.TrainingTypeResponse;
+import com.epam.gym.dto.workload.ActionType;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.model.TrainingType;
 import com.epam.gym.service.TraineeService;
@@ -65,17 +65,21 @@ class GymFacadeTest {
         trainerRegistrationRequest =
                 new TrainerRegistrationRequest("R", "Two", TrainingType.Type.CARDIO);
         addTrainingRequest =
-                new AddTrainingRequest("t.one", "r.two", "Sesh", new Date(), 60, ActionType.ADD);
+                new AddTrainingRequest("t.one", "r.two", "Sesh", new Date(),
+                        60, ActionType.ADD);
         registrationResponse = new RegistrationResponse("t.one", "password123");
         traineeProfileResponse =
                 new TraineeProfileResponse(
-                        "t.one", "T", "One", new Date(0), "Address", true, List.of());
+                        "t.one", "T", "One", new Date(0), "Address", true,
+                        List.of());
         trainerProfileResponse =
                 new TrainerProfileResponse(
-                        "r.two", "R", "Two", TrainingType.Type.CARDIO, true, List.of());
+                        "r.two", "R", "Two", TrainingType.Type.CARDIO, true,
+                        List.of());
         trainingResponse =
                 new TrainingResponse(
-                        "Sesh", new Date(), TrainingType.Type.CARDIO, 60, "r.two", "t.one");
+                        "Sesh", new Date(), TrainingType.Type.CARDIO, 60, "r.two",
+                        "t.one");
         trainingTypeResponse = new TrainingTypeResponse(1L, "CARDIO");
     }
 
@@ -93,7 +97,8 @@ class GymFacadeTest {
     @Test
     void updateTrainee_delegatesAndReturns() {
         UpdateTraineeRequest request =
-                new UpdateTraineeRequest("t.one", "T", "One", new Date(0), "Address", true);
+                new UpdateTraineeRequest("t.one", "T", "One", new Date(0), "Address",
+                        true);
         when(traineeService.updateTrainee("t.one", request)).thenReturn(traineeProfileResponse);
 
         TraineeProfileResponse out = facade.updateTrainee("t.one", request);
@@ -160,7 +165,8 @@ class GymFacadeTest {
     @Test
     void getTrainersNotAssignedToTrainee_delegatesAndReturns() {
         TrainerInfoResponse trainerInfo =
-                new TrainerInfoResponse("r.two", "R", "Two", TrainingType.Type.CARDIO);
+                new TrainerInfoResponse("r.two", "R", "Two",
+                        TrainingType.Type.CARDIO);
         when(traineeService.getTrainersNotAssignedToTrainee("t.one"))
                 .thenReturn(List.of(trainerInfo));
 
@@ -177,7 +183,8 @@ class GymFacadeTest {
                 new UpdateTraineeTrainersRequest(
                         List.of(new UpdateTraineeTrainersRequest.TrainerUsernameRequest("r.two")));
         TrainerInfoResponse trainerInfo =
-                new TrainerInfoResponse("r.two", "R", "Two", TrainingType.Type.CARDIO);
+                new TrainerInfoResponse("r.two", "R", "Two",
+                        TrainingType.Type.CARDIO);
         when(traineeService.updateTraineeTrainers("t.one", request))
                 .thenReturn(List.of(trainerInfo));
 
@@ -201,7 +208,8 @@ class GymFacadeTest {
     @Test
     void updateTrainer_delegatesAndReturns() {
         UpdateTrainerRequest request =
-                new UpdateTrainerRequest("r.two", "R", "Two", TrainingType.Type.CARDIO, true);
+                new UpdateTrainerRequest("r.two", "R", "Two", TrainingType.Type.CARDIO,
+                        true);
         when(trainerService.updateTrainer("r.two", request)).thenReturn(trainerProfileResponse);
 
         TrainerProfileResponse out = facade.updateTrainer("r.two", request);

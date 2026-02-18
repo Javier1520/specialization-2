@@ -1,6 +1,7 @@
 package com.epam.gym.workload.service;
 
 import com.epam.gym.workload.dto.ActionType;
+import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.WorkloadRequest;
 import com.epam.gym.workload.entity.MonthEntity;
 import com.epam.gym.workload.entity.TrainerEntity;
@@ -10,10 +11,12 @@ import com.epam.gym.workload.repository.TrainerWorkloadRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +49,7 @@ class WorkloadServiceStrategyTest {
     void updateWorkload_usesAddHandler() {
         TrainerEntity trainer =
                 TrainerEntity.builder().username("t1").years(new ArrayList<>()).build();
-        when(repository.findByUsername("t1")).thenReturn(java.util.Optional.of(trainer));
+        when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
         WorkloadRequest request =
                 new WorkloadRequest(
@@ -54,16 +57,16 @@ class WorkloadServiceStrategyTest {
 
         workloadService.updateWorkload(request);
 
-        org.mockito.Mockito.verify(addHandler)
-                .handle(any(MonthEntity.class), org.mockito.Mockito.eq(60));
-        org.mockito.Mockito.verify(repository).save(trainer);
+        Mockito.verify(addHandler)
+                .handle(any(MonthEntity.class), Mockito.eq(60));
+        Mockito.verify(repository).save(trainer);
     }
 
     @Test
     void updateWorkload_usesDeleteHandler() {
         TrainerEntity trainer =
                 TrainerEntity.builder().username("t1").years(new ArrayList<>()).build();
-        when(repository.findByUsername("t1")).thenReturn(java.util.Optional.of(trainer));
+        when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
         WorkloadRequest request =
                 new WorkloadRequest(
@@ -71,9 +74,9 @@ class WorkloadServiceStrategyTest {
 
         workloadService.updateWorkload(request);
 
-        org.mockito.Mockito.verify(deleteHandler)
-                .handle(any(MonthEntity.class), org.mockito.Mockito.eq(60));
-        org.mockito.Mockito.verify(repository).save(trainer);
+        Mockito.verify(deleteHandler)
+                .handle(any(MonthEntity.class), Mockito.eq(60));
+        Mockito.verify(repository).save(trainer);
     }
 
     @Test
@@ -88,21 +91,21 @@ class WorkloadServiceStrategyTest {
     @Test
     void getWorkload_callsRepositoryAndMapper() {
         TrainerEntity trainer = new TrainerEntity();
-        when(repository.findByUsername("t1")).thenReturn(java.util.Optional.of(trainer));
+        when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
         when(mapper.toDto(trainer))
                 .thenReturn(
-                        new com.epam.gym.workload.dto.TrainerWorkloadDto(
+                        new TrainerWorkloadDto(
                                 "t1", "F", "L", true, List.of()));
 
         workloadService.getWorkload("t1");
 
-        org.mockito.Mockito.verify(repository).findByUsername("t1");
-        org.mockito.Mockito.verify(mapper).toDto(trainer);
+        Mockito.verify(repository).findByUsername("t1");
+        Mockito.verify(mapper).toDto(trainer);
     }
 
     @Test
     void getWorkload_notFound_throws() {
-        when(repository.findByUsername("t1")).thenReturn(java.util.Optional.empty());
+        when(repository.findByUsername("t1")).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> workloadService.getWorkload("t1"));
     }
@@ -113,7 +116,7 @@ class WorkloadServiceStrategyTest {
         YearEntity year = YearEntity.builder().yearNumber(2025).months(List.of(month)).build();
         TrainerEntity trainer = TrainerEntity.builder().years(List.of(year)).build();
 
-        when(repository.findByUsername("t1")).thenReturn(java.util.Optional.of(trainer));
+        when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
         var result = workloadService.getTrainingHours("t1", 2025, 1);
 
@@ -122,14 +125,14 @@ class WorkloadServiceStrategyTest {
 
     @Test
     void getTrainingHours_notFound_throws() {
-        when(repository.findByUsername("t1")).thenReturn(java.util.Optional.empty());
+        when(repository.findByUsername("t1")).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> workloadService.getTrainingHours("t1", 2025, 1));
     }
 
     @Test
     void updateWorkload_createsNewTrainer() {
-        when(repository.findByUsername("newTrainer")).thenReturn(java.util.Optional.empty());
+        when(repository.findByUsername("newTrainer")).thenReturn(Optional.empty());
 
         WorkloadRequest request =
                 new WorkloadRequest(
@@ -143,8 +146,8 @@ class WorkloadServiceStrategyTest {
 
         workloadService.updateWorkload(request);
 
-        org.mockito.Mockito.verify(repository).save(any(TrainerEntity.class));
-        org.mockito.Mockito.verify(addHandler)
-                .handle(any(MonthEntity.class), org.mockito.Mockito.eq(60));
+        Mockito.verify(repository).save(any(TrainerEntity.class));
+        Mockito.verify(addHandler)
+                .handle(any(MonthEntity.class), Mockito.eq(60));
     }
 }

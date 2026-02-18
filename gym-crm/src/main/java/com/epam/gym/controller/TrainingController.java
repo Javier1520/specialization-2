@@ -53,14 +53,18 @@ public class TrainingController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetAllOperation(summary = "Get Trainer Workload", description = "Retrieve trainer's monthly summary of provided trainings")
+    @GetAllOperation(
+            summary = "Get Trainer Workload",
+            description = "Retrieve trainer's monthly summary of provided trainings")
     @GetMapping("/workload/{username}")
     public ResponseEntity<TrainerWorkloadDto> getTrainerWorkload(@PathVariable("username") String username) {
         logUtils.info(log, "Get trainer workload request: username={}", username);
         return ResponseEntity.ok(workloadClient.getWorkload(username));
     }
 
-    @GetAllOperation(summary = "Get Training Hours", description = "Retrieve training hours for a trainer in a specific month")
+    @GetAllOperation(
+            summary = "Get Training Hours",
+            description = "Retrieve training hours for a trainer in a specific month")
     @GetMapping("/hours")
     public ResponseEntity<TrainingHoursDto> getTrainingHours(
             @RequestParam("username") String username,

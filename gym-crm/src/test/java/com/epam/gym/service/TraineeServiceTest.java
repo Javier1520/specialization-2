@@ -8,6 +8,8 @@ import com.epam.gym.dto.response.RegistrationResponse;
 import com.epam.gym.dto.response.TraineeProfileResponse;
 import com.epam.gym.dto.response.TrainerInfoResponse;
 import com.epam.gym.dto.response.TrainingResponse;
+import com.epam.gym.dto.workload.ActionType;
+import com.epam.gym.dto.workload.WorkloadRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.mapper.TraineeMapper;
@@ -20,10 +22,8 @@ import com.epam.gym.repository.TraineeRepository;
 import com.epam.gym.repository.TrainerRepository;
 import com.epam.gym.repository.TrainingRepository;
 import com.epam.gym.service.impl.TraineeServiceImpl;
-import com.epam.gym.util.LogUtils;
-import com.epam.gym.dto.workload.ActionType;
-import com.epam.gym.dto.workload.WorkloadRequest;
 import com.epam.gym.service.workload.WorkloadService;
+import com.epam.gym.util.LogUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,7 +70,8 @@ class TraineeServiceTest {
 
     @BeforeEach
     void setUp() {
-        registrationRequest = new TraineeRegistrationRequest("John", "Doe", new Date(0), "Addr");
+        registrationRequest = new TraineeRegistrationRequest("John", "Doe", new Date(0),
+                "Addr");
     }
 
     @Test
@@ -119,7 +120,8 @@ class TraineeServiceTest {
         Trainee t = Trainee.builder().username("u1").build();
         TraineeProfileResponse response =
                 new TraineeProfileResponse(
-                        "u1", "John", "Doe", new Date(0), "Addr", true, List.of());
+                        "u1", "John", "Doe", new Date(0), "Addr", true,
+                        List.of());
 
         when(traineeRepository.findByUsernameWithTrainers("u1")).thenReturn(Optional.of(t));
         when(traineeMapper.toProfileResponse(t)).thenReturn(response);
@@ -174,9 +176,11 @@ class TraineeServiceTest {
                         .dateOfBirth(new Date(0))
                         .build();
         UpdateTraineeRequest request =
-                new UpdateTraineeRequest("u", "X", "Y", new Date(1), "new", true);
+                new UpdateTraineeRequest("u", "X", "Y", new Date(1), "new",
+                        true);
         TraineeProfileResponse response =
-                new TraineeProfileResponse("u", "X", "Y", new Date(1), "new", true, List.of());
+                new TraineeProfileResponse("u", "X", "Y", new Date(1), "new",
+                        true, List.of());
 
         when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(existing));
         when(traineeRepository.save(any())).thenReturn(existing);
@@ -194,7 +198,8 @@ class TraineeServiceTest {
     @Test
     void updateTrainee_notFound_throwsNotFound() {
         UpdateTraineeRequest request =
-                new UpdateTraineeRequest("missing", "X", "Y", new Date(1), "new", true);
+                new UpdateTraineeRequest("missing", "X", "Y", new Date(1), "new",
+                        true);
         when(traineeRepository.findByUsername("missing")).thenReturn(Optional.empty());
         assertThrows(
                 NotFoundException.class, () -> traineeService.updateTrainee("missing", request));
@@ -322,7 +327,8 @@ class TraineeServiceTest {
                         .specialization(TrainingType.Type.CARDIO)
                         .build();
         TrainerInfoResponse trainerInfo =
-                new TrainerInfoResponse("trainer1", "Trainer", "One", TrainingType.Type.CARDIO);
+                new TrainerInfoResponse("trainer1", "Trainer", "One",
+                        TrainingType.Type.CARDIO);
 
         when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
         when(trainerRepository.findNotAssignedToTrainee(15L)).thenReturn(List.of(trainer));
@@ -361,9 +367,11 @@ class TraineeServiceTest {
                                 new UpdateTraineeTrainersRequest.TrainerUsernameRequest("n2")));
 
         TrainerInfoResponse info1 =
-                new TrainerInfoResponse("n1", "First", "Name", TrainingType.Type.CARDIO);
+                new TrainerInfoResponse("n1", "First", "Name",
+                        TrainingType.Type.CARDIO);
         TrainerInfoResponse info2 =
-                new TrainerInfoResponse("n2", "Second", "Name", TrainingType.Type.STRENGTH);
+                new TrainerInfoResponse("n2", "Second", "Name",
+                        TrainingType.Type.STRENGTH);
 
         when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
         when(trainerRepository.findByUsername("n1")).thenReturn(Optional.of(new1));

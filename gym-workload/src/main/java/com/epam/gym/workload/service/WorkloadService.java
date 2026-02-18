@@ -1,5 +1,6 @@
 package com.epam.gym.workload.service;
 
+import com.epam.gym.workload.dto.ActionType;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.TrainingHoursDto;
 import com.epam.gym.workload.dto.WorkloadRequest;
@@ -11,6 +12,7 @@ import com.epam.gym.workload.repository.TrainerWorkloadRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,7 @@ public class WorkloadService {
     private final TrainerWorkloadRepository repository;
     private final WorkloadMapper mapper;
     private final List<WorkloadActionHandler> handlers;
-    private final Map<com.epam.gym.workload.dto.ActionType, WorkloadActionHandler> handlerMap =
-            new EnumMap<>(com.epam.gym.workload.dto.ActionType.class);
+    private final Map<ActionType, WorkloadActionHandler> handlerMap = new EnumMap<>(ActionType.class);
 
     @PostConstruct
     void initHandlers() {
@@ -78,7 +79,7 @@ public class WorkloadService {
                                             YearEntity.builder()
                                                     .yearNumber(yearNum)
                                                     .trainer(trainer)
-                                                    .months(new java.util.ArrayList<>())
+                                                    .months(new ArrayList<>())
                                                     .build();
                                     trainer.getYears().add(newYear);
                                     return newYear;
@@ -145,7 +146,7 @@ public class WorkloadService {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .isActive(request.isActive())
-                .years(new java.util.ArrayList<>())
+                .years(new ArrayList<>())
                 .build();
     }
 }

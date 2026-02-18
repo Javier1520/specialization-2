@@ -2,6 +2,7 @@ package com.epam.gym.workload.config;
 
 import com.epam.gym.workload.security.JwtAuthenticationFilter;
 import com.epam.gym.workload.security.JwtService;
+import com.epam.gym.workload.service.WorkloadService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,7 +21,7 @@ class SecurityConfigTest {
 
     @MockBean private JwtService jwtService;
 
-    @MockBean private com.epam.gym.workload.service.WorkloadService workloadService;
+    @MockBean private WorkloadService workloadService;
 
     // We only need to test that security is active.
     // Since we don't have actual controllers in this test context unless we define one or mock one,

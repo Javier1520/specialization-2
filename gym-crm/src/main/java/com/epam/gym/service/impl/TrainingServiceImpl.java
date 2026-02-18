@@ -16,7 +16,6 @@ import com.epam.gym.service.workload.WorkloadService;
 import com.epam.gym.util.LogUtils;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.time.ZoneId;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -66,15 +65,14 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     public void updateWorkloadFallback(AddTrainingRequest request, Throwable ex) {
-    logUtils.error(
-        log,
-        "Workload service unavailable. Training saved but workload update failed. " +
-        "Trainee={}, Trainer={}, Error={}",
-        request.traineeUsername(),
-        request.trainerUsername(),
-        ex.getMessage()
-    );
-}
+        logUtils.error(
+                log,
+                "Workload service unavailable. Training saved but workload update failed. "
+                        + "Trainee={}, Trainer={}, Error={}",
+                request.traineeUsername(),
+                request.trainerUsername(),
+                ex.getMessage());
+    }
 
     private void handleAddTraining(AddTrainingRequest request) {
         Trainee trainee =
@@ -103,17 +101,25 @@ public class TrainingServiceImpl implements TrainingService {
                 saved.getTrainee().getUsername(),
                 saved.getTrainer().getUsername());
 
-        WorkloadRequest trainingWorkloadRequest = WorkloadRequest.builder()
-                .username(trainer.getUsername())
-                .firstName(trainer.getFirstName())
-                .lastName(trainer.getLastName())
-                .isActive(trainer.getIsActive())
-                .trainingDate(saved.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .trainingDuration(saved.getDuration())
-                .actionType(ActionType.ADD)
-                .build();
+        WorkloadRequest trainingWorkloadRequest =
+                WorkloadRequest.builder()
+                        .username(trainer.getUsername())
+                        .firstName(trainer.getFirstName())
+                        .lastName(trainer.getLastName())
+                        .isActive(trainer.getIsActive())
+                        .trainingDate(
+                                saved.getDate()
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate())
+                        .trainingDuration(saved.getDuration())
+                        .actionType(ActionType.ADD)
+                        .build();
 
-        logUtils.info(log, "Calling workload service to update workload for trainer {}", trainingWorkloadRequest);
+        logUtils.info(
+                log,
+                "Calling workload service to update workload for trainer {}",
+                trainingWorkloadRequest);
         workloadService.updateWorkload(trainingWorkloadRequest);
     }
 
@@ -139,30 +145,44 @@ public class TrainingServiceImpl implements TrainingService {
 
         Trainer trainer = training.getTrainer();
         if (trainer == null) {
-            logUtils.info(log, "Training id={} has no assigned trainer, skipping workload update", training.getId());
+            logUtils.info(
+                    log,
+                    "Training id={} has no assigned trainer, skipping workload update",
+                    training.getId());
             trainingRepository.delete(training);
             return;
         }
 
         trainingRepository.delete(training);
-        logUtils.info(log, "Deleted training id={} trainee={} trainer={}",
+        logUtils.info(
+                log,
+                "Deleted training id={} trainee={} trainer={}",
                 training.getId(),
                 training.getTrainee().getUsername(),
                 trainer.getUsername());
 
-        WorkloadRequest trainingWorkloadRequest = WorkloadRequest.builder()
-                .username(trainer.getUsername())
-                .firstName(trainer.getFirstName())
-                .lastName(trainer.getLastName())
-                .isActive(trainer.getIsActive())
-                .trainingDate(training.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .trainingDuration(training.getDuration())
-                .actionType(ActionType.DELETE)
-                .build();
+        WorkloadRequest trainingWorkloadRequest =
+                WorkloadRequest.builder()
+                        .username(trainer.getUsername())
+                        .firstName(trainer.getFirstName())
+                        .lastName(trainer.getLastName())
+                        .isActive(trainer.getIsActive())
+                        .trainingDate(
+                                training.getDate()
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate())
+                        .trainingDuration(training.getDuration())
+                        .actionType(ActionType.DELETE)
+                        .build();
 
-        logUtils.info(log, "Calling workload service to update workload for trainer {}", trainingWorkloadRequest);
+        logUtils.info(
+                log,
+                "Calling workload service to update workload for trainer {}",
+                trainingWorkloadRequest);
         workloadService.updateWorkload(trainingWorkloadRequest);
     }
+
     private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {
         training.setSpecialization(trainer.getSpecialization());
         training.setTrainee(trainee);

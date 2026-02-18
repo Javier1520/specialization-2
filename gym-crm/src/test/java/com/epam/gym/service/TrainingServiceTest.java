@@ -45,7 +45,9 @@ class TrainingServiceTest {
     @BeforeEach
     void setUp() {
         Date trainingDate = new Date();
-        request = new AddTrainingRequest("trainee1", "trainer1", "S1", trainingDate, 30, ActionType.ADD);
+        request = new AddTrainingRequest(
+        "trainee1", "trainer1", "S1", trainingDate, 30,
+                        ActionType.ADD);
     }
 
     @Test
@@ -109,7 +111,9 @@ class TrainingServiceTest {
         // Arrange
         Date trainingDate = new Date();
         AddTrainingRequest deleteRequest =
-                new AddTrainingRequest("trainee1", "trainer1", "S1", trainingDate, 30, ActionType.DELETE);
+                new AddTrainingRequest(
+                        "trainee1", "trainer1", "S1", trainingDate,
+                        30, ActionType.DELETE);
 
         Trainee trainee = Trainee.builder().username("trainee1").id(11L).build();
         Trainer trainer =
@@ -140,7 +144,8 @@ class TrainingServiceTest {
 
         // Assert
         verify(trainingRepository)
-                .findByTraineeAndTrainerAndNameAndDate("trainee1", "trainer1", "S1", trainingDate);
+                .findByTraineeAndTrainerAndNameAndDate("trainee1", "trainer1",
+                        "S1", trainingDate);
         verify(trainingRepository).delete(training);
         verify(workloadService).updateWorkload(any());
     }
@@ -149,7 +154,9 @@ class TrainingServiceTest {
     void updateTraining_deleteAction_withoutTrainer_deletesAndSkipsWorkload() {
         Date trainingDate = new Date();
         AddTrainingRequest deleteRequest =
-                new AddTrainingRequest("trainee1", "trainer1", "S1", trainingDate, 30, ActionType.DELETE);
+                new AddTrainingRequest(
+                        "trainee1", "trainer1", "S1", trainingDate,
+                        30, ActionType.DELETE);
 
         Trainee trainee = Trainee.builder().username("trainee1").id(11L).build();
         Training training =
@@ -177,7 +184,9 @@ class TrainingServiceTest {
     void updateTraining_deleteAction_missingTraining_throwsNotFound() {
         Date trainingDate = new Date();
         AddTrainingRequest deleteRequest =
-                new AddTrainingRequest("trainee1", "trainer1", "S1", trainingDate, 30, ActionType.DELETE);
+                new AddTrainingRequest(
+                        "trainee1", "trainer1", "S1", trainingDate,
+                        30, ActionType.DELETE);
 
         when(trainingRepository.findByTraineeAndTrainerAndNameAndDate(
                         "trainee1", "trainer1", "S1", trainingDate))
@@ -190,8 +199,10 @@ class TrainingServiceTest {
     void updateTraining_unknownAction_throwsIllegalArgument() {
         Date trainingDate = new Date();
         AddTrainingRequest badRequest =
-                new AddTrainingRequest("trainee1", "trainer1", "S1", trainingDate, 30, null);
+                new AddTrainingRequest("trainee1", "trainer1", "S1",
+                        trainingDate, 30, null);
 
-        assertThrows(IllegalArgumentException.class, () -> trainingService.updateTraining(badRequest));
+        assertThrows(
+                IllegalArgumentException.class, () -> trainingService.updateTraining(badRequest));
     }
 }

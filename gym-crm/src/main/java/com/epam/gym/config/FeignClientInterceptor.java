@@ -2,6 +2,7 @@ package com.epam.gym.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -10,8 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class FeignClientInterceptor implements RequestInterceptor {
@@ -35,7 +34,7 @@ public class FeignClientInterceptor implements RequestInterceptor {
         // 1. Try to get from SecurityContext
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getCredentials() instanceof String) {
-             return (String) authentication.getCredentials();
+            return (String) authentication.getCredentials();
         }
 
         // 2. Fallback: Try to get from current HTTP request

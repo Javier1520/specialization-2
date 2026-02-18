@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkloadServiceTest {
@@ -63,7 +62,7 @@ class WorkloadServiceTest {
                         .actionType(null)
                         .build();
 
-        assertThrows(IllegalArgumentException.class, () -> workloadService.updateWorkload(badRequest));
+        assertThrows(
+                IllegalArgumentException.class, () -> workloadService.updateWorkload(badRequest));
     }
 }
-

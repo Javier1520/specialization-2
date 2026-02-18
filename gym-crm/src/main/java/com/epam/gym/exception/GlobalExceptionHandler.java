@@ -1,7 +1,6 @@
 package com.epam.gym.exception;
 
 import com.epam.gym.util.LogUtils;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;

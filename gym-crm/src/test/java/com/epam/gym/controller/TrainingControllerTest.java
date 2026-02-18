@@ -1,11 +1,11 @@
 package com.epam.gym.controller;
 
+import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.dto.workload.ActionType;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
-import com.epam.gym.client.WorkloadClient;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

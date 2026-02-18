@@ -4,7 +4,9 @@ import com.epam.gym.util.LogUtils;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -60,7 +62,7 @@ class GlobalExceptionHandlerTest {
     void handleConstraintViolation_returnsBadRequestWithErrors() {
         // Given
         ConstraintViolationException exception =
-                new ConstraintViolationException(java.util.Set.of(createMockConstraintViolation()));
+                new ConstraintViolationException(Set.of(createMockConstraintViolation()));
 
         // When
         ResponseEntity<Map<String, Object>> response =
@@ -93,7 +95,6 @@ class GlobalExceptionHandlerTest {
     void handleGenericException_withUnhandledException_returnsInternalServerError() {
         // Given - use an exception that has NO dedicated handler
         Exception exception = new IllegalStateException("Unexpected state");
-
 
         // When
         ResponseEntity<Map<String, String>> response =
@@ -168,7 +169,7 @@ class GlobalExceptionHandlerTest {
                     }
 
                     @Override
-                    public java.util.Iterator<Node> iterator() {
+                    public Iterator<Node> iterator() {
                         return Collections.emptyIterator();
                     }
                 };
