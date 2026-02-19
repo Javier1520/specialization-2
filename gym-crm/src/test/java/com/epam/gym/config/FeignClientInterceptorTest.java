@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -38,9 +39,10 @@ class FeignClientInterceptorTest {
     @Test
     void apply_shouldAddAuthorizationHeader_whenTokenInSecurityContext() {
         String token = "test.jwt.token";
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                "user", token, Collections.emptyList());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addHeader("Authorization", "Bearer " + token);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockRequest));
 
         interceptor.apply(template);
 

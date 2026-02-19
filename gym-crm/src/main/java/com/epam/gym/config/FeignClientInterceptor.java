@@ -31,13 +31,6 @@ public class FeignClientInterceptor implements RequestInterceptor {
     }
 
     private String getJwtToken() {
-        // 1. Try to get from SecurityContext
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getCredentials() instanceof String) {
-            return (String) authentication.getCredentials();
-        }
-
-        // 2. Fallback: Try to get from current HTTP request
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
             HttpServletRequest request = attributes.getRequest();

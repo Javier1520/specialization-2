@@ -91,12 +91,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authenticateUser(HttpServletRequest request, String username) {
-        // Since gym-workload might not have a full UserDetailsService,
-        // we can trust the token and create an authenticated token with default/extracted
-        // authorities.
-        // For simplicity, we assign a default role or extract roles from claims if available.
-        // Assuming implicit trust for valid tokens from gym-crm.
-
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(
                         username,
