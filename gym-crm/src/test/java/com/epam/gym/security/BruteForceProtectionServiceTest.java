@@ -117,7 +117,6 @@ class BruteForceProtectionServiceTest {
         bruteForceProtectionService.recordFailedAttempt(username);
         bruteForceProtectionService.recordFailedAttempt(username);
 
-        // Verify account is locked
         assertThrows(
                 AccountLockedException.class,
                 () -> bruteForceProtectionService.checkAccountLocked(username));

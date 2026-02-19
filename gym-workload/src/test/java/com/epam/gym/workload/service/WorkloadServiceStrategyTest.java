@@ -63,9 +63,6 @@ class WorkloadServiceStrategyTest {
                 TrainerEntity.builder().username("t1").years(List.of(yearEntity)).build();
         monthEntity.setYear(yearEntity);
 
-        // Need mutable list for months if our logic adds to it, but here we read
-        // The service logic calls resolveMonthEntity which might try to add to year's month list if not found
-        // Let's make the list mutable just in case
         yearEntity.setMonths(new ArrayList<>(List.of(monthEntity)));
         trainer.setYears(new ArrayList<>(List.of(yearEntity)));
 
@@ -126,8 +123,6 @@ class WorkloadServiceStrategyTest {
     @Test
     void addWorkload_createsNewTrainer() {
         when(repository.findByUsername("newTrainer")).thenReturn(Optional.empty());
-        // Mock save to return the argument or do nothing
-        // Implicitly verified by verify(repository).save(any())
 
         AddWorkloadRequest request =
                 new AddWorkloadRequest(

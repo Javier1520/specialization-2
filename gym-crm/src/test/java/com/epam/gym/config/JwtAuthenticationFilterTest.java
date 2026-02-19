@@ -56,7 +56,6 @@ class JwtAuthenticationFilterTest {
     void setUp() {
         SecurityContextHolder.clearContext();
 
-        // Set up writer for response
         stringWriter = new StringWriter();
         writer = new PrintWriter(stringWriter);
     }
@@ -244,7 +243,6 @@ class JwtAuthenticationFilterTest {
         // Given
         String token = "valid.jwt.token";
 
-        // Set existing authentication with proper password length
         UserDetails existingUser =
                 User.builder()
                         .username("existinguser")
@@ -263,7 +261,6 @@ class JwtAuthenticationFilterTest {
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         // Then
-        // Should keep existing authentication unchanged
         assertEquals(
                 "existinguser",
                 ((UserDetails)

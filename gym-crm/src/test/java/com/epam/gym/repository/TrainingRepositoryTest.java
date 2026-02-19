@@ -74,11 +74,9 @@ class TrainingRepositoryTest {
 
     @Test
     void complexCriteria_invocationExample() {
-        // Demonstrates that the method accepts parameters and the repository will be called
-        // correctly.
         TrainingRepository repo = mock(TrainingRepository.class);
 
-        Date from = new Date(0); // epoch
+        Date from = new Date(0);
         Date to = new Date();
         when(repo.findByTraineeUsernameWithOptionalFilters(
                         "userA", from, to, "trainerX", TrainingType.Type.HIIT))

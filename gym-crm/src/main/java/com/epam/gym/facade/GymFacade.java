@@ -78,7 +78,6 @@ public class GymFacade {
         return traineeService.updateTraineeTrainers(traineeUsername, request);
     }
 
-    // --- Trainer operations ---
     public RegistrationResponse createTrainer(TrainerRegistrationRequest request) {
         return trainerService.createTrainer(request);
     }
@@ -104,7 +103,6 @@ public class GymFacade {
         return trainerService.getTrainerTrainings(username, filter);
     }
 
-    // --- Training operations ---
     public void createTraining(AddTrainingRequest request) {
         trainingService.addTraining(request);
     }

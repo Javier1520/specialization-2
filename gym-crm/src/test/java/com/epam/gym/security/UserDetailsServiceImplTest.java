@@ -147,7 +147,6 @@ class UserDetailsServiceImplTest {
 
     @Test
     void loadUserByUsername_traineeTakesPrecedenceOverTrainer() {
-        // Given - Both trainee and trainer exist with same username (edge case)
         String sharedUsername = "shared.user";
         testTrainee.setUsername(sharedUsername);
         when(traineeRepository.findByUsername(sharedUsername)).thenReturn(Optional.of(testTrainee));
@@ -158,9 +157,8 @@ class UserDetailsServiceImplTest {
         // Then
         assertNotNull(userDetails);
         assertEquals(sharedUsername, userDetails.getUsername());
-        assertEquals("password123", userDetails.getPassword()); // Trainee's password
+        assertEquals("password123", userDetails.getPassword());
 
         verify(traineeRepository).findByUsername(sharedUsername);
-        // Trainer repository should not be called since trainee was found
     }
 }

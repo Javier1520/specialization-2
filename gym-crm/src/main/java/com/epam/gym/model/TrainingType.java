@@ -16,10 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-/**
- * Reference data entity for training types. This table contains a constant list of values and
- * should not be modified from the application.
- */
 @Entity
 @Table(name = "training_types")
 @Getter
@@ -46,10 +42,6 @@ public class TrainingType {
     @OneToMany(mappedBy = "specialization", fetch = FetchType.LAZY)
     private List<Training> trainings;
 
-    /**
-     * Enum representing the constant training type values. Use this in business logic for type-safe
-     * comparisons.
-     */
     public enum Type {
         CARDIO,
         STRENGTH,

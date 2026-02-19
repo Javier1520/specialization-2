@@ -19,8 +19,7 @@ class TransactionIdGeneratorTest {
 
         // Then
         assertNotNull(result);
-        // Verify it's a valid UUID format
-        UUID.fromString(result); // Will throw if invalid
+        UUID.fromString(result);
     }
 
     @Test
@@ -69,7 +68,6 @@ class TransactionIdGeneratorTest {
 
         // Then
         assertNotNull(result);
-        // UUID format: 8-4-4-4-12 hexadecimal digits
         assertTrue(
                 result.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
     }

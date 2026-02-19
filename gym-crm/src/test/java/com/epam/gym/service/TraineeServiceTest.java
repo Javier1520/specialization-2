@@ -226,12 +226,10 @@ class TraineeServiceTest {
     @Test
     void deleteByUsername_removesAssociationsAndDeletesAndCancelsFutureTrainings() {
         Trainee t = Trainee.builder().username("u").id(10L).trainers(new ArrayList<>()).build();
-        // create two trainers that reference the trainee
         Trainer trainer1 =
                 Trainer.builder().id(1L).username("tr1").trainees(new ArrayList<>()).build();
         Trainer trainer2 =
                 Trainer.builder().id(2L).username("tr2").trainees(new ArrayList<>()).build();
-        // set both to have trainee in their trainees list
         trainer1.getTrainees().add(t);
         trainer2.getTrainees().add(t);
         t.getTrainers().add(trainer1);
@@ -240,7 +238,6 @@ class TraineeServiceTest {
         when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
         when(trainerRepository.saveAll(anyIterable())).thenReturn(List.of(trainer1, trainer2));
 
-        // future training with trainer
         Date futureDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
         Training futureTraining =
                 Training.builder()
@@ -251,7 +248,6 @@ class TraineeServiceTest {
                         .trainee(t)
                         .build();
 
-        // past training should be ignored
         Date pastDate = new Date(System.currentTimeMillis() - 2 * 60 * 60 * 1000);
         Training pastTraining =
                 Training.builder()
@@ -267,7 +263,6 @@ class TraineeServiceTest {
 
         traineeService.deleteByUsername("u");
 
-        // verify trainers had trainee removed
         assertFalse(trainer1.getTrainees().contains(t));
         assertFalse(trainer2.getTrainees().contains(t));
         verify(trainerRepository).saveAll(argThat(list -> ((List<?>) list).size() == 2));
@@ -351,12 +346,9 @@ class TraineeServiceTest {
     @Test
     void updateTraineeTrainers_success_synchronizesAssociations() {
         Trainee t = Trainee.builder().username("u").id(20L).trainers(new ArrayList<>()).build();
-        // existing trainer
         Trainer old = Trainer.builder().id(1L).username("old").trainees(new ArrayList<>()).build();
-        old.getTrainees().add(t); // old has trainee
+        old.getTrainees().add(t);
         t.getTrainers().add(old);
-
-        // new trainers returned by repo
         Trainer new1 = Trainer.builder().id(2L).username("n1").trainees(new ArrayList<>()).build();
         Trainer new2 = Trainer.builder().id(3L).username("n2").trainees(new ArrayList<>()).build();
 
@@ -382,9 +374,7 @@ class TraineeServiceTest {
 
         List<TrainerInfoResponse> result = traineeService.updateTraineeTrainers("u", request);
 
-        // old trainer should no longer reference trainee
         assertFalse(old.getTrainees().contains(t));
-        // new trainers should reference trainee
         assertTrue(new1.getTrainees().contains(t));
         assertTrue(new2.getTrainees().contains(t));
         assertEquals(2, result.size());
@@ -405,7 +395,6 @@ class TraineeServiceTest {
         when(traineeRepository.findByUsername("u")).thenReturn(Optional.of(t));
         when(trainerRepository.findByUsername("n1")).thenReturn(Optional.of(new1));
         when(trainerRepository.findByUsername("n2")).thenReturn(Optional.of(new1));
-        // repo returns only one but requested two ids -> mismatch
         when(trainerRepository.findAllById(List.of(2L, 2L))).thenReturn(List.of(new1));
 
         assertThrows(

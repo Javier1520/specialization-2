@@ -25,7 +25,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Try to find as Trainee first
         return traineeRepository
                 .findByUsername(username)
                 .map(this::createUserDetails)

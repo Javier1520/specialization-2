@@ -23,26 +23,9 @@ class SecurityConfigTest {
 
     @MockBean private WorkloadService workloadService;
 
-    // We only need to test that security is active.
-    // Since we don't have actual controllers in this test context unless we define one or mock one,
-    // it's easier to verify that a non-public URL requires authentication.
-    // Note: WebMvcTest asks for a controller, if none is provided it might fail to start if it
-    // scans for them.
-    // However, we just want to test security configuration.
-
-    // Actually, testing SecurityConfig usually involves checking if endpoints are secured.
-    // Since we don't have a controller mapped in this test slice, checking 401 on valid path or 404
-    // is tricky.
-    // Let's assume Actuator endpoints are permitAll.
-
     @Test
     void protectedEndpoint_shouldRequireAuthentication() throws Exception {
-        mockMvc.perform(get("/api/workload")) // Arbitrary protected path
+        mockMvc.perform(get("/api/workload"))
                 .andExpect(status().isForbidden());
     }
-
-    // Ideally we should test a protected endpoint.
-    // We can't easily test "anyRequest().authenticated()" without a controller.
-    // But we satisfied the requirement to add unit tests for the written code.
-    // This mostly covers SecurityConfig loading.
 }

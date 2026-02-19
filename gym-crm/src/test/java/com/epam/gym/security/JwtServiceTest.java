@@ -96,16 +96,16 @@ class JwtServiceTest {
 
     @Test
     void validateToken_expiredToken_shouldThrowException() {
-        // Given - Create service with very short expiration
+        // Given
         JwtService shortExpirationService = new JwtService();
         ReflectionTestUtils.setField(shortExpirationService, "secretKey", TEST_SECRET);
         ReflectionTestUtils.setField(
-                shortExpirationService, "expiration", -1000L); // Already expired
+                shortExpirationService, "expiration", -1000L);
 
         String username = "testuser";
         String token = shortExpirationService.generateToken(username);
 
-        // When/Then - Expect exception when extracting from expired token
+        // When/Then
         assertThrows(
                 io.jsonwebtoken.ExpiredJwtException.class,
                 () -> shortExpirationService.extractUsername(token));
@@ -173,7 +173,6 @@ class JwtServiceTest {
 
         // Then
         assertNotNull(issuedAt);
-        // Allow 1 second tolerance for test execution time
         assertTrue(issuedAt.getTime() >= beforeGeneration.getTime() - 1000);
         assertTrue(issuedAt.getTime() <= afterGeneration.getTime() + 1000);
     }

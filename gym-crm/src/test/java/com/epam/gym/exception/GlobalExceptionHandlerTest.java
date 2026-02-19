@@ -93,7 +93,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleGenericException_withUnhandledException_returnsInternalServerError() {
-        // Given - use an exception that has NO dedicated handler
+        // Given
         Exception exception = new IllegalStateException("Unexpected state");
 
         // When

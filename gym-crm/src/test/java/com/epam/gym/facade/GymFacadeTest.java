@@ -146,8 +146,8 @@ class GymFacadeTest {
 
     @Test
     void getTraineeTrainings_delegatesAndReturnsList() {
-        Date from = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000)); // 1 day ago
-        Date to = new Date(); // current date
+        Date from = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000));
+        Date to = new Date();
 
         TrainingFilterRequest filter =
                 new TrainingFilterRequest(from, to, "r", TrainingType.Type.CARDIO);
@@ -291,7 +291,6 @@ class GymFacadeTest {
 
     @Test
     void noUnexpectedInteractions() {
-        // quick smoke: call a method and ensure no other service is touched
         when(trainingTypeService.listAll()).thenReturn(Collections.emptyList());
         facade.listTrainingTypes();
         verify(trainingTypeService).listAll();
