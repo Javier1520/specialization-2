@@ -118,9 +118,9 @@ class GlobalExceptionHandlerTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Requested resource not found", response.getBody().get("errors"));
+        assertEquals("An unexpected error occurred", response.getBody().get("errors"));
     }
 
     private ConstraintViolation<?> createMockConstraintViolation() {

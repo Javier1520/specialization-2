@@ -66,10 +66,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Map<String, String>> handleNullPointerException(NullPointerException ex) {
         logUtils.error(log, "Null pointer exception: {}", ex.getMessage());
-        return buildErrorResponse("Requested resource not found", HttpStatus.NOT_FOUND);
+        return buildErrorResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
