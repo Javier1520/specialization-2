@@ -5,6 +5,7 @@ import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.dto.workload.TrainerWorkloadDto;
 import com.epam.gym.dto.workload.TrainingHoursDto;
 import com.epam.gym.openapi.annotation.operation.CreateOperation;
+import com.epam.gym.openapi.annotation.operation.DeleteOperation;
 import com.epam.gym.openapi.annotation.operation.GetAllOperation;
 import com.epam.gym.service.TrainingService;
 import com.epam.gym.util.LogUtils;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,19 +40,32 @@ public class TrainingController {
         this.workloadClient = workloadClient;
     }
 
-    @CreateOperation(summary = "Update Training", description = "Apply an action for a Training in Gym CRM")
+    @CreateOperation(summary = "Add Training", description = "Create a new Training in Gym CRM")
     @PostMapping
-    public ResponseEntity<Void> updateTraining(@Valid @RequestBody AddTrainingRequest request) {
+    public ResponseEntity<Void> addTraining(@Valid @RequestBody AddTrainingRequest request) {
         logUtils.info(
                 log,
-                "Update training request: traineeUsername={}, trainerUsername={}, trainingName={}, actionType={}",
+                "Add training request: traineeUsername={}, trainerUsername={}, trainingName={}",
                 request.traineeUsername(),
                 request.trainerUsername(),
-                request.trainingName(),
-                request.actionType());
+                request.trainingName());
 
-        trainingService.updateTraining(request);
+        trainingService.addTraining(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteOperation(summary = "Delete Training", description = "Delete a Training from Gym CRM")
+    @DeleteMapping
+    public ResponseEntity<Void> deleteTraining(@Valid @RequestBody AddTrainingRequest request) {
+        logUtils.info(
+                log,
+                "Delete training request: traineeUsername={}, trainerUsername={}, trainingName={}",
+                request.traineeUsername(),
+                request.trainerUsername(),
+                request.trainingName());
+
+        trainingService.deleteTraining(request);
+        return ResponseEntity.ok().build();
     }
 
     @GetAllOperation(

@@ -51,7 +51,7 @@ class TrainingServiceTest {
     }
 
     @Test
-    void updateTraining_addAction_bindsEntitiesAndSavesAndUpdatesWorkload() {
+    void addTraining_bindsEntitiesAndSavesAndUpdatesWorkload() {
         // Arrange
         Trainee persistedT = Trainee.builder().username("trainee1").id(11L).build();
         Trainer persistedTr =
@@ -81,33 +81,33 @@ class TrainingServiceTest {
                         });
 
         // Act
-        trainingService.updateTraining(request);
+        trainingService.addTraining(request);
 
         // Assert
         verify(traineeRepository).findByUsername("trainee1");
         verify(trainerRepository).findByUsername("trainer1");
         verify(trainingMapper).toEntity(request);
         verify(trainingRepository).save(any(Training.class));
-        verify(workloadService).updateWorkload(any());
+        verify(workloadService).addWorkload(any());
     }
 
     @Test
-    void updateTraining_addAction_missingTrainee_throwsNotFound() {
+    void addTraining_missingTrainee_throwsNotFound() {
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> trainingService.updateTraining(request));
+        assertThrows(NotFoundException.class, () -> trainingService.addTraining(request));
     }
 
     @Test
-    void updateTraining_addAction_trainerUsernameProvidedButNotFound_throwsNotFound() {
+    void addTraining_trainerNotFound_throwsNotFound() {
         Trainee persistedT = Trainee.builder().username("trainee1").id(11L).build();
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.of(persistedT));
         when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> trainingService.updateTraining(request));
+        assertThrows(NotFoundException.class, () -> trainingService.addTraining(request));
     }
 
     @Test
-    void updateTraining_deleteAction_withTrainer_deletesAndUpdatesWorkload() {
+    void deleteTraining_withTrainer_deletesAndUpdatesWorkload() {
         // Arrange
         Date trainingDate = new Date();
         AddTrainingRequest deleteRequest =
@@ -140,18 +140,18 @@ class TrainingServiceTest {
                 .thenReturn(Optional.of(training));
 
         // Act
-        trainingService.updateTraining(deleteRequest);
+        trainingService.deleteTraining(deleteRequest);
 
         // Assert
         verify(trainingRepository)
                 .findByTraineeAndTrainerAndNameAndDate("trainee1", "trainer1",
                         "S1", trainingDate);
         verify(trainingRepository).delete(training);
-        verify(workloadService).updateWorkload(any());
+        verify(workloadService).deleteWorkload(any());
     }
 
     @Test
-    void updateTraining_deleteAction_withoutTrainer_deletesAndSkipsWorkload() {
+    void deleteTraining_withoutTrainer_deletesAndSkipsWorkload() {
         Date trainingDate = new Date();
         AddTrainingRequest deleteRequest =
                 new AddTrainingRequest(
@@ -173,15 +173,15 @@ class TrainingServiceTest {
                         "trainee1", "trainer1", "S1", trainingDate))
                 .thenReturn(Optional.of(training));
 
-        trainingService.updateTraining(deleteRequest);
+        trainingService.deleteTraining(deleteRequest);
 
         verify(trainingRepository).delete(training);
         // no workload update when trainer is null
-        verify(workloadService, org.mockito.Mockito.never()).updateWorkload(any());
+        verify(workloadService, org.mockito.Mockito.never()).deleteWorkload(any());
     }
 
     @Test
-    void updateTraining_deleteAction_missingTraining_throwsNotFound() {
+    void deleteTraining_missingTraining_throwsNotFound() {
         Date trainingDate = new Date();
         AddTrainingRequest deleteRequest =
                 new AddTrainingRequest(
@@ -192,17 +192,6 @@ class TrainingServiceTest {
                         "trainee1", "trainer1", "S1", trainingDate))
                 .thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> trainingService.updateTraining(deleteRequest));
-    }
-
-    @Test
-    void updateTraining_unknownAction_throwsIllegalArgument() {
-        Date trainingDate = new Date();
-        AddTrainingRequest badRequest =
-                new AddTrainingRequest("trainee1", "trainer1", "S1",
-                        trainingDate, 30, null);
-
-        assertThrows(
-                IllegalArgumentException.class, () -> trainingService.updateTraining(badRequest));
+        assertThrows(NotFoundException.class, () -> trainingService.deleteTraining(deleteRequest));
     }
 }

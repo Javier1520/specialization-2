@@ -47,34 +47,12 @@ public class TrainingServiceImpl implements TrainingService {
         this.workloadService = workloadService;
     }
 
+    @Override
     @Transactional
-    //@TimeLimiter(name = "workloadService")
-    @CircuitBreaker(name = "workloadService", fallbackMethod = "updateWorkloadFallback")
-    public void updateTraining(AddTrainingRequest request) {
-        logUtils.info(log, "Update training request: {}", request);
+    @CircuitBreaker(name = "workloadService", fallbackMethod = "addTrainingFallback")
+    public void addTraining(AddTrainingRequest request) {
+        logUtils.info(log, "Add training request: {}", request);
 
-        ActionType actionType = request.actionType();
-
-        if (actionType == ActionType.ADD) {
-            handleAddTraining(request);
-        } else if (actionType == ActionType.DELETE) {
-            handleDeleteTraining(request);
-        } else {
-            throw new IllegalArgumentException("Unsupported action type: " + actionType);
-        }
-    }
-
-    public void updateWorkloadFallback(AddTrainingRequest request, Throwable ex) {
-        logUtils.error(
-                log,
-                "Workload service unavailable. Training saved but workload update failed. "
-                        + "Trainee={}, Trainer={}, Error={}",
-                request.traineeUsername(),
-                request.trainerUsername(),
-                ex.getMessage());
-    }
-
-    private void handleAddTraining(AddTrainingRequest request) {
         Trainee trainee =
                 traineeRepository
                         .findByUsername(request.traineeUsername())
@@ -118,12 +96,17 @@ public class TrainingServiceImpl implements TrainingService {
 
         logUtils.info(
                 log,
-                "Calling workload service to update workload for trainer {}",
+                "Calling workload service to add workload for trainer {}",
                 trainingWorkloadRequest);
-        workloadService.updateWorkload(trainingWorkloadRequest);
+        workloadService.addWorkload(trainingWorkloadRequest);
     }
 
-    private void handleDeleteTraining(AddTrainingRequest request) {
+    @Override
+    @Transactional
+    @CircuitBreaker(name = "workloadService", fallbackMethod = "deleteTrainingFallback")
+    public void deleteTraining(AddTrainingRequest request) {
+        logUtils.info(log, "Delete training request: {}", request);
+
         Training training =
                 trainingRepository
                         .findByTraineeAndTrainerAndNameAndDate(
@@ -178,9 +161,29 @@ public class TrainingServiceImpl implements TrainingService {
 
         logUtils.info(
                 log,
-                "Calling workload service to update workload for trainer {}",
+                "Calling workload service to delete workload for trainer {}",
                 trainingWorkloadRequest);
-        workloadService.updateWorkload(trainingWorkloadRequest);
+        workloadService.deleteWorkload(trainingWorkloadRequest);
+    }
+
+    public void addTrainingFallback(AddTrainingRequest request, Throwable ex) {
+        logUtils.error(
+                log,
+                "Workload service unavailable. Training saved but workload update failed. "
+                        + "Trainee={}, Trainer={}, Error={}",
+                request.traineeUsername(),
+                request.trainerUsername(),
+                ex.getMessage());
+    }
+
+    public void deleteTrainingFallback(AddTrainingRequest request, Throwable ex) {
+        logUtils.error(
+                log,
+                "Workload service unavailable. Training deleted but workload update failed. "
+                        + "Trainee={}, Trainer={}, Error={}",
+                request.traineeUsername(),
+                request.trainerUsername(),
+                ex.getMessage());
     }
 
     private void setAdditionalInfo(Training training, Trainer trainer, Trainee trainee) {

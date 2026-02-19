@@ -264,11 +264,11 @@ class GymFacadeTest {
 
     @Test
     void createTraining_delegatesAndReturns() {
-        doNothing().when(trainingService).updateTraining(addTrainingRequest);
+        doNothing().when(trainingService).addTraining(addTrainingRequest);
 
         facade.createTraining(addTrainingRequest);
 
-        verify(trainingService).updateTraining(addTrainingRequest);
+        verify(trainingService).addTraining(addTrainingRequest);
     }
 
     @Test

@@ -4,5 +4,7 @@ import com.epam.gym.dto.request.AddTrainingRequest;
 
 public interface TrainingService {
 
-    void updateTraining(AddTrainingRequest request);
+    void addTraining(AddTrainingRequest request);
+
+    void deleteTraining(AddTrainingRequest request);
 }

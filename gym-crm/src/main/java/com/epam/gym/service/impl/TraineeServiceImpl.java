@@ -281,7 +281,7 @@ public class TraineeServiceImpl implements TraineeService {
                             .actionType(ActionType.DELETE)
                             .build();
 
-                    workloadService.updateWorkload(workloadRequest);
+                    workloadService.deleteWorkload(workloadRequest);
                 });
     }
 

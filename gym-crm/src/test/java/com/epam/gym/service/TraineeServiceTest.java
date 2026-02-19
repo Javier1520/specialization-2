@@ -273,7 +273,7 @@ class TraineeServiceTest {
         verify(trainerRepository).saveAll(argThat(list -> ((List<?>) list).size() == 2));
         verify(traineeRepository).deleteByUsername("u");
         verify(workloadService)
-                .updateWorkload(
+                .deleteWorkload(
                         argThat(
                                 (WorkloadRequest req) ->
                                         req.actionType() == ActionType.DELETE

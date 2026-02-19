@@ -34,12 +34,13 @@ class TrainingControllerTest {
 
     @InjectMocks private TrainingController trainingController;
 
-    private AddTrainingRequest request;
+    private AddTrainingRequest addRequest;
+    private AddTrainingRequest deleteRequest;
 
     @BeforeEach
     void setUp() {
         Date trainingDate = new Date();
-        request =
+        addRequest =
                 new AddTrainingRequest(
                         "trainee1",
                         "trainer1",
@@ -47,51 +48,89 @@ class TrainingControllerTest {
                         trainingDate,
                         60,
                         ActionType.ADD);
+        deleteRequest =
+                new AddTrainingRequest(
+                        "trainee1",
+                        "trainer1",
+                        "Morning Run",
+                        trainingDate,
+                        60,
+                        ActionType.DELETE);
     }
 
     @Test
-    void updateTraining_success_returnsCreated() {
+    void addTraining_success_returnsCreated() {
         // Given
-        doNothing().when(trainingService).updateTraining(any(AddTrainingRequest.class));
+        doNothing().when(trainingService).addTraining(any(AddTrainingRequest.class));
 
         // When
-        ResponseEntity<Void> response = trainingController.updateTraining(request);
+        ResponseEntity<Void> response = trainingController.addTraining(addRequest);
 
         // Then
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        verify(trainingService).updateTraining(any(AddTrainingRequest.class));
+        verify(trainingService).addTraining(any(AddTrainingRequest.class));
     }
 
     @Test
-    void updateTraining_traineeNotFound_throwsException() {
+    void addTraining_traineeNotFound_throwsException() {
         // Given
         doThrow(new NotFoundException("Trainee not found: trainee1"))
                 .when(trainingService)
-                .updateTraining(any(AddTrainingRequest.class));
+                .addTraining(any(AddTrainingRequest.class));
 
         // When & Then
         try {
-            trainingController.updateTraining(request);
+            trainingController.addTraining(addRequest);
         } catch (NotFoundException e) {
             assertEquals("Trainee not found: trainee1", e.getMessage());
         }
-        verify(trainingService).updateTraining(any(AddTrainingRequest.class));
+        verify(trainingService).addTraining(any(AddTrainingRequest.class));
     }
 
     @Test
-    void updateTraining_trainerNotFound_throwsException() {
+    void addTraining_trainerNotFound_throwsException() {
         // Given
         doThrow(new NotFoundException("Trainer not found: trainer1"))
                 .when(trainingService)
-                .updateTraining(any(AddTrainingRequest.class));
+                .addTraining(any(AddTrainingRequest.class));
 
         // When & Then
         try {
-            trainingController.updateTraining(request);
+            trainingController.addTraining(addRequest);
         } catch (NotFoundException e) {
             assertEquals("Trainer not found: trainer1", e.getMessage());
         }
-        verify(trainingService).updateTraining(any(AddTrainingRequest.class));
+        verify(trainingService).addTraining(any(AddTrainingRequest.class));
+    }
+
+    @Test
+    void deleteTraining_success_returnsOk() {
+        // Given
+        doNothing().when(trainingService).deleteTraining(any(AddTrainingRequest.class));
+
+        // When
+        ResponseEntity<Void> response = trainingController.deleteTraining(deleteRequest);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(trainingService).deleteTraining(any(AddTrainingRequest.class));
+    }
+
+    @Test
+    void deleteTraining_notFound_throwsException() {
+        // Given
+        doThrow(new NotFoundException("Training not found for trainee=trainee1, trainer=trainer1"))
+                .when(trainingService)
+                .deleteTraining(any(AddTrainingRequest.class));
+
+        // When & Then
+        try {
+            trainingController.deleteTraining(deleteRequest);
+        } catch (NotFoundException e) {
+            assertEquals("Training not found for trainee=trainee1, trainer=trainer1", e.getMessage());
+        }
+        verify(trainingService).deleteTraining(any(AddTrainingRequest.class));
     }
 }

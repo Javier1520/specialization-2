@@ -7,6 +7,7 @@ import com.epam.gym.workload.service.WorkloadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +24,14 @@ public class WorkloadController {
     private final WorkloadService workloadService;
 
     @PostMapping
-    public ResponseEntity<Void> updateWorkload(@Valid @RequestBody WorkloadRequest request) {
-        workloadService.updateWorkload(request);
+    public ResponseEntity<Void> addWorkload(@Valid @RequestBody WorkloadRequest request) {
+        workloadService.addWorkload(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteWorkload(@Valid @RequestBody WorkloadRequest request) {
+        workloadService.deleteWorkload(request);
         return ResponseEntity.ok().build();
     }
 

@@ -1,6 +1,5 @@
 package com.epam.gym.workload.service;
 
-import com.epam.gym.workload.dto.ActionType;
 import com.epam.gym.workload.entity.MonthEntity;
 import org.junit.jupiter.api.Test;
 
@@ -9,11 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DeleteWorkloadActionHandlerTest {
 
     private final DeleteWorkloadActionHandler handler = new DeleteWorkloadActionHandler();
-
-    @Test
-    void getSupportedAction_returnsDelete() {
-        assertEquals(ActionType.DELETE, handler.getSupportedAction());
-    }
 
     @Test
     void handle_subtractsDuration() {

@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,15 +42,32 @@ class WorkloadControllerTest {
 
     @Test
     @WithMockUser
-    void updateWorkload_success() throws Exception {
+    void addWorkload_success() throws Exception {
         WorkloadRequest request =
                 new WorkloadRequest(
                         "trainer1", "John", "Doe", true, LocalDate.now(), 60, ActionType.ADD);
 
-        doNothing().when(workloadService).updateWorkload(any(WorkloadRequest.class));
+        doNothing().when(workloadService).addWorkload(any(WorkloadRequest.class));
 
         mockMvc.perform(
                         post("/api/workload")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                                .with(csrf()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void deleteWorkload_success() throws Exception {
+        WorkloadRequest request =
+                new WorkloadRequest(
+                        "trainer1", "John", "Doe", true, LocalDate.now(), 60, ActionType.DELETE);
+
+        doNothing().when(workloadService).deleteWorkload(any(WorkloadRequest.class));
+
+        mockMvc.perform(
+                        delete("/api/workload")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                                 .with(csrf()))
