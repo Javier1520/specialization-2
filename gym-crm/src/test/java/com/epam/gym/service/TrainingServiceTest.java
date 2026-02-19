@@ -1,7 +1,10 @@
 package com.epam.gym.service;
 
 import com.epam.gym.dto.request.AddTrainingRequest;
+import com.epam.gym.dto.request.DeleteTrainingRequest;
 import com.epam.gym.dto.workload.ActionType;
+import com.epam.gym.dto.workload.AddWorkloadRequest;
+import com.epam.gym.dto.workload.DeleteWorkloadRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainee;
@@ -40,12 +43,12 @@ class TrainingServiceTest {
 
     @InjectMocks TrainingServiceImpl trainingService;
 
-    private AddTrainingRequest request;
+    private AddTrainingRequest addRequest;
 
     @BeforeEach
     void setUp() {
         Date trainingDate = new Date();
-        request = new AddTrainingRequest(
+        addRequest = new AddTrainingRequest(
         "trainee1", "trainer1", "S1", trainingDate, 30,
                         ActionType.ADD);
     }
@@ -61,11 +64,11 @@ class TrainingServiceTest {
                         .specialization(TrainingType.Type.HIIT)
                         .build();
         Training mappedTraining =
-                Training.builder().name("S1").date(request.trainingDate()).duration(30).build();
+                Training.builder().name("S1").date(addRequest.trainingDate()).duration(30).build();
 
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.of(persistedT));
         when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.of(persistedTr));
-        when(trainingMapper.toEntity(request)).thenReturn(mappedTraining);
+        when(trainingMapper.toEntity(addRequest)).thenReturn(mappedTraining);
         when(trainingRepository.save(any(Training.class)))
                 .thenAnswer(
                         invocation -> {
@@ -81,20 +84,20 @@ class TrainingServiceTest {
                         });
 
         // Act
-        trainingService.addTraining(request);
+        trainingService.addTraining(addRequest);
 
         // Assert
         verify(traineeRepository).findByUsername("trainee1");
         verify(trainerRepository).findByUsername("trainer1");
-        verify(trainingMapper).toEntity(request);
+        verify(trainingMapper).toEntity(addRequest);
         verify(trainingRepository).save(any(Training.class));
-        verify(workloadService).addWorkload(any());
+        verify(workloadService).addWorkload(any(AddWorkloadRequest.class));
     }
 
     @Test
     void addTraining_missingTrainee_throwsNotFound() {
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> trainingService.addTraining(request));
+        assertThrows(NotFoundException.class, () -> trainingService.addTraining(addRequest));
     }
 
     @Test
@@ -103,15 +106,15 @@ class TrainingServiceTest {
         when(traineeRepository.findByUsername("trainee1")).thenReturn(Optional.of(persistedT));
         when(trainerRepository.findByUsername("trainer1")).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> trainingService.addTraining(request));
+        assertThrows(NotFoundException.class, () -> trainingService.addTraining(addRequest));
     }
 
     @Test
     void deleteTraining_withTrainer_deletesAndUpdatesWorkload() {
         // Arrange
         Date trainingDate = new Date();
-        AddTrainingRequest deleteRequest =
-                new AddTrainingRequest(
+        DeleteTrainingRequest deleteRequest =
+                new DeleteTrainingRequest(
                         "trainee1", "trainer1", "S1", trainingDate,
                         30, ActionType.DELETE);
 
@@ -147,14 +150,14 @@ class TrainingServiceTest {
                 .findByTraineeAndTrainerAndNameAndDate("trainee1", "trainer1",
                         "S1", trainingDate);
         verify(trainingRepository).delete(training);
-        verify(workloadService).deleteWorkload(any());
+        verify(workloadService).deleteWorkload(any(DeleteWorkloadRequest.class));
     }
 
     @Test
     void deleteTraining_withoutTrainer_deletesAndSkipsWorkload() {
         Date trainingDate = new Date();
-        AddTrainingRequest deleteRequest =
-                new AddTrainingRequest(
+        DeleteTrainingRequest deleteRequest =
+                new DeleteTrainingRequest(
                         "trainee1", "trainer1", "S1", trainingDate,
                         30, ActionType.DELETE);
 
@@ -177,14 +180,14 @@ class TrainingServiceTest {
 
         verify(trainingRepository).delete(training);
         // no workload update when trainer is null
-        verify(workloadService, org.mockito.Mockito.never()).deleteWorkload(any());
+        verify(workloadService, org.mockito.Mockito.never()).deleteWorkload(any(DeleteWorkloadRequest.class));
     }
 
     @Test
     void deleteTraining_missingTraining_throwsNotFound() {
         Date trainingDate = new Date();
-        AddTrainingRequest deleteRequest =
-                new AddTrainingRequest(
+        DeleteTrainingRequest deleteRequest =
+                new DeleteTrainingRequest(
                         "trainee1", "trainer1", "S1", trainingDate,
                         30, ActionType.DELETE);
 

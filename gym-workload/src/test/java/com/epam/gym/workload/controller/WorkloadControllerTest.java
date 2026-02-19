@@ -1,9 +1,10 @@
 package com.epam.gym.workload.controller;
 
 import com.epam.gym.workload.dto.ActionType;
+import com.epam.gym.workload.dto.AddWorkloadRequest;
+import com.epam.gym.workload.dto.DeleteWorkloadRequest;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.TrainingHoursDto;
-import com.epam.gym.workload.dto.WorkloadRequest;
 import com.epam.gym.workload.security.JwtService;
 import com.epam.gym.workload.service.WorkloadService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,11 +44,11 @@ class WorkloadControllerTest {
     @Test
     @WithMockUser
     void addWorkload_success() throws Exception {
-        WorkloadRequest request =
-                new WorkloadRequest(
+        AddWorkloadRequest request =
+                new AddWorkloadRequest(
                         "trainer1", "John", "Doe", true, LocalDate.now(), 60, ActionType.ADD);
 
-        doNothing().when(workloadService).addWorkload(any(WorkloadRequest.class));
+        doNothing().when(workloadService).addWorkload(any(AddWorkloadRequest.class));
 
         mockMvc.perform(
                         post("/api/workload")
@@ -60,11 +61,11 @@ class WorkloadControllerTest {
     @Test
     @WithMockUser
     void deleteWorkload_success() throws Exception {
-        WorkloadRequest request =
-                new WorkloadRequest(
+        DeleteWorkloadRequest request =
+                new DeleteWorkloadRequest(
                         "trainer1", "John", "Doe", true, LocalDate.now(), 60, ActionType.DELETE);
 
-        doNothing().when(workloadService).deleteWorkload(any(WorkloadRequest.class));
+        doNothing().when(workloadService).deleteWorkload(any(DeleteWorkloadRequest.class));
 
         mockMvc.perform(
                         delete("/api/workload")

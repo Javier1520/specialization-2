@@ -2,7 +2,8 @@ package com.epam.gym.service.workload;
 
 import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.workload.ActionType;
-import com.epam.gym.dto.workload.WorkloadRequest;
+import com.epam.gym.dto.workload.AddWorkloadRequest;
+import com.epam.gym.dto.workload.DeleteWorkloadRequest;
 import com.epam.gym.util.LogUtils;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,8 @@ class WorkloadServiceTest {
 
     @Test
     void addWorkload_delegatesToClient() {
-        WorkloadRequest request =
-                WorkloadRequest.builder()
+        AddWorkloadRequest request =
+                AddWorkloadRequest.builder()
                         .username("trainer1")
                         .firstName("T")
                         .lastName("R")
@@ -38,13 +39,13 @@ class WorkloadServiceTest {
 
         workloadService.addWorkload(request);
 
-        verify(workloadClient).addWorkload(any(WorkloadRequest.class));
+        verify(workloadClient).addWorkload(any(AddWorkloadRequest.class));
     }
 
     @Test
     void deleteWorkload_delegatesToClient() {
-        WorkloadRequest request =
-                WorkloadRequest.builder()
+        DeleteWorkloadRequest request =
+                DeleteWorkloadRequest.builder()
                         .username("trainer1")
                         .firstName("T")
                         .lastName("R")
@@ -56,6 +57,6 @@ class WorkloadServiceTest {
 
         workloadService.deleteWorkload(request);
 
-        verify(workloadClient).deleteWorkload(any(WorkloadRequest.class));
+        verify(workloadClient).deleteWorkload(any(DeleteWorkloadRequest.class));
     }
 }

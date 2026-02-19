@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record WorkloadRequest(
+public record DeleteWorkloadRequest(
         String username,
         String firstName,
         String lastName,

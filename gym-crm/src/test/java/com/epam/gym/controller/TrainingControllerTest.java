@@ -2,6 +2,7 @@ package com.epam.gym.controller;
 
 import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.request.AddTrainingRequest;
+import com.epam.gym.dto.request.DeleteTrainingRequest;
 import com.epam.gym.dto.workload.ActionType;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.service.TrainingService;
@@ -35,7 +36,7 @@ class TrainingControllerTest {
     @InjectMocks private TrainingController trainingController;
 
     private AddTrainingRequest addRequest;
-    private AddTrainingRequest deleteRequest;
+    private DeleteTrainingRequest deleteRequest;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +50,7 @@ class TrainingControllerTest {
                         60,
                         ActionType.ADD);
         deleteRequest =
-                new AddTrainingRequest(
+                new DeleteTrainingRequest(
                         "trainee1",
                         "trainer1",
                         "Morning Run",
@@ -107,7 +108,7 @@ class TrainingControllerTest {
     @Test
     void deleteTraining_success_returnsOk() {
         // Given
-        doNothing().when(trainingService).deleteTraining(any(AddTrainingRequest.class));
+        doNothing().when(trainingService).deleteTraining(any(DeleteTrainingRequest.class));
 
         // When
         ResponseEntity<Void> response = trainingController.deleteTraining(deleteRequest);
@@ -115,7 +116,7 @@ class TrainingControllerTest {
         // Then
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(trainingService).deleteTraining(any(AddTrainingRequest.class));
+        verify(trainingService).deleteTraining(any(DeleteTrainingRequest.class));
     }
 
     @Test
@@ -123,7 +124,7 @@ class TrainingControllerTest {
         // Given
         doThrow(new NotFoundException("Training not found for trainee=trainee1, trainer=trainer1"))
                 .when(trainingService)
-                .deleteTraining(any(AddTrainingRequest.class));
+                .deleteTraining(any(DeleteTrainingRequest.class));
 
         // When & Then
         try {
@@ -131,6 +132,6 @@ class TrainingControllerTest {
         } catch (NotFoundException e) {
             assertEquals("Training not found for trainee=trainee1, trainer=trainer1", e.getMessage());
         }
-        verify(trainingService).deleteTraining(any(AddTrainingRequest.class));
+        verify(trainingService).deleteTraining(any(DeleteTrainingRequest.class));
     }
 }

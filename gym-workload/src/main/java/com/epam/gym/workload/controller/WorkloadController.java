@@ -1,8 +1,9 @@
 package com.epam.gym.workload.controller;
 
+import com.epam.gym.workload.dto.AddWorkloadRequest;
+import com.epam.gym.workload.dto.DeleteWorkloadRequest;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.TrainingHoursDto;
-import com.epam.gym.workload.dto.WorkloadRequest;
 import com.epam.gym.workload.service.WorkloadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +25,13 @@ public class WorkloadController {
     private final WorkloadService workloadService;
 
     @PostMapping
-    public ResponseEntity<Void> addWorkload(@Valid @RequestBody WorkloadRequest request) {
+    public ResponseEntity<Void> addWorkload(@Valid @RequestBody AddWorkloadRequest request) {
         workloadService.addWorkload(request);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteWorkload(@Valid @RequestBody WorkloadRequest request) {
+    public ResponseEntity<Void> deleteWorkload(@Valid @RequestBody DeleteWorkloadRequest request) {
         workloadService.deleteWorkload(request);
         return ResponseEntity.ok().build();
     }

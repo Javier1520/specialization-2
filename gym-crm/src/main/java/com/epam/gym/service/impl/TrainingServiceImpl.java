@@ -1,8 +1,10 @@
 package com.epam.gym.service.impl;
 
 import com.epam.gym.dto.request.AddTrainingRequest;
+import com.epam.gym.dto.request.DeleteTrainingRequest;
 import com.epam.gym.dto.workload.ActionType;
-import com.epam.gym.dto.workload.WorkloadRequest;
+import com.epam.gym.dto.workload.AddWorkloadRequest;
+import com.epam.gym.dto.workload.DeleteWorkloadRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.mapper.TrainingMapper;
 import com.epam.gym.model.Trainee;
@@ -79,8 +81,8 @@ public class TrainingServiceImpl implements TrainingService {
                 saved.getTrainee().getUsername(),
                 saved.getTrainer().getUsername());
 
-        WorkloadRequest trainingWorkloadRequest =
-                WorkloadRequest.builder()
+        AddWorkloadRequest workloadRequest =
+                AddWorkloadRequest.builder()
                         .username(trainer.getUsername())
                         .firstName(trainer.getFirstName())
                         .lastName(trainer.getLastName())
@@ -97,14 +99,14 @@ public class TrainingServiceImpl implements TrainingService {
         logUtils.info(
                 log,
                 "Calling workload service to add workload for trainer {}",
-                trainingWorkloadRequest);
-        workloadService.addWorkload(trainingWorkloadRequest);
+                workloadRequest);
+        workloadService.addWorkload(workloadRequest);
     }
 
     @Override
     @Transactional
     @CircuitBreaker(name = "workloadService", fallbackMethod = "deleteTrainingFallback")
-    public void deleteTraining(AddTrainingRequest request) {
+    public void deleteTraining(DeleteTrainingRequest request) {
         logUtils.info(log, "Delete training request: {}", request);
 
         Training training =
@@ -144,8 +146,8 @@ public class TrainingServiceImpl implements TrainingService {
                 training.getTrainee().getUsername(),
                 trainer.getUsername());
 
-        WorkloadRequest trainingWorkloadRequest =
-                WorkloadRequest.builder()
+        DeleteWorkloadRequest workloadRequest =
+                DeleteWorkloadRequest.builder()
                         .username(trainer.getUsername())
                         .firstName(trainer.getFirstName())
                         .lastName(trainer.getLastName())
@@ -162,8 +164,8 @@ public class TrainingServiceImpl implements TrainingService {
         logUtils.info(
                 log,
                 "Calling workload service to delete workload for trainer {}",
-                trainingWorkloadRequest);
-        workloadService.deleteWorkload(trainingWorkloadRequest);
+                workloadRequest);
+        workloadService.deleteWorkload(workloadRequest);
     }
 
     public void addTrainingFallback(AddTrainingRequest request, Throwable ex) {
@@ -176,7 +178,7 @@ public class TrainingServiceImpl implements TrainingService {
                 ex.getMessage());
     }
 
-    public void deleteTrainingFallback(AddTrainingRequest request, Throwable ex) {
+    public void deleteTrainingFallback(DeleteTrainingRequest request, Throwable ex) {
         logUtils.error(
                 log,
                 "Workload service unavailable. Training deleted but workload update failed. "

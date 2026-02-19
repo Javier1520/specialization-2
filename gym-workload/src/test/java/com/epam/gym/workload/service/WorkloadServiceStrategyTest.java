@@ -1,8 +1,9 @@
 package com.epam.gym.workload.service;
 
 import com.epam.gym.workload.dto.ActionType;
+import com.epam.gym.workload.dto.AddWorkloadRequest;
+import com.epam.gym.workload.dto.DeleteWorkloadRequest;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
-import com.epam.gym.workload.dto.WorkloadRequest;
 import com.epam.gym.workload.entity.MonthEntity;
 import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.entity.YearEntity;
@@ -29,44 +30,55 @@ class WorkloadServiceStrategyTest {
 
     @Mock TrainerWorkloadRepository repository;
     @Mock WorkloadMapper mapper;
-    @Mock AddWorkloadActionHandler addHandler;
-    @Mock DeleteWorkloadActionHandler deleteHandler;
 
     @InjectMocks
     WorkloadService workloadService;
 
     @Test
-    void addWorkload_usesAddHandler() {
+    void addWorkload_addsDuration() {
         TrainerEntity trainer =
                 TrainerEntity.builder().username("t1").years(new ArrayList<>()).build();
         when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
-        WorkloadRequest request =
-                new WorkloadRequest(
+        AddWorkloadRequest request =
+                new AddWorkloadRequest(
                         "t1", "F", "L", true, LocalDate.of(2025, 1, 10), 60, ActionType.ADD);
 
         workloadService.addWorkload(request);
 
-        Mockito.verify(addHandler)
-                .handle(any(MonthEntity.class), Mockito.eq(60));
         Mockito.verify(repository).save(trainer);
+
+        Optional<YearEntity> year = trainer.getYears().stream().filter(y -> y.getYearNumber() == 2025).findFirst();
+        assertEquals(true, year.isPresent());
+        Optional<MonthEntity> month = year.get().getMonths().stream().filter(m -> m.getMonthNumber() == 1).findFirst();
+        assertEquals(true, month.isPresent());
+        assertEquals(60L, month.get().getTrainingDuration());
     }
 
     @Test
-    void deleteWorkload_usesDeleteHandler() {
+    void deleteWorkload_removesDuration() {
+        MonthEntity monthEntity = MonthEntity.builder().monthNumber(1).trainingDuration(100L).build();
+        YearEntity yearEntity = YearEntity.builder().yearNumber(2025).months(List.of(monthEntity)).build();
         TrainerEntity trainer =
-                TrainerEntity.builder().username("t1").years(new ArrayList<>()).build();
+                TrainerEntity.builder().username("t1").years(List.of(yearEntity)).build();
+        monthEntity.setYear(yearEntity);
+
+        // Need mutable list for months if our logic adds to it, but here we read
+        // The service logic calls resolveMonthEntity which might try to add to year's month list if not found
+        // Let's make the list mutable just in case
+        yearEntity.setMonths(new ArrayList<>(List.of(monthEntity)));
+        trainer.setYears(new ArrayList<>(List.of(yearEntity)));
+
         when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
-        WorkloadRequest request =
-                new WorkloadRequest(
+        DeleteWorkloadRequest request =
+                new DeleteWorkloadRequest(
                         "t1", "F", "L", true, LocalDate.of(2025, 1, 10), 60, ActionType.DELETE);
 
         workloadService.deleteWorkload(request);
 
-        Mockito.verify(deleteHandler)
-                .handle(any(MonthEntity.class), Mockito.eq(60));
         Mockito.verify(repository).save(trainer);
+        assertEquals(40L, monthEntity.getTrainingDuration());
     }
 
     @Test
@@ -114,9 +126,11 @@ class WorkloadServiceStrategyTest {
     @Test
     void addWorkload_createsNewTrainer() {
         when(repository.findByUsername("newTrainer")).thenReturn(Optional.empty());
+        // Mock save to return the argument or do nothing
+        // Implicitly verified by verify(repository).save(any())
 
-        WorkloadRequest request =
-                new WorkloadRequest(
+        AddWorkloadRequest request =
+                new AddWorkloadRequest(
                         "newTrainer",
                         "New",
                         "User",
@@ -128,7 +142,5 @@ class WorkloadServiceStrategyTest {
         workloadService.addWorkload(request);
 
         Mockito.verify(repository).save(any(TrainerEntity.class));
-        Mockito.verify(addHandler)
-                .handle(any(MonthEntity.class), Mockito.eq(60));
     }
 }

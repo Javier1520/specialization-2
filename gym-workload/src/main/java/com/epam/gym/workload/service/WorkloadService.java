@@ -1,8 +1,9 @@
 package com.epam.gym.workload.service;
 
+import com.epam.gym.workload.dto.AddWorkloadRequest;
+import com.epam.gym.workload.dto.DeleteWorkloadRequest;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.TrainingHoursDto;
-import com.epam.gym.workload.dto.WorkloadRequest;
 import com.epam.gym.workload.entity.MonthEntity;
 import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.entity.YearEntity;
@@ -22,24 +23,36 @@ public class WorkloadService {
 
     private final TrainerWorkloadRepository repository;
     private final WorkloadMapper mapper;
-    private final AddWorkloadActionHandler addHandler;
-    private final DeleteWorkloadActionHandler deleteHandler;
 
     @Transactional
-    public void addWorkload(WorkloadRequest request) {
+    public void addWorkload(AddWorkloadRequest request) {
         log.info("Adding workload for trainer: {}", request.username());
-        MonthEntity monthEntity = resolveMonthEntity(request);
-        addHandler.handle(monthEntity, request.trainingDuration());
-        repository.save(resolveTrainer(request));
+        TrainerEntity trainer = resolveTrainer(request.username(), request.firstName(), request.lastName(), request.isActive());
+        MonthEntity monthEntity = resolveMonthEntity(trainer, request.trainingDate());
+
+        int duration = request.trainingDuration();
+        long currentDuration = monthEntity.getTrainingDuration();
+        monthEntity.setTrainingDuration(currentDuration + duration);
+
+        repository.save(trainer);
         log.info("Workload added successfully for trainer: {}", request.username());
     }
 
     @Transactional
-    public void deleteWorkload(WorkloadRequest request) {
+    public void deleteWorkload(DeleteWorkloadRequest request) {
         log.info("Deleting workload for trainer: {}", request.username());
-        MonthEntity monthEntity = resolveMonthEntity(request);
-        deleteHandler.handle(monthEntity, request.trainingDuration());
-        repository.save(resolveTrainer(request));
+        TrainerEntity trainer = resolveTrainer(request.username(), request.firstName(), request.lastName(), request.isActive());
+        MonthEntity monthEntity = resolveMonthEntity(trainer, request.trainingDate());
+
+        int duration = request.trainingDuration();
+        long currentDuration = monthEntity.getTrainingDuration();
+        long newDuration = currentDuration - duration;
+        if (newDuration < 0) {
+            newDuration = 0;
+        }
+        monthEntity.setTrainingDuration(newDuration);
+
+        repository.save(trainer);
         log.info("Workload deleted successfully for trainer: {}", request.username());
     }
 
@@ -72,23 +85,20 @@ public class WorkloadService {
         return new TrainingHoursDto(username, year, month, hours);
     }
 
-    private TrainerEntity resolveTrainer(WorkloadRequest request) {
+    private TrainerEntity resolveTrainer(String username, String firstName, String lastName, Boolean isActive) {
         TrainerEntity trainer =
                 repository
-                        .findByUsername(request.username())
-                        .orElseGet(() -> createTrainer(request));
+                        .findByUsername(username)
+                        .orElseGet(() -> createTrainer(username, firstName, lastName, isActive));
 
-        trainer.setFirstName(request.firstName());
-        trainer.setLastName(request.lastName());
-        trainer.setActive(request.isActive());
+        trainer.setFirstName(firstName);
+        trainer.setLastName(lastName);
+        trainer.setActive(isActive);
 
         return trainer;
     }
 
-    private MonthEntity resolveMonthEntity(WorkloadRequest request) {
-        TrainerEntity trainer = resolveTrainer(request);
-
-        LocalDate date = request.trainingDate();
+    private MonthEntity resolveMonthEntity(TrainerEntity trainer, LocalDate date) {
         int yearNum = date.getYear();
         int monthNum = date.getMonthValue();
 
@@ -124,12 +134,12 @@ public class WorkloadService {
                         });
     }
 
-    private TrainerEntity createTrainer(WorkloadRequest request) {
+    private TrainerEntity createTrainer(String username, String firstName, String lastName, Boolean isActive) {
         return TrainerEntity.builder()
-                .username(request.username())
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .isActive(request.isActive())
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .isActive(isActive)
                 .years(new ArrayList<>())
                 .build();
     }

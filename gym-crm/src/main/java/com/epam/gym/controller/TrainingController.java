@@ -2,6 +2,7 @@ package com.epam.gym.controller;
 
 import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.request.AddTrainingRequest;
+import com.epam.gym.dto.request.DeleteTrainingRequest;
 import com.epam.gym.dto.workload.TrainerWorkloadDto;
 import com.epam.gym.dto.workload.TrainingHoursDto;
 import com.epam.gym.openapi.annotation.operation.CreateOperation;
@@ -56,7 +57,7 @@ public class TrainingController {
 
     @DeleteOperation(summary = "Delete Training", description = "Delete a Training from Gym CRM")
     @DeleteMapping
-    public ResponseEntity<Void> deleteTraining(@Valid @RequestBody AddTrainingRequest request) {
+    public ResponseEntity<Void> deleteTraining(@Valid @RequestBody DeleteTrainingRequest request) {
         logUtils.info(
                 log,
                 "Delete training request: traineeUsername={}, trainerUsername={}, trainingName={}",

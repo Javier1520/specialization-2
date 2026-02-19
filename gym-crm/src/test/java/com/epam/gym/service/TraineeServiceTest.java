@@ -9,7 +9,7 @@ import com.epam.gym.dto.response.TraineeProfileResponse;
 import com.epam.gym.dto.response.TrainerInfoResponse;
 import com.epam.gym.dto.response.TrainingResponse;
 import com.epam.gym.dto.workload.ActionType;
-import com.epam.gym.dto.workload.WorkloadRequest;
+import com.epam.gym.dto.workload.DeleteWorkloadRequest;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.exception.ValidationException;
 import com.epam.gym.mapper.TraineeMapper;
@@ -275,7 +275,7 @@ class TraineeServiceTest {
         verify(workloadService)
                 .deleteWorkload(
                         argThat(
-                                (WorkloadRequest req) ->
+                                (DeleteWorkloadRequest req) ->
                                         req.actionType() == ActionType.DELETE
                                                 && req.trainingDuration().equals(60)));
     }
