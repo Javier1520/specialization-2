@@ -1,11 +1,13 @@
 package com.epam.gym.controller;
 
-import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.dto.request.DeleteTrainingRequest;
 import com.epam.gym.dto.workload.ActionType;
+import com.epam.gym.dto.workload.TrainerWorkloadDto;
+import com.epam.gym.dto.workload.TrainingHoursDto;
 import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.service.TrainingService;
+import com.epam.gym.service.workload.WorkloadService;
 import com.epam.gym.util.LogUtils;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingControllerTest {
@@ -31,7 +34,7 @@ class TrainingControllerTest {
 
     @Mock private LogUtils logUtils;
 
-    @Mock private WorkloadClient workloadClient;
+    @Mock private WorkloadService workloadService;
 
     @InjectMocks private TrainingController trainingController;
 
@@ -133,5 +136,37 @@ class TrainingControllerTest {
             assertEquals("Training not found for trainee=trainee1, trainer=trainer1", e.getMessage());
         }
         verify(trainingService).deleteTraining(any(DeleteTrainingRequest.class));
+    }
+
+    @Test
+    void getTrainerWorkload_success_returnsWorkload() {
+        // Given
+        TrainerWorkloadDto mockDto = new TrainerWorkloadDto("trainer1", "T", "R", true, java.util.List.of());
+        when(workloadService.getWorkload("trainer1")).thenReturn(mockDto);
+
+        // When
+        ResponseEntity<TrainerWorkloadDto> response = trainingController.getTrainerWorkload("trainer1");
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockDto, response.getBody());
+        verify(workloadService).getWorkload("trainer1");
+    }
+
+    @Test
+    void getTrainingHours_success_returnsHours() {
+        // Given
+        TrainingHoursDto mockDto = new TrainingHoursDto("trainer1", 2024, 1, 10L);
+        when(workloadService.getTrainingHours("trainer1", 2024, 1)).thenReturn(mockDto);
+
+        // When
+        ResponseEntity<TrainingHoursDto> response = trainingController.getTrainingHours("trainer1", 2024, 1);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockDto, response.getBody());
+        verify(workloadService).getTrainingHours("trainer1", 2024, 1);
     }
 }

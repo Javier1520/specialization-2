@@ -1,6 +1,5 @@
 package com.epam.gym.controller;
 
-import com.epam.gym.client.WorkloadClient;
 import com.epam.gym.dto.request.AddTrainingRequest;
 import com.epam.gym.dto.request.DeleteTrainingRequest;
 import com.epam.gym.dto.workload.TrainerWorkloadDto;
@@ -9,6 +8,7 @@ import com.epam.gym.openapi.annotation.operation.CreateOperation;
 import com.epam.gym.openapi.annotation.operation.DeleteOperation;
 import com.epam.gym.openapi.annotation.operation.GetAllOperation;
 import com.epam.gym.service.TrainingService;
+import com.epam.gym.service.workload.WorkloadService;
 import com.epam.gym.util.LogUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,12 +33,12 @@ public class TrainingController {
 
     private final TrainingService trainingService;
     private final LogUtils logUtils;
-    private final WorkloadClient workloadClient;
+    private final WorkloadService workloadService;
 
-    public TrainingController(TrainingService trainingService, LogUtils logUtils, WorkloadClient workloadClient) {
+    public TrainingController(TrainingService trainingService, LogUtils logUtils, WorkloadService workloadService) {
         this.trainingService = trainingService;
         this.logUtils = logUtils;
-        this.workloadClient = workloadClient;
+        this.workloadService = workloadService;
     }
 
     @CreateOperation(summary = "Add Training", description = "Create a new Training in Gym CRM")
@@ -75,7 +75,7 @@ public class TrainingController {
     @GetMapping("/workload/{username}")
     public ResponseEntity<TrainerWorkloadDto> getTrainerWorkload(@PathVariable("username") String username) {
         logUtils.info(log, "Get trainer workload request: username={}", username);
-        return ResponseEntity.ok(workloadClient.getWorkload(username));
+        return ResponseEntity.ok(workloadService.getWorkload(username));
     }
 
     @GetAllOperation(
@@ -92,6 +92,6 @@ public class TrainingController {
                 username,
                 year,
                 month);
-        return ResponseEntity.ok(workloadClient.getTrainingHours(username, year, month));
+        return ResponseEntity.ok(workloadService.getTrainingHours(username, year, month));
     }
 }

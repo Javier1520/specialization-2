@@ -10,8 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,6 +39,7 @@ public class YearEntity {
     @com.fasterxml.jackson.annotation.JsonIgnore
     private TrainerEntity trainer;
 
+    @Builder.Default
     @OneToMany(mappedBy = "year", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MonthEntity> months = new ArrayList<>();
+    private Set<MonthEntity> months = new HashSet<>();
 }

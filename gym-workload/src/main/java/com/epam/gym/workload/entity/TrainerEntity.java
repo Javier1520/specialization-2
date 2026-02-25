@@ -8,8 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,6 +41,7 @@ public class TrainerEntity {
     @Column(nullable = false)
     private boolean isActive;
 
+    @Builder.Default
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<YearEntity> years = new ArrayList<>();
+    private Set<YearEntity> years = new HashSet<>();
 }

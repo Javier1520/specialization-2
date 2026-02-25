@@ -10,9 +10,10 @@ import com.epam.gym.workload.entity.YearEntity;
 import com.epam.gym.workload.mapper.WorkloadMapper;
 import com.epam.gym.workload.repository.TrainerWorkloadRepository;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,7 +38,7 @@ class WorkloadServiceStrategyTest {
     @Test
     void addWorkload_addsDuration() {
         TrainerEntity trainer =
-                TrainerEntity.builder().username("t1").years(new ArrayList<>()).build();
+                TrainerEntity.builder().username("t1").years(new HashSet<>()).build();
         when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
         AddWorkloadRequest request =
@@ -58,13 +59,13 @@ class WorkloadServiceStrategyTest {
     @Test
     void deleteWorkload_removesDuration() {
         MonthEntity monthEntity = MonthEntity.builder().monthNumber(1).trainingDuration(100L).build();
-        YearEntity yearEntity = YearEntity.builder().yearNumber(2025).months(List.of(monthEntity)).build();
+        YearEntity yearEntity = YearEntity.builder().yearNumber(2025).months(Set.of(monthEntity)).build();
         TrainerEntity trainer =
-                TrainerEntity.builder().username("t1").years(List.of(yearEntity)).build();
+                TrainerEntity.builder().username("t1").years(Set.of(yearEntity)).build();
         monthEntity.setYear(yearEntity);
 
-        yearEntity.setMonths(new ArrayList<>(List.of(monthEntity)));
-        trainer.setYears(new ArrayList<>(List.of(yearEntity)));
+        yearEntity.setMonths(new HashSet<>(Set.of(monthEntity)));
+        trainer.setYears(new HashSet<>(Set.of(yearEntity)));
 
         when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
@@ -103,8 +104,8 @@ class WorkloadServiceStrategyTest {
     @Test
     void getTrainingHours_returnsCorrectHours() {
         MonthEntity month = MonthEntity.builder().monthNumber(1).trainingDuration(120).build();
-        YearEntity year = YearEntity.builder().yearNumber(2025).months(List.of(month)).build();
-        TrainerEntity trainer = TrainerEntity.builder().years(List.of(year)).build();
+        YearEntity year = YearEntity.builder().yearNumber(2025).months(Set.of(month)).build();
+        TrainerEntity trainer = TrainerEntity.builder().years(Set.of(year)).build();
 
         when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
 
