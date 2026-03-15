@@ -2,9 +2,6 @@ package com.epam.gym.workload.service;
 
 import com.epam.gym.workload.dto.AddWorkloadRequest;
 import com.epam.gym.workload.dto.DeleteWorkloadRequest;
-import com.epam.gym.workload.dto.TrainerWorkloadDto;
-import com.epam.gym.workload.dto.TrainingHoursDto;
-import com.epam.gym.workload.dto.TrainingHoursRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -39,28 +36,6 @@ public class WorkloadMessageListener {
         } catch (Exception e) {
             log.error("Error processing DeleteWorkloadRequest. Sending to DLQ.", e);
             jmsTemplate.convertAndSend("workload.dlq", request);
-        }
-    }
-
-    @JmsListener(destination = "workload.get.queue")
-    public TrainerWorkloadDto handleGetWorkload(@Payload String username) {
-        log.info("Received GetWorkload request via JMS for trainer: {}", username);
-        try {
-            return workloadService.getWorkload(username);
-        } catch (Exception e) {
-            log.error("Error processing GetWorkload request.", e);
-            throw new RuntimeException("Failed to get workload", e);
-        }
-    }
-
-    @JmsListener(destination = "workload.hours.queue")
-    public TrainingHoursDto handleGetTrainingHours(@Payload TrainingHoursRequest request) {
-        log.info("Received GetTrainingHours request via JMS for trainer: {}, {}/{}", request.username(), request.month(), request.year());
-        try {
-            return workloadService.getTrainingHours(request.username(), request.year(), request.month());
-        } catch (Exception e) {
-            log.error("Error processing GetTrainingHours request.", e);
-            throw new RuntimeException("Failed to get training hours", e);
         }
     }
 }
