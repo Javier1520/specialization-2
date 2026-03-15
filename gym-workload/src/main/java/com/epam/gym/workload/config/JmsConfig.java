@@ -2,15 +2,17 @@ package com.epam.gym.workload.config;
 
 import com.epam.gym.workload.dto.AddWorkloadRequest;
 import com.epam.gym.workload.dto.DeleteWorkloadRequest;
-import com.epam.gym.workload.dto.TrainerWorkloadDto;
-import com.epam.gym.workload.dto.TrainingHoursDto;
-import com.epam.gym.workload.dto.TrainingHoursRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Session;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.RedeliveryPolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
@@ -28,13 +30,37 @@ public class JmsConfig {
         Map<String, Class<?>> typeIdMappings = new HashMap<>();
         typeIdMappings.put("AddWorkloadRequest", AddWorkloadRequest.class);
         typeIdMappings.put("DeleteWorkloadRequest", DeleteWorkloadRequest.class);
-        typeIdMappings.put("TrainerWorkloadDto", TrainerWorkloadDto.class);
-        typeIdMappings.put("TrainingHoursDto", TrainingHoursDto.class);
-        typeIdMappings.put("TrainingHoursRequest", TrainingHoursRequest.class);
         converter.setTypeIdMappings(typeIdMappings);
 
         converter.setObjectMapper(objectMapper);
 
         return converter;
     }
+
+    @Bean
+    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(
+            ConnectionFactory connectionFactory,
+            MessageConverter messageConverter) {
+
+        if (connectionFactory instanceof ActiveMQConnectionFactory) {
+            ActiveMQConnectionFactory activeMQConnectionFactory = (ActiveMQConnectionFactory) connectionFactory;
+
+            RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
+            redeliveryPolicy.setMaximumRedeliveries(3);
+            redeliveryPolicy.setInitialRedeliveryDelay(1000);
+            redeliveryPolicy.setBackOffMultiplier(2.0);
+            redeliveryPolicy.setUseExponentialBackOff(true);
+            activeMQConnectionFactory.setRedeliveryPolicy(redeliveryPolicy);
+        }
+
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter);
+        factory.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
+        factory.setSessionTransacted(true);
+        factory.setConcurrency("2-5");
+
+        return factory;
+    }
 }
+

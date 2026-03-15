@@ -10,8 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.jms.core.JmsTemplate;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
@@ -20,9 +20,6 @@ class WorkloadMessageListenerTest {
 
     @Mock
     private WorkloadService workloadService;
-
-    @Mock
-    private JmsTemplate jmsTemplate;
 
     @InjectMocks
     private WorkloadMessageListener listener;
@@ -47,12 +44,10 @@ class WorkloadMessageListenerTest {
     }
 
     @Test
-    void handleAddWorkload_exception_sendsToDlq() {
+    void handleAddWorkload_exception_propagates() {
         doThrow(new RuntimeException("Test Exception")).when(workloadService).addWorkload(addRequest);
 
-        listener.handleAddWorkload(addRequest);
-
-        verify(jmsTemplate).convertAndSend("workload.dlq", addRequest);
+        assertThrows(RuntimeException.class, () -> listener.handleAddWorkload(addRequest));
     }
 
     @Test
@@ -62,12 +57,9 @@ class WorkloadMessageListenerTest {
     }
 
     @Test
-    void handleDeleteWorkload_exception_sendsToDlq() {
+    void handleDeleteWorkload_exception_propagates() {
         doThrow(new RuntimeException("Test Exception")).when(workloadService).deleteWorkload(deleteRequest);
 
-        listener.handleDeleteWorkload(deleteRequest);
-
-        verify(jmsTemplate).convertAndSend("workload.dlq", deleteRequest);
+        assertThrows(RuntimeException.class, () -> listener.handleDeleteWorkload(deleteRequest));
     }
 }
-

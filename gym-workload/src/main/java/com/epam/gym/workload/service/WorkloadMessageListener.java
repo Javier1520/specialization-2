@@ -5,7 +5,6 @@ import com.epam.gym.workload.dto.DeleteWorkloadRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
@@ -15,27 +14,17 @@ import org.springframework.stereotype.Component;
 public class WorkloadMessageListener {
 
     private final WorkloadService workloadService;
-    private final JmsTemplate jmsTemplate;
 
-    @JmsListener(destination = "workload.add.queue")
+    @JmsListener(destination = "workload.add.queue", containerFactory = "jmsListenerContainerFactory")
     public void handleAddWorkload(@Payload AddWorkloadRequest request) {
         log.info("Received AddWorkloadRequest via JMS for trainer: {}", request.username());
-        try {
-            workloadService.addWorkload(request);
-        } catch (Exception e) {
-            log.error("Error processing AddWorkloadRequest. Sending to DLQ.", e);
-            jmsTemplate.convertAndSend("workload.dlq", request);
-        }
+        workloadService.addWorkload(request);
     }
 
-    @JmsListener(destination = "workload.delete.queue")
+    @JmsListener(destination = "workload.delete.queue", containerFactory = "jmsListenerContainerFactory")
     public void handleDeleteWorkload(@Payload DeleteWorkloadRequest request) {
         log.info("Received DeleteWorkloadRequest via JMS for trainer: {}", request.username());
-        try {
-            workloadService.deleteWorkload(request);
-        } catch (Exception e) {
-            log.error("Error processing DeleteWorkloadRequest. Sending to DLQ.", e);
-            jmsTemplate.convertAndSend("workload.dlq", request);
-        }
+        workloadService.deleteWorkload(request);
     }
 }
+
