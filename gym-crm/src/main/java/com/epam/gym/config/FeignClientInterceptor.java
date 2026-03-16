@@ -1,5 +1,6 @@
 package com.epam.gym.config;
 
+import com.epam.gym.util.LogUtils;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,14 +18,20 @@ public class FeignClientInterceptor implements RequestInterceptor {
     private static final String BEARER_PREFIX = "Bearer ";
     private static final Logger log = LoggerFactory.getLogger(FeignClientInterceptor.class);
 
+    private final LogUtils logUtils;
+
+    public FeignClientInterceptor(LogUtils logUtils) {
+        this.logUtils = logUtils;
+    }
+
     @Override
     public void apply(RequestTemplate template) {
         String token = getJwtToken();
         if (token != null) {
             template.header(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + token);
-            log.debug("Added Authorization header to Feign request");
+            logUtils.debug(log, "Added Authorization header to Feign request");
         } else {
-            log.warn("No JWT token found in SecurityContext or RequestContext to propagate");
+            logUtils.warn(log, "No JWT token found in SecurityContext or RequestContext to propagate");
         }
     }
 

@@ -9,12 +9,12 @@ import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.entity.YearEntity;
 import com.epam.gym.workload.mapper.WorkloadMapper;
 import com.epam.gym.workload.repository.TrainerWorkloadRepository;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -112,7 +112,7 @@ public class WorkloadService {
                                             YearEntity.builder()
                                                     .yearNumber(yearNum)
                                                     .trainer(trainer)
-                                                    .months(new ArrayList<>())
+                                                    .months(new java.util.HashSet<>())
                                                     .build();
                                     trainer.getYears().add(newYear);
                                     return newYear;
@@ -140,7 +140,7 @@ public class WorkloadService {
                 .firstName(firstName)
                 .lastName(lastName)
                 .isActive(isActive)
-                .years(new ArrayList<>())
+                .years(new HashSet<>())
                 .build();
     }
 }

@@ -6,7 +6,7 @@ import com.epam.gym.workload.dto.YearSummaryDto;
 import com.epam.gym.workload.entity.MonthEntity;
 import com.epam.gym.workload.entity.TrainerEntity;
 import com.epam.gym.workload.entity.YearEntity;
-import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
@@ -22,14 +22,14 @@ class WorkloadMapperTest {
     @Test
     void toDto_trainerEntity_mapsCorrectly() {
         MonthEntity month = MonthEntity.builder().monthNumber(1).trainingDuration(120).build();
-        YearEntity year = YearEntity.builder().yearNumber(2025).months(List.of(month)).build();
+        YearEntity year = YearEntity.builder().yearNumber(2025).months(Set.of(month)).build();
         TrainerEntity trainer =
                 TrainerEntity.builder()
                         .username("trainer1")
                         .firstName("John")
                         .lastName("Doe")
                         .isActive(true)
-                        .years(List.of(year))
+                        .years(Set.of(year))
                         .build();
 
         TrainerWorkloadDto dto = mapper.toDto(trainer);
@@ -46,7 +46,7 @@ class WorkloadMapperTest {
     @Test
     void toDto_yearEntity_mapsCorrectly() {
         MonthEntity month = MonthEntity.builder().monthNumber(1).trainingDuration(120).build();
-        YearEntity year = YearEntity.builder().yearNumber(2025).months(List.of(month)).build();
+        YearEntity year = YearEntity.builder().yearNumber(2025).months(Set.of(month)).build();
 
         YearSummaryDto dto = mapper.toDto(year);
 

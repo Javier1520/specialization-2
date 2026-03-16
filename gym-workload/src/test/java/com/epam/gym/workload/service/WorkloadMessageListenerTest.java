@@ -1,0 +1,105 @@
+package com.epam.gym.workload.service;
+
+import com.epam.gym.workload.dto.ActionType;
+import com.epam.gym.workload.dto.AddWorkloadRequest;
+import com.epam.gym.workload.dto.DeleteWorkloadRequest;
+import com.epam.gym.workload.entity.ProcessedMessageEntity;
+import com.epam.gym.workload.repository.ProcessedMessageRepository;
+import java.time.LocalDate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class WorkloadMessageListenerTest {
+
+    @Mock
+    private WorkloadService workloadService;
+
+    @Mock
+    private ProcessedMessageRepository processedMessageRepository;
+
+    @InjectMocks
+    private WorkloadMessageListener listener;
+
+    private AddWorkloadRequest addRequest;
+    private DeleteWorkloadRequest deleteRequest;
+
+    @BeforeEach
+    void setUp() {
+        addRequest = new AddWorkloadRequest(
+                "trainer.username", "Trainer", "Name", true, LocalDate.now(),
+                60, ActionType.ADD);
+        deleteRequest = new DeleteWorkloadRequest(
+                "trainer.username", "Trainer", "Name", true, LocalDate.now(),
+                60, ActionType.DELETE);
+    }
+
+    @Test
+    void handleAddWorkload_success() {
+        when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
+
+        listener.handleAddWorkload(addRequest);
+
+        verify(workloadService).addWorkload(addRequest);
+        verify(processedMessageRepository).save(any(ProcessedMessageEntity.class));
+    }
+
+    @Test
+    void handleAddWorkload_duplicate_skips() {
+        when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(true);
+
+        listener.handleAddWorkload(addRequest);
+
+        verify(workloadService, never()).addWorkload(any());
+        verify(processedMessageRepository, never()).save(any());
+    }
+
+    @Test
+    void handleAddWorkload_exception_propagates() {
+        when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
+        doThrow(new RuntimeException("Test Exception")).when(workloadService).addWorkload(addRequest);
+
+        assertThrows(RuntimeException.class, () -> listener.handleAddWorkload(addRequest));
+    }
+
+    @Test
+    void handleDeleteWorkload_success() {
+        when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
+
+        listener.handleDeleteWorkload(deleteRequest);
+
+        verify(workloadService).deleteWorkload(deleteRequest);
+        verify(processedMessageRepository).save(any(ProcessedMessageEntity.class));
+    }
+
+    @Test
+    void handleDeleteWorkload_duplicate_skips() {
+        when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(true);
+
+        listener.handleDeleteWorkload(deleteRequest);
+
+        verify(workloadService, never()).deleteWorkload(any());
+        verify(processedMessageRepository, never()).save(any());
+    }
+
+    @Test
+    void handleDeleteWorkload_exception_propagates() {
+        when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
+        doThrow(new RuntimeException("Test Exception")).when(workloadService).deleteWorkload(deleteRequest);
+
+        assertThrows(RuntimeException.class, () -> listener.handleDeleteWorkload(deleteRequest));
+    }
+}
+
