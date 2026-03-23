@@ -96,11 +96,7 @@ class WorkloadServiceStrategyTest {
 
     @Test
     void getTrainingHours_returnsCorrectHours() {
-        TrainerWorkload.MonthSummary month = TrainerWorkload.MonthSummary.builder().monthNumber(1).trainingDuration(120L).build();
-        TrainerWorkload.YearSummary year = TrainerWorkload.YearSummary.builder().yearNumber(2025).months(List.of(month)).build();
-        TrainerWorkload trainer = TrainerWorkload.builder().years(List.of(year)).build();
-
-        when(repository.findByUsername("t1")).thenReturn(Optional.of(trainer));
+        when(repository.findTrainingHours("t1", 2025, 1)).thenReturn(Optional.of(120L));
 
         var result = workloadService.getTrainingHours("t1", 2025, 1);
 
@@ -108,10 +104,12 @@ class WorkloadServiceStrategyTest {
     }
 
     @Test
-    void getTrainingHours_notFound_throws() {
-        when(repository.findByUsername("t1")).thenReturn(Optional.empty());
+    void getTrainingHours_noMatch_returnsZero() {
+        when(repository.findTrainingHours("t1", 2025, 1)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> workloadService.getTrainingHours("t1", 2025, 1));
+        var result = workloadService.getTrainingHours("t1", 2025, 1);
+
+        assertEquals(0L, result.trainingHours());
     }
 
     @Test

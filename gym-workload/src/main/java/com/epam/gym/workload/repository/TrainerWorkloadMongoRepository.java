@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TrainerWorkloadMongoRepository extends MongoRepository<TrainerWorkload, String> {
+public interface TrainerWorkloadMongoRepository extends MongoRepository<TrainerWorkload, String>, TrainerWorkloadCustomRepository {
     Optional<TrainerWorkload> findByUsername(String username);
 }

@@ -58,23 +58,7 @@ public class WorkloadService {
     }
 
     public TrainingHoursDto getTrainingHours(String username, Integer year, Integer month) {
-        TrainerWorkload trainer =
-                repository
-                        .findByUsername(username)
-                        .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
-
-        long hours =
-                trainer.getYears().stream()
-                        .filter(y -> y.getYearNumber().equals(year))
-                        .findFirst()
-                        .flatMap(
-                                yearSummary ->
-                                        yearSummary.getMonths().stream()
-                                                .filter(m -> m.getMonthNumber().equals(month))
-                                                .findFirst()
-                                                .map(TrainerWorkload.MonthSummary::getTrainingDuration))
-                        .orElse(0L);
-
+        long hours = repository.findTrainingHours(username, year, month).orElse(0L);
         return new TrainingHoursDto(username, year, month, hours);
     }
 
