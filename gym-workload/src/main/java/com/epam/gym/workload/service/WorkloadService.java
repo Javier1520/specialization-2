@@ -85,7 +85,7 @@ public class WorkloadService {
 
         TrainerWorkload.YearSummary yearSummary =
                 trainer.getYears().stream()
-                        .filter(y -> y.getYearNumber() == yearNum)
+                        .filter(y -> y.getYearNumber().equals(yearNum))
                         .findFirst()
                         .orElseGet(
                                 () -> {
@@ -99,7 +99,7 @@ public class WorkloadService {
                                 });
 
         return yearSummary.getMonths().stream()
-                .filter(m -> m.getMonthNumber() == monthNum)
+                .filter(m -> m.getMonthNumber().equals(monthNum))
                 .findFirst()
                 .orElseGet(
                         () -> {

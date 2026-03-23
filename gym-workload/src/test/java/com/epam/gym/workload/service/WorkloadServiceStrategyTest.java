@@ -46,9 +46,9 @@ class WorkloadServiceStrategyTest {
 
         Mockito.verify(repository).save(trainer);
 
-        Optional<TrainerWorkload.YearSummary> year = trainer.getYears().stream().filter(y -> y.getYearNumber() == 2025).findFirst();
+        Optional<TrainerWorkload.YearSummary> year = trainer.getYears().stream().filter(y -> y.getYearNumber().equals(2025)).findFirst();
         assertEquals(true, year.isPresent());
-        Optional<TrainerWorkload.MonthSummary> month = year.get().getMonths().stream().filter(m -> m.getMonthNumber() == 1).findFirst();
+        Optional<TrainerWorkload.MonthSummary> month = year.get().getMonths().stream().filter(m -> m.getMonthNumber().equals(1)).findFirst();
         assertEquals(true, month.isPresent());
         assertEquals(60L, month.get().getTrainingDuration());
     }
