@@ -62,4 +62,14 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("An unexpected error occurred", response.getBody().get("error"));
     }
+
+    @Test
+    void handleNotFoundException_returnsNotFoundWithMessage() {
+        NotFoundException ex = new NotFoundException("Trainer not found: john.doe");
+
+        ResponseEntity<Map<String, String>> response = handler.handleNotFoundException(ex);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Trainer not found: john.doe", response.getBody().get("error"));
+}
 }

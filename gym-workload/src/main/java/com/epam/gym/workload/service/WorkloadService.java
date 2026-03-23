@@ -5,6 +5,7 @@ import com.epam.gym.workload.dto.DeleteWorkloadRequest;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.TrainingHoursDto;
 import com.epam.gym.workload.entity.TrainerWorkload;
+import com.epam.gym.workload.exception.NotFoundException;
 import com.epam.gym.workload.mapper.WorkloadMapper;
 import com.epam.gym.workload.repository.TrainerWorkloadMongoRepository;
 import java.time.LocalDate;
@@ -54,7 +55,7 @@ public class WorkloadService {
         TrainerWorkload trainer =
                 repository
                         .findByUsername(username)
-                        .orElseThrow(() -> new RuntimeException("Trainer not found: " + username));
+                        .orElseThrow(() -> new NotFoundException("Trainer not found: " + username));
         return mapper.toDto(trainer);
     }
 
