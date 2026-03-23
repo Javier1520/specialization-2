@@ -23,7 +23,8 @@ public class WorkloadService {
 
     public void addWorkload(AddWorkloadRequest request) {
         log.info("Adding workload for trainer: {}", request.username());
-        TrainerWorkload trainer = resolveTrainer(request.username(), request.firstName(), request.lastName(), request.isActive());
+        TrainerWorkload trainer = resolveTrainerAndUpdateProfile(request.username(), request.firstName(),
+            request.lastName(), request.isActive());
         TrainerWorkload.MonthSummary monthSummary = resolveMonthSummary(trainer, request.trainingDate());
 
         long currentDuration = monthSummary.getTrainingDuration() != null ? monthSummary.getTrainingDuration() : 0;
@@ -62,18 +63,20 @@ public class WorkloadService {
         return new TrainingHoursDto(username, year, month, hours);
     }
 
-    private TrainerWorkload resolveTrainer(String username, String firstName, String lastName, Boolean isActive) {
-        TrainerWorkload trainer =
-                repository
-                        .findByUsername(username)
-                        .orElseGet(() -> createTrainer(username, firstName, lastName, isActive));
+    private TrainerWorkload resolveTrainer(String username, String firstName,
+                                        String lastName, Boolean isActive) {
+        return repository.findByUsername(username)
+            .orElseGet(() -> createTrainer(username, firstName, lastName, isActive));
+    }
 
+    private TrainerWorkload resolveTrainerAndUpdateProfile(String username, String firstName,
+                                                                String lastName, Boolean isActive) {
+        TrainerWorkload trainer = resolveTrainer(username, firstName, lastName, isActive);
         trainer.setFirstName(firstName);
         trainer.setLastName(lastName);
         trainer.setIsActive(isActive);
-
         return trainer;
-    }
+        }
 
     private TrainerWorkload.MonthSummary resolveMonthSummary(TrainerWorkload trainer, LocalDate date) {
         int yearNum = date.getYear();
