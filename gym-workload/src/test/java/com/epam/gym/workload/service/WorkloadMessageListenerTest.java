@@ -3,7 +3,7 @@ package com.epam.gym.workload.service;
 import com.epam.gym.workload.dto.ActionType;
 import com.epam.gym.workload.dto.AddWorkloadRequest;
 import com.epam.gym.workload.dto.DeleteWorkloadRequest;
-import com.epam.gym.workload.entity.ProcessedMessageEntity;
+import com.epam.gym.workload.entity.ProcessedMessageDocument;
 import com.epam.gym.workload.repository.ProcessedMessageRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +53,7 @@ class WorkloadMessageListenerTest {
         listener.handleAddWorkload(addRequest);
 
         verify(workloadService).addWorkload(addRequest);
-        verify(processedMessageRepository).save(any(ProcessedMessageEntity.class));
+        verify(processedMessageRepository).save(any(ProcessedMessageDocument.class));
     }
 
     @Test
@@ -81,7 +81,7 @@ class WorkloadMessageListenerTest {
         listener.handleDeleteWorkload(deleteRequest);
 
         verify(workloadService).deleteWorkload(deleteRequest);
-        verify(processedMessageRepository).save(any(ProcessedMessageEntity.class));
+        verify(processedMessageRepository).save(any(ProcessedMessageDocument.class));
     }
 
     @Test

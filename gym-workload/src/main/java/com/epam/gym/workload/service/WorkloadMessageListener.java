@@ -2,7 +2,7 @@ package com.epam.gym.workload.service;
 
 import com.epam.gym.workload.dto.AddWorkloadRequest;
 import com.epam.gym.workload.dto.DeleteWorkloadRequest;
-import com.epam.gym.workload.entity.ProcessedMessageEntity;
+import com.epam.gym.workload.entity.ProcessedMessageDocument;
 import com.epam.gym.workload.repository.ProcessedMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class WorkloadMessageListener {
         }
 
         workloadService.addWorkload(request);
-        processedMessageRepository.save(ProcessedMessageEntity.builder().messageKey(messageKey).build());
+        processedMessageRepository.save(ProcessedMessageDocument.builder().messageKey(messageKey).build());
     }
 
     @JmsListener(destination = "workload.delete.queue", containerFactory = "jmsListenerContainerFactory")
@@ -45,6 +45,6 @@ public class WorkloadMessageListener {
         }
 
         workloadService.deleteWorkload(request);
-        processedMessageRepository.save(ProcessedMessageEntity.builder().messageKey(messageKey).build());
+        processedMessageRepository.save(ProcessedMessageDocument.builder().messageKey(messageKey).build());
     }
 }
