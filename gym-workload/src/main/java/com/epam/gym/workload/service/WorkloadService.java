@@ -23,7 +23,7 @@ public class WorkloadService {
     private final WorkloadMapper mapper;
 
     public void addWorkload(AddWorkloadRequest request) {
-        log.info("Adding workload for trainer: {}", request.username());
+        log.info("[OP] Adding workload for trainer: {}", request.username());
         TrainerWorkload trainer = resolveTrainerAndUpdateProfile(request.username(), request.firstName(),
             request.lastName(), request.isActive());
         TrainerWorkload.MonthSummary monthSummary = resolveMonthSummary(trainer, request.trainingDate());
@@ -32,11 +32,11 @@ public class WorkloadService {
         monthSummary.setTrainingDuration(currentDuration + request.trainingDuration());
 
         repository.save(trainer);
-        log.info("Workload added successfully for trainer: {}", request.username());
+        log.info("[OP] Workload added successfully for trainer: {}", request.username());
     }
 
     public void deleteWorkload(DeleteWorkloadRequest request) {
-        log.info("Deleting workload for trainer: {}", request.username());
+        log.info("[OP] Deleting workload for trainer: {}", request.username());
         TrainerWorkload trainer = resolveTrainer(request.username(), request.firstName(), request.lastName(), request.isActive());
         TrainerWorkload.MonthSummary monthSummary = resolveMonthSummary(trainer, request.trainingDate());
 
@@ -48,7 +48,7 @@ public class WorkloadService {
         monthSummary.setTrainingDuration(newDuration);
 
         repository.save(trainer);
-        log.info("Workload deleted successfully for trainer: {}", request.username());
+        log.info("[OP] Workload deleted successfully for trainer: {}", request.username());
     }
 
     public TrainerWorkloadDto getWorkload(String username) {

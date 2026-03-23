@@ -6,6 +6,7 @@ import com.epam.gym.workload.dto.DeleteWorkloadRequest;
 import com.epam.gym.workload.entity.ProcessedMessageDocument;
 import com.epam.gym.workload.repository.ProcessedMessageRepository;
 import java.time.LocalDate;
+import jakarta.jms.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,9 @@ class WorkloadMessageListenerTest {
     @Mock
     private ProcessedMessageRepository processedMessageRepository;
 
+    @Mock
+    private Message mockMessage;
+
     @InjectMocks
     private WorkloadMessageListener listener;
 
@@ -50,7 +54,7 @@ class WorkloadMessageListenerTest {
     void handleAddWorkload_success() {
         when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
 
-        listener.handleAddWorkload(addRequest);
+        listener.handleAddWorkload(addRequest, mockMessage);
 
         verify(workloadService).addWorkload(addRequest);
         verify(processedMessageRepository).save(any(ProcessedMessageDocument.class));
@@ -60,7 +64,7 @@ class WorkloadMessageListenerTest {
     void handleAddWorkload_duplicate_skips() {
         when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(true);
 
-        listener.handleAddWorkload(addRequest);
+        listener.handleAddWorkload(addRequest, mockMessage);
 
         verify(workloadService, never()).addWorkload(any());
         verify(processedMessageRepository, never()).save(any());
@@ -71,14 +75,14 @@ class WorkloadMessageListenerTest {
         when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
         doThrow(new RuntimeException("Test Exception")).when(workloadService).addWorkload(addRequest);
 
-        assertThrows(RuntimeException.class, () -> listener.handleAddWorkload(addRequest));
+        assertThrows(RuntimeException.class, () -> listener.handleAddWorkload(addRequest, mockMessage));
     }
 
     @Test
     void handleDeleteWorkload_success() {
         when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
 
-        listener.handleDeleteWorkload(deleteRequest);
+        listener.handleDeleteWorkload(deleteRequest, mockMessage);
 
         verify(workloadService).deleteWorkload(deleteRequest);
         verify(processedMessageRepository).save(any(ProcessedMessageDocument.class));
@@ -88,7 +92,7 @@ class WorkloadMessageListenerTest {
     void handleDeleteWorkload_duplicate_skips() {
         when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(true);
 
-        listener.handleDeleteWorkload(deleteRequest);
+        listener.handleDeleteWorkload(deleteRequest, mockMessage);
 
         verify(workloadService, never()).deleteWorkload(any());
         verify(processedMessageRepository, never()).save(any());
@@ -99,7 +103,7 @@ class WorkloadMessageListenerTest {
         when(processedMessageRepository.existsByMessageKey(anyString())).thenReturn(false);
         doThrow(new RuntimeException("Test Exception")).when(workloadService).deleteWorkload(deleteRequest);
 
-        assertThrows(RuntimeException.class, () -> listener.handleDeleteWorkload(deleteRequest));
+        assertThrows(RuntimeException.class, () -> listener.handleDeleteWorkload(deleteRequest, mockMessage));
     }
 }
 
