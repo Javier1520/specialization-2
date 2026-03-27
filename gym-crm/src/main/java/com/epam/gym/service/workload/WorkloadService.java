@@ -5,7 +5,9 @@ import com.epam.gym.dto.workload.AddWorkloadRequest;
 import com.epam.gym.dto.workload.DeleteWorkloadRequest;
 import com.epam.gym.dto.workload.TrainerWorkloadDto;
 import com.epam.gym.dto.workload.TrainingHoursDto;
+import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.util.LogUtils;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -51,7 +53,11 @@ public class WorkloadService {
 
     public TrainerWorkloadDto getWorkload(String username) {
         logUtils.info(log, "Fetching workload for trainer via OpenFeign: {}", username);
-        return workloadClient.getWorkload(username);
+        try {
+            return workloadClient.getWorkload(username);
+        } catch (FeignException.NotFound ex) {
+            throw new NotFoundException("Trainer not found: " + username);
+        }
     }
 
     public TrainingHoursDto getTrainingHours(String username, Integer year, Integer month) {

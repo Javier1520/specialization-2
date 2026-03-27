@@ -29,14 +29,13 @@ class TrainingTypeServiceTest {
 
     @Test
     void listAll_returnsAllTrainingTypeResponses() {
-        TrainingType type1 = new TrainingType(1L, "CARDIO", null, null);
-        TrainingType type2 = new TrainingType(2L, "STRENGTH", null, null);
-        TrainingTypeResponse response1 = new TrainingTypeResponse(1L, "CARDIO");
-        TrainingTypeResponse response2 = new TrainingTypeResponse(2L, "STRENGTH");
+        TrainingType.Type[] types = TrainingType.Type.values();
+        List<TrainingTypeResponse> expectedResponses = List.of(
+                new TrainingTypeResponse(1L, "CARDIO"),
+                new TrainingTypeResponse(2L, "STRENGTH")
+        );
 
-        when(repo.findAll()).thenReturn(List.of(type1, type2));
-        when(mapper.toResponse(type1)).thenReturn(response1);
-        when(mapper.toResponse(type2)).thenReturn(response2);
+        when(mapper.toResponseList(List.of(types))).thenReturn(expectedResponses);
 
         List<TrainingTypeResponse> out = service.listAll();
         assertEquals(2, out.size());

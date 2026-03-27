@@ -21,7 +21,7 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 
     @Override
     public List<TrainingTypeResponse> listAll() {
-        return repo.findAll().stream().map(mapper::toResponse).toList();
+        return mapper.toResponseList(List.of(TrainingType.Type.values()));
     }
 
     @Override
