@@ -6,9 +6,14 @@ import com.epam.gym.dto.workload.AddWorkloadRequest;
 import com.epam.gym.dto.workload.DeleteWorkloadRequest;
 import com.epam.gym.dto.workload.TrainerWorkloadDto;
 import com.epam.gym.dto.workload.TrainingHoursDto;
+import com.epam.gym.exception.NotFoundException;
 import com.epam.gym.util.LogUtils;
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +23,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -85,6 +91,22 @@ class WorkloadServiceTest {
 
         assertEquals(mockDto, result);
         verify(workloadClient).getWorkload("trainer1");
+    }
+
+    @Test
+    void getWorkload_whenTrainerDoesNotExist_throwsNotFoundException() {
+        Request request =
+                Request.create(
+                        Request.HttpMethod.GET,
+                        "/api/workload/missing",
+                        Map.of(),
+                        null,
+                        new RequestTemplate());
+        FeignException.NotFound notFound =
+                new FeignException.NotFound("Not Found", request, null, Map.of());
+        when(workloadClient.getWorkload("missing")).thenThrow(notFound);
+
+        assertThrows(NotFoundException.class, () -> workloadService.getWorkload("missing"));
     }
 
     @Test
