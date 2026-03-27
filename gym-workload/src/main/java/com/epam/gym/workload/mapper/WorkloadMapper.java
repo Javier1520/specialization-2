@@ -3,19 +3,17 @@ package com.epam.gym.workload.mapper;
 import com.epam.gym.workload.dto.MonthSummaryDto;
 import com.epam.gym.workload.dto.TrainerWorkloadDto;
 import com.epam.gym.workload.dto.YearSummaryDto;
-import com.epam.gym.workload.entity.MonthEntity;
-import com.epam.gym.workload.entity.TrainerEntity;
-import com.epam.gym.workload.entity.YearEntity;
+import com.epam.gym.workload.entity.TrainerWorkload;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface WorkloadMapper {
 
-    @Mapping(source = "active", target = "status")
-    TrainerWorkloadDto toDto(TrainerEntity entity);
+    @Mapping(source = "isActive", target = "status")
+    TrainerWorkloadDto toDto(TrainerWorkload entity);
 
-    YearSummaryDto toDto(YearEntity entity);
+    YearSummaryDto toDto(TrainerWorkload.YearSummary entity);
 
-    MonthSummaryDto toDto(MonthEntity entity);
+    MonthSummaryDto toDto(TrainerWorkload.MonthSummary entity);
 }

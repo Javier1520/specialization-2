@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessagePostProcessor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +48,10 @@ class WorkloadServiceTest {
 
         workloadService.addWorkload(request);
 
-        verify(jmsTemplate).convertAndSend(eq("workload.add.queue"), any(AddWorkloadRequest.class));
+        verify(jmsTemplate).convertAndSend(
+            eq("workload.add.queue"),
+            any(AddWorkloadRequest.class),
+            any(MessagePostProcessor.class));
     }
 
     @Test
@@ -65,7 +69,10 @@ class WorkloadServiceTest {
 
         workloadService.deleteWorkload(request);
 
-        verify(jmsTemplate).convertAndSend(eq("workload.delete.queue"), any(DeleteWorkloadRequest.class));
+        verify(jmsTemplate).convertAndSend(
+            eq("workload.delete.queue"),
+            any(DeleteWorkloadRequest.class),
+            any(MessagePostProcessor.class));
     }
 
     @Test

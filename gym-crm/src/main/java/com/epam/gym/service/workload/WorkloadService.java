@@ -8,6 +8,7 @@ import com.epam.gym.dto.workload.TrainingHoursDto;
 import com.epam.gym.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +28,25 @@ public class WorkloadService {
     }
 
     public void addWorkload(AddWorkloadRequest request) {
-        logUtils.info(log, "Adding workload for trainer via JMS: {}", request.username());
-        jmsTemplate.convertAndSend("workload.add.queue", request);
+        String transactionId = MDC.get("transactionId");
+        logUtils.info(log, "[TXN] Sending addWorkload via JMS for trainer: {}", request.username());
+        jmsTemplate.convertAndSend("workload.add.queue", request, message -> {
+            if (transactionId != null) {
+                message.setStringProperty("transactionId", transactionId);
+            }
+            return message;
+        });
     }
 
     public void deleteWorkload(DeleteWorkloadRequest request) {
-        logUtils.info(log, "Deleting workload for trainer via JMS: {}", request.username());
-        jmsTemplate.convertAndSend("workload.delete.queue", request);
+        String transactionId = MDC.get("transactionId");
+        logUtils.info(log, "[TXN] Sending deleteWorkload via JMS for trainer: {}", request.username());
+        jmsTemplate.convertAndSend("workload.delete.queue", request, message -> {
+            if (transactionId != null) {
+                message.setStringProperty("transactionId", transactionId);
+            }
+            return message;
+        });
     }
 
     public TrainerWorkloadDto getWorkload(String username) {
